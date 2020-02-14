@@ -1,0 +1,33 @@
+{
+  "claimId": "{}",
+  "receiptElements": [
+    {
+      "barcode": {
+        "alignment": "Center",
+        "data": "012345678",
+        "height": 100,
+        "symbology": "CODE39",
+        "textPosition": "Below",
+        "width": 100
+      }
+    },
+    
+    {
+      "image": {
+        "alignment": "Center",
+        "url": "https://logoeps.com/wp-content/uploads/2012/02/fedex-logo-vector.jpg"
+      }
+    },
+    {
+      "receiptText": {
+        "alignment": "Center",
+        "text": "This is a text line to be printed on receipt"
+      }
+    },
+    {
+      "cut": {
+        "cutReceipt": true
+      }
+    }
+  ]
+}

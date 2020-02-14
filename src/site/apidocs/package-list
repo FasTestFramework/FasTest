@@ -1,0 +1,13 @@
+com.fedex.peripherals
+com.fedex.peripherals.config
+com.fedex.peripherals.constants
+com.fedex.peripherals.controller
+com.fedex.peripherals.dto
+com.fedex.peripherals.mapper
+com.fedex.peripherals.model
+com.fedex.peripherals.properties
+com.fedex.peripherals.repository
+com.fedex.peripherals.service
+com.fedex.peripherals.tests
+com.fedex.peripherals.utilities
+com.fedex.peripherals.validator

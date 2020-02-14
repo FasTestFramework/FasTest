@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.1.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>eai3530951.com.fedex.peripherals</groupId>
+	<artifactId>rt-peripherals-automation</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<packaging>jar</packaging>
+
+	<name>rt-peripherals-automation</name>
+	<description>Automation Test cases for rt-peripherals</description>
+	<url>https://www.home.fedex.com/</url>
+	<inceptionYear>2019</inceptionYear>
+	<licenses>
+		<license>
+			<name>FedEx License</name>
+			<url>https://www.home.fedex.com/</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Rudhra Koul</name>
+			<roles>
+				<role>Tech Lead</role>
+			</roles>
+			<url>https://gitlab.prod.fedex.com/5173824</url>
+			<email>rudhra.koul.osv@fedex.com</email>
+			<organization>FedEx</organization>
+			<organizationUrl>https://www.home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</developer>
+	</developers>
+
+	<organization>
+		<name>FedEx</name>
+		<url>https://www.home.fedex.com/</url>
+	</organization>
+	<issueManagement>
+		<url>https://gitlab.prod.fedex.com/5173824/peripheral-server-automation/issues</url>
+		<system>gitlab</system>
+	</issueManagement>
+	<scm>
+		<url>https://gitlab.prod.fedex.com/5173824/peripheral-server-automation.git</url>
+		<connection>scm:git:git@gitlab.prod.fedex.com:5173824/peripheral-server-automation.git</connection>
+		<developerConnection>scm:git:git@gitlab.prod.fedex.com:5173824/peripheral-server-automation.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<contributors>
+		<contributor>
+			<name>Niket Sharma</name>
+			<email>niket.sharma@infogain.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.fedex.com/3860761</url>
+			<organization>FedEx</organization>
+			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Malay Ranjan Biswal</name>
+			<email>malay.biswal.osv@fedex.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.fedex.com/3860759</url>
+			<organization>FedEx</organization>
+			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Namit Jain</name>
+			<email>namit.jain.osv@fedex.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.fedex.com/3696360</url>
+			<organization>FedEx</organization>
+			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Shobhit Agarwal</name>
+			<email>shobhit.agarwal@infogain.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url></url>
+			<organization>FedEx</organization>
+			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Vrinda Narang</name>
+			<email>vrinda.narang.osv@fedex.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.fedex.com/3779013</url>
+			<organization>FedEx</organization>
+			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Akanksha Keasri</name>
+			<email>akanksha.kesari.osv@fedex.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.fedex.com/3743543</url>
+			<organization>FedEx</organization>
+			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Neeraj Jain</name>
+			<email>neeraj.jain.osv@fedex.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.fedex.com/3719097</url>
+			<organization>FedEx</organization>
+			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+
+	</contributors>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<spring.data>2.2.2.RELEASE</spring.data>
+		<hibernate.manager>4.3.0.Final</hibernate.manager>
+		<jacoco.version>0.8.4</jacoco.version>
+		<spring-version>5.2.1.RELEASE</spring-version>
+		<project.reporting.outputDirectory>${basedir}\src\site\</project.reporting.outputDirectory>
+		<maven-project-info-reports-plugin-version>3.0.0</maven-project-info-reports-plugin-version>
+		<maven-javadoc-plugin-version>3.0.1</maven-javadoc-plugin-version>
+		<maven-site-plugin-version>3.7.1</maven-site-plugin-version>
+		<rest-assured-version>3.3.0</rest-assured-version>
+		<poi-version>4.1.1</poi-version>
+		<poi-ooxml-version>4.1.1</poi-ooxml-version>
+		<json-simple-version>1.1.1</json-simple-version>
+		<commons-lang3-version>3.9</commons-lang3-version>
+		<log4j-version>2.12.1</log4j-version>
+		<mssql-jdbc-version>6.1.0.jre8</mssql-jdbc-version>
+		<maven-jar-plugin-version>3.1.0</maven-jar-plugin-version>
+		<reflow-velocity-tools-version>1.3.3</reflow-velocity-tools-version>
+		<velocity-version>1.7</velocity-version>
+		<maven-assembly-version>3.1.1</maven-assembly-version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.14.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${poi-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi-ooxml-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>${json-simple-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.perf4j</groupId>
+			<artifactId>perf4j</artifactId>
+			<version>0.9.16</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j-version}</version>
+		</dependency>
+		<!-- Use for H2 Database only -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+			<version>1.4.199</version>
+		</dependency>
+
+		<!-- Use for MsSQL Database only -->
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>${mssql-jdbc-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<doclint>none</doclint>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${maven-site-plugin-version}</version>
+				<configuration>
+					<customBundle>${project.basedir}/src/site/custom/project-info-reports.properties</customBundle>
+					<outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+					<reportsDirectory>${project.reporting.outputDirectory}</reportsDirectory>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>nl.demon.shadowland.freedumbytes.patch.lt.velykis.maven.skins</groupId>
+						<artifactId>reflow-velocity-tools</artifactId>
+						<version>${reflow-velocity-tools-version}</version>
+					</dependency>
+
+					<dependency>
+						<groupId>org.apache.velocity</groupId>
+						<artifactId>velocity</artifactId>
+						<version>${velocity-version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+	<reporting>
+
+		<plugins>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${maven-project-info-reports-plugin-version}</version>
+				<configuration>
+					<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+					<customBundle>${project.basedir}/src/site/custom/project-info-reports.properties</customBundle>
+					<outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+					<reportsDirectory>${project.reporting.outputDirectory}</reportsDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin-version}</version>
+				<configuration>
+					<!--Default configuration for all reports -->
+					<doclint>none</doclint>
+					<outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+					<reportsDirectory>${project.reporting.outputDirectory}</reportsDirectory>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<id>default</id>
+						<configuration>
+							<!--Specific configuration for the given reports -->
+						</configuration>
+						<reports>
+							<report>javadoc</report>
+							<report>test-javadoc</report>
+						</reports>
+					</reportSet>
+					<reportSet>
+						<id>aggregate</id>
+						<configuration>
+							<!--Specific configuration for the given reports -->
+						</configuration>
+						<reports>
+							<report>aggregate</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+
+			</plugin>
+		</plugins>
+		<outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+	</reporting>
+	<ciManagement>
+		<system>circleci</system>
+		<url>https://gitlab.prod.fedex.com/5173824/peripheral-server-automation/pipelines</url>
+		<notifiers>
+			<notifier>
+				<type>mail</type>
+				<address>rudhra.koul.osv@fedex.com</address>
+				<sendOnError>true</sendOnError>
+				<sendOnFailure>true</sendOnFailure>
+				<sendOnSuccess>true</sendOnSuccess>
+				<sendOnWarning>true</sendOnWarning>
+			</notifier>
+		</notifiers>
+	</ciManagement>
+</project>

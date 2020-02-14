@@ -1,0 +1,32 @@
+package com.infogain.automation.exception;
+
+/**
+ * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * 
+ * Theme - Core Retail Peripheral Services<br>
+ * Feature - Peripheral Services - Automation and Testing<br>
+ * Description - This class is user defined Exception class
+ * 
+ * @author Rudhra Koul [5173824]
+ * @version 1.0.0
+ * @since Nov 27, 2019
+ */
+public class AutomationException extends RuntimeException {
+
+    private static final long serialVersionUID = 1955733436336278411L;
+
+    /**
+     * @param message User defined Exception Message
+     * @param cause Exception cause
+     */
+    public AutomationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * @param message User defined Exception Message
+     */
+    public AutomationException(String message) {
+        super(message);
+    }
+}

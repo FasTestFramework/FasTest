@@ -1,0 +1,53 @@
+<div class="column-contanier col-4">
+	<div>
+		<label>Select by:</label> <select name="selectionType"
+			id="selectionType">
+			<option value="date" selected="selected">Date</option>
+			<option value="pi">Pi and Sprint</option>
+		</select>
+	</div>
+	<form id="graphForm">
+		<div>
+			<label>Sheets:</label> <select name="sheets" id="sheetsDropdown"
+				multiple required>
+				<option value="-1" disabled>Choose sheet names</option>
+			</select> <input type="checkbox" id="selectAllSheets" /> <label
+				class="inline">Select All</label>
+		</div>
+		<div id="startDateDiv">
+			<label>Start date:</label> <input type="date" name="startDate"
+				id="startDate">
+		</div>
+		<div id="endDateDiv">
+			<label>End date:</label> <input type="date" name="endDate"
+				id="endDate">
+		</div>
+
+		<div id="startPiDiv">
+			<label>Start PI:</label> <select name="startPiSelect"
+				id="startPiSelect">
+				<option value="-1" disabled>Choose pi</option>
+			</select>
+		</div>
+		<div id="startSprintDiv">
+			<label>Start Sprint:</label> <select name="startSprint"
+				id="startSprint">
+				<option value="-1" disabled>Choose start sprint</option>
+			</select>
+		</div>
+		<div id="endPiDiv">
+			<label>End PI:</label> <select name="endPiSelect" id="endPiSelect">
+				<option value="-1" disabled>Choose pi</option>
+			</select>
+		</div>
+		<div id="endSprintDiv">
+			<label>End Sprint:</label> <select name="endSprint" id="endSprint">
+				<option value="-1" disabled>Choose end sprint</option>
+			</select>
+		</div>
+		<div>
+			<input type="submit" class="primary" id="generateGraph"
+				value="Submit" />
+		</div>
+	</form>
+</div>

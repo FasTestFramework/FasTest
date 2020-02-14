@@ -1,0 +1,27 @@
+target
+.project
+.classpath
+.settings
+.metadata/
+.springBeans
+.factorypath
+test-output
+/log/*
+*.log
+log/PeripheralAutomation.log
+
+# intellij files
+*.iws
+*.iml
+*.ipr
+*.ids
+*/*.iws
+*/*.ipr
+.idea/
+.ideaDataSources/
+dataSources/
+*.exec
+
+#  sts files
+
+.sts4-cache/
