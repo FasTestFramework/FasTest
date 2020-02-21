@@ -2,7 +2,6 @@ package com.infogain.automation.tests;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -28,10 +27,10 @@ import com.infogain.automation.utilities.AutomationValidationUtility;
 import com.infogain.automation.utilities.BeanUtil;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class is the parent class of all test classes which does the following tasks :
  * <ul>
  * <li>Generate response for every Request Type</li>
@@ -39,7 +38,7 @@ import com.infogain.automation.utilities.BeanUtil;
  * <li>clean up tasks which writes the data to output Excel File and release the ClaimID</li>
  * </ul>
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Nov 27, 2019
  */
@@ -50,7 +49,7 @@ public abstract class AutomationAbstractTests {
     protected String testSheetName;
     protected String baseClaimUrl;
 
-    private Properties automationProperties;
+    private AutomationProperties automationProperties;
     private String inputExcelFileName;
     private String outputExcelSheet;
 
@@ -62,7 +61,7 @@ public abstract class AutomationAbstractTests {
     private final AutomationRequestBodyAndHeadersUtility automationRequestBodyAndHeadersUtility;
 
     public AutomationAbstractTests() {
-        automationProperties = BeanUtil.getBean(AutomationProperties.class).getProps();
+        automationProperties = BeanUtil.getBean(AutomationProperties.class);
         automationEmailUtility = BeanUtil.getBean(AutomationEmailUtility.class);
         automationClaimsUtility = BeanUtil.getBean(AutomationClaimsUtility.class);
         automationReportService = BeanUtil.getBean(AutomationReportService.class);
@@ -77,7 +76,7 @@ public abstract class AutomationAbstractTests {
         this.testSheetName = testSheetName;
         this.inputExcelFileName = inputExcelFileName;
         String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_FOLDER_PATH) + "/"
+                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
                                         + inputExcelFileName;
         // Reading Data from Excel Utility Method and setting it to Automation Input DTO
         automationInputDTOList = automationExcelUtility.readInputExcelFile(inputExcelFilePath, testSheetName);
@@ -146,7 +145,7 @@ public abstract class AutomationAbstractTests {
     public void publishResults(boolean saveToDatabase) {
         logger.traceEntry("publishResults method of {} class", testSheetName);
         String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_FOLDER_PATH) + "/"
+                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
                                         + inputExcelFileName;
         automationExcelUtility.writeOutputExcelFile(inputExcelFilePath, testSheetName, automationInputDTOList);
         AutomationOutputModel automationOutputModel =
@@ -192,14 +191,14 @@ public abstract class AutomationAbstractTests {
         automationInputDTO.setExecutionDateTime(LocalDateTime.now());
         return logger.traceExit(resp);
     }
-    
+
     private void setRequestBodyAndHeaders(String inputjsonFolderPath) {
         automationInputDTOList.forEach(automationInputDTO -> {
             String inputJson = automationInputDTO.getInputJson();
             String headerJson = automationInputDTO.getHeaderJson();
             if (StringUtils.isNotBlank(inputJson)) {
-                automationInputDTO.setTestCaseInputJson(
-                                automationRequestBodyAndHeadersUtility.fetchJSONObject(inputjsonFolderPath+ "/" +inputJson));
+                automationInputDTO.setTestCaseInputJson(automationRequestBodyAndHeadersUtility
+                                .fetchJSONObject(inputjsonFolderPath + "/" + inputJson));
             }
             // sets Header Object in AutomationInputDTO
             if (StringUtils.isNotBlank(headerJson)) {

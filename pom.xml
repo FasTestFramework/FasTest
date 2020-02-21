@@ -11,20 +11,20 @@
 		<version>2.0.1.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>eai3530951.com.fedex.peripherals</groupId>
-	<artifactId>rt-peripherals-automation</artifactId>
+	<groupId>com.Infogain.fastest</groupId>
+	<artifactId>fastest-automation</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
-	<name>rt-peripherals-automation</name>
-	<description>Automation Test cases for rt-peripherals</description>
-	<url>https://www.home.fedex.com/</url>
+	<name>FasTest</name>
+	<description>Automation Test cases framework</description>
+	<url>https://www.infogain.com/</url>
 	<inceptionYear>2019</inceptionYear>
 	<licenses>
 		<license>
-			<name>FedEx License</name>
-			<url>https://www.home.fedex.com/</url>
+			<name>Infogain License</name>
+			<url>https://www.home.Infogain.com/</url>
 		</license>
 	</licenses>
 	<developers>
@@ -33,61 +33,39 @@
 			<roles>
 				<role>Tech Lead</role>
 			</roles>
-			<url>https://gitlab.prod.fedex.com/5173824</url>
-			<email>rudhra.koul.osv@fedex.com</email>
-			<organization>FedEx</organization>
-			<organizationUrl>https://www.home.fedex.com/</organizationUrl>
+			<url>https://gitlab.prod.Infogain.com/103264</url>
+			<email>rudhra.koul@infogain.com</email>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
 			<timezone>+5:30</timezone>
 		</developer>
 	</developers>
 
 	<organization>
-		<name>FedEx</name>
-		<url>https://www.home.fedex.com/</url>
+		<name>Infogain</name>
+		<url>https://www.infogain.com/</url>
 	</organization>
 	<issueManagement>
-		<url>https://gitlab.prod.fedex.com/5173824/peripheral-server-automation/issues</url>
+		<url>https://github.com/FasTestFramework/FasTest/issues</url>
 		<system>gitlab</system>
 	</issueManagement>
 	<scm>
-		<url>https://gitlab.prod.fedex.com/5173824/peripheral-server-automation.git</url>
-		<connection>scm:git:git@gitlab.prod.fedex.com:5173824/peripheral-server-automation.git</connection>
-		<developerConnection>scm:git:git@gitlab.prod.fedex.com:5173824/peripheral-server-automation.git</developerConnection>
+		<url>https://github.com/FasTestFramework/FasTest.git</url>
+		<connection>scm:git:git@github.com:FasTestFramework/FasTest.git</connection>
+		<developerConnection>scm:git:git@github.com:FasTestFramework/FasTest.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
 	<contributors>
 		<contributor>
-			<name>Niket Sharma</name>
-			<email>niket.sharma@infogain.com</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<url>https://gitlab.prod.fedex.com/3860761</url>
-			<organization>FedEx</organization>
-			<organizationUrl>http://home.fedex.com/</organizationUrl>
-			<timezone>+5:30</timezone>
-		</contributor>
-		<contributor>
-			<name>Malay Ranjan Biswal</name>
-			<email>malay.biswal.osv@fedex.com</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<url>https://gitlab.prod.fedex.com/3860759</url>
-			<organization>FedEx</organization>
-			<organizationUrl>http://home.fedex.com/</organizationUrl>
-			<timezone>+5:30</timezone>
-		</contributor>
-		<contributor>
 			<name>Namit Jain</name>
-			<email>namit.jain.osv@fedex.com</email>
+			<email>namit.jain@infogain.com</email>
 			<roles>
 				<role>Developer</role>
 			</roles>
-			<url>https://gitlab.prod.fedex.com/3696360</url>
-			<organization>FedEx</organization>
-			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<url>https://gitlab.prod.Infogain.com/3696360</url>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
 			<timezone>+5:30</timezone>
 		</contributor>
 		<contributor>
@@ -97,44 +75,65 @@
 				<role>Developer</role>
 			</roles>
 			<url></url>
-			<organization>FedEx</organization>
-			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Niket Sharma</name>
+			<email>niket.sharma@infogain.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.Infogain.com/3860761</url>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
+			<timezone>+5:30</timezone>
+		</contributor>
+		<contributor>
+			<name>Malay Ranjan Biswal</name>
+			<email>malay.biswal@infogain.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<url>https://gitlab.prod.Infogain.com/3860759</url>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
 			<timezone>+5:30</timezone>
 		</contributor>
 		<contributor>
 			<name>Vrinda Narang</name>
-			<email>vrinda.narang.osv@fedex.com</email>
+			<email>vrinda@infogain.com</email>
 			<roles>
 				<role>Developer</role>
 			</roles>
-			<url>https://gitlab.prod.fedex.com/3779013</url>
-			<organization>FedEx</organization>
-			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<url>https://gitlab.prod.Infogain.com/3779013</url>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
 			<timezone>+5:30</timezone>
 		</contributor>
 		<contributor>
 			<name>Akanksha Keasri</name>
-			<email>akanksha.kesari.osv@fedex.com</email>
+			<email>akanksha.kesari@infogain.com</email>
 			<roles>
 				<role>Developer</role>
 			</roles>
-			<url>https://gitlab.prod.fedex.com/3743543</url>
-			<organization>FedEx</organization>
-			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<url>https://gitlab.prod.Infogain.com/3743543</url>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
 			<timezone>+5:30</timezone>
 		</contributor>
 		<contributor>
 			<name>Neeraj Jain</name>
-			<email>neeraj.jain.osv@fedex.com</email>
+			<email>neeraj1.jain@infogain.com</email>
 			<roles>
 				<role>Developer</role>
 			</roles>
-			<url>https://gitlab.prod.fedex.com/3719097</url>
-			<organization>FedEx</organization>
-			<organizationUrl>http://home.fedex.com/</organizationUrl>
+			<url>https://gitlab.prod.Infogain.com/3719097</url>
+			<organization>Infogain</organization>
+			<organizationUrl>https://www.infogain.com/</organizationUrl>
 			<timezone>+5:30</timezone>
 		</contributor>
-
 	</contributors>
 
 	<properties>
@@ -198,7 +197,7 @@
 			<artifactId>assertj-core</artifactId>
 			<version>3.14.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -379,11 +378,11 @@
 	</reporting>
 	<ciManagement>
 		<system>circleci</system>
-		<url>https://gitlab.prod.fedex.com/5173824/peripheral-server-automation/pipelines</url>
+		<url>https://gitlab.prod.Infogain.com/103264/peripheral-server-automation/pipelines</url>
 		<notifiers>
 			<notifier>
 				<type>mail</type>
-				<address>rudhra.koul.osv@fedex.com</address>
+				<address>rudhra.koul@Infogain.com</address>
 				<sendOnError>true</sendOnError>
 				<sendOnFailure>true</sendOnFailure>
 				<sendOnSuccess>true</sendOnSuccess>

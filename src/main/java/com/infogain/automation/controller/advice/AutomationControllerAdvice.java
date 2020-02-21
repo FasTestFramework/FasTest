@@ -21,11 +21,12 @@ import com.infogain.automation.dto.AutomationResponse;
 import com.infogain.automation.dto.ErrorCodesDTO;
 import com.infogain.automation.errors.AutomationErrorCodes;
 import com.infogain.automation.exception.AutomationException;
+import com.infogain.automation.exception.FastTestBadRequestException;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * <br>
- * Theme - Core Retail Peripheral Services<br>
+ * Theme - Automation<br>
  * Feature - Peripheral Services - Design and Architecture<br>
  * Description - This class handles the exceptions for Automation Framework Controllers
  * 
@@ -54,8 +55,8 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
      * @since 09-Jul-2019
      */
     @ExceptionHandler(AutomationException.class)
-    public ResponseEntity<AutomationResponse> handleReceiptPrinterException(
-                    final AutomationException automationException, HttpServletRequest request) {
+    public ResponseEntity<AutomationResponse> handleAutomationException(final AutomationException automationException,
+                    HttpServletRequest request) {
         logger.error("AutomationException has occured for request from: '{}' Exception: {}",
                         getRequestOriginAddress(request.getRemoteAddr()),
                         ExceptionUtils.getStackTrace(automationException));
@@ -64,6 +65,26 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
                                         automationException.getMessage()).convertToAutomationError();
         final AutomationResponse automationResponse = AutomationResponse.error(automationError);
         // Returning Http status & filled AutomationResponse as per error code received from response builder
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(automationResponse);
+    }
+
+    /**
+     * This method handling the exception of type FastTestBadRequestException and returning the appropriate
+     * AutomationResponse.
+     * 
+     * @param automationException {@link FastTestBadRequestException} object
+     * @param request Object of incoming {@link HttpServletRequest request}
+     * @return {@code ResponseEntity<AutomationResponse>} Response wrapped with CXS Envelope error message
+     * @since 09-Jul-2019
+     */
+    @ExceptionHandler(FastTestBadRequestException.class)
+    public ResponseEntity<AutomationResponse> handleFastTestBadRequestException(
+                    final FastTestBadRequestException fastTestBadRequestException, HttpServletRequest request) {
+        logger.error("FastTestBadRequestException has occured for request from: '{}' Exception: {}",
+                        getRequestOriginAddress(request.getRemoteAddr()),
+                        ExceptionUtils.getStackTrace(fastTestBadRequestException));
+        final AutomationResponse automationResponse = AutomationResponse
+                        .error(convertErrorCodesDtoListToCXSErrorList(fastTestBadRequestException.getErrorCodes()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
     }
 

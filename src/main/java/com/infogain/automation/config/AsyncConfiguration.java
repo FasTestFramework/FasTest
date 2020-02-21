@@ -5,13 +5,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class is to enable Async
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Dec 13, 2019
  */

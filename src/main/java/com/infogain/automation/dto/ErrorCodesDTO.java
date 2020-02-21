@@ -10,9 +10,9 @@ import org.apache.logging.log4j.Logger;
 import com.infogain.automation.errors.ErrorCodes;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * <br>
- * Theme - Core Retail Peripheral Services<br>
+ * Theme - Automation<br>
  * Feature - Peripheral Services - Design and Architecture<br>
  * Description - This class is a DTO class for Error Codes
  * 

@@ -10,13 +10,13 @@ import org.springframework.http.HttpMethod;
 import io.restassured.http.Headers;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class is Peripheral Input DTO which contains all variables for reading and writing column of Excel
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Nov 27, 2019
  */
@@ -38,7 +38,7 @@ public class AutomationInputDTO {
     Headers headers;
     String requestURL;
     HttpMethod requestType;
-    Map<String,String> keyValidation;
+    Map<String, String> keyValidation;
 
     /**
      * @return the inputParam
@@ -53,18 +53,18 @@ public class AutomationInputDTO {
     public void setInputParam(String inputParam) {
         this.inputParam = inputParam;
     }
- 
+
     /**
      * @return the keyValidation
      */
-    public Map<String,String> getKeyValidation() {
+    public Map<String, String> getKeyValidation() {
         return keyValidation;
     }
 
     /**
      * @param keyValidation the keyValidation to set
      */
-    public void setKeyValidation(Map<String,String> keyValidation) {
+    public void setKeyValidation(Map<String, String> keyValidation) {
         this.keyValidation = keyValidation;
     }
 
@@ -164,7 +164,7 @@ public class AutomationInputDTO {
 
     public AutomationInputDTO(String serialNo, String testCaseDescription, String headerJson, String inputJson,
                     String inputParam, String expectedOutput, Integer expectedHttpStatus, String requestURL,
-                    HttpMethod requestType, Map<String,String> keyValidation) {
+                    HttpMethod requestType, Map<String, String> keyValidation) {
         super();
         this.serialNo = serialNo;
         this.testCaseDescription = testCaseDescription;
@@ -178,10 +178,10 @@ public class AutomationInputDTO {
         this.keyValidation = keyValidation;
     }
 
- 
+
 
     /**
-     * This method 
+     * This method
      * 
      * @return
      * @since Feb 12, 2020

@@ -5,9 +5,9 @@
 	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.7.0 https://maven.apache.org/xsd/decoration-1.7.0.xsd"
 	combine.self="override">
 	<bannerRight>
-		<name>FedEx</name>
-		<src>./images/logos/FedExLogo.jpg</src>
-		<href>https://home.fedex.com</href>
+		<name>FasTest</name>
+		<src>./images/logos/FasTest.jpg</src>
+		<href>https://infogain.com</href>
 		<width>138</width>
 		<height>125</height>
 	</bannerRight>
@@ -63,7 +63,7 @@
 			<bottomDescription>
         <![CDATA[<div><a href="${project.scm.url}"><img src="./images/logos/GitLabLogo.png" alt="GitLab" width="116" height="125"></a></div>
                  Catch us on GitLab.
-                 <div><a href="${organization.url}" title="${organization.name}" class="builtBy"><img class="builtBy" alt="${organization.name}" src="./images/logos/FedExLogo.jpg" width="80" height="15"></a></div>]]>
+                 <div><a href="${organization.url}" title="${organization.name}" class="builtBy"><img class="builtBy" alt="${organization.name}" src="./images/logos/FasTest.jpg" width="80" height="15"></a></div>]]>
 			</bottomDescription>
 
 			<skinAttribution>false</skinAttribution>

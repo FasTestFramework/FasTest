@@ -3,13 +3,13 @@ package com.infogain.automation.model;
 import java.time.LocalDate;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class is the model class for getting Test Case data for Report generation
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Dec 12, 2019
  */

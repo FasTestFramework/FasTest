@@ -24,108 +24,68 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AutomationValidationUtility {
     private static final Logger logger = LogManager.getLogger(AutomationValidationUtility.class);
     private static Map<String, String> customKeysValidation;
-private static StringBuilder comments = new StringBuilder();
-    private AutomationValidationUtility() {}
+    private static StringBuilder comments = new StringBuilder();
 
-    public static void main(String[] args) {
-        //to be removed
-        String expected = "{\"output\":{\r\n" + "  \"claimId\": \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n"
-                        + "  \"receiptElements\": [\r\n" + "    {\r\n" + "      \"barcode\": {\r\n"
-                        + "        \"alignment\": \"Center\",\r\n" + "        \"data\": [1.23],\r\n"
-                        + "        \"height\": 100,\r\n" + "        \"symbology\": \"PDF41\",\r\n"
-                        + "        \"textPosition\": \"Below\",\r\n" + "        \"width\": 100\r\n" + "      },\r\n"
-                        + "      \"cut\": {\r\n" + "        \"cutReceipt\": true\r\n" + "      }\r\n" + "    },\r\n"
-                        + "    {\r\n" + "      \"image\": {\r\n" + "        \"alignment\": \"Center\",\r\n"
-                        + "        \"requestURL\": \"https://home.fedex.com/Corporate/SiteAssets/Lists/FedEx%20News%20Articles/NewForm/FedExCollective_120W_2017.jpg\"\r\n"
-                        + "      }\r\n" + "    },\r\n" + "    {\"barcode\": {\r\n"
-                        + "        \"alignment\": \"Center\",\r\n" + "        \"data\": [13.122,2.0,3,4],\r\n"
-                        + "        \"height\": 10000,\r\n" + "        \"symbology\": \"PDF41\",\r\n"
-                        + "        \"textPosition\": \"dfg\",\r\n" + "        \"width\": \"1000\"\r\n" + "      },\r\n"
-                        + "      \"receiptText\": {\r\n" + "        \"alignment\": \"Center\",\r\n"
-                        + "        \"text\": \"This is a text line to be printed on receipt\"\r\n" + "      }\r\n"
-                        + "    }\r\n" + "  ]}\r\n" + "}";
-
-        String actual = "{\"output\":{\r\n" + "  \"claimId\": \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n"
-                        + "  \"receiptElements\": [\r\n" + "    {\r\n" + "      \"barcode\": {\r\n"
-                        + "        \"alignment\": \"Center\",\r\n" + "        \"data\": [1.2],\r\n"
-                        + "        \"height\": 100,\r\n" + "        \"symbology\": \"PDF41\",\r\n"
-                        + "        \"textPosition\": \"Below\",\r\n" + "        \"width\": 100\r\n" + "      },\r\n"
-                        + "      \"cut\": {\r\n" + "        \"cutReceipt\": true\r\n" + "      }\r\n" + "    },\r\n"
-                        + "    {\r\n" + "      \"image\": {\r\n" + "        \"alignment\": \"Center\",\r\n"
-                        + "        \"requestURL\": \"https://home.fedex.com/Corporate/SiteAssets/Lists/FedEx%20News%20Articles/NewForm/FedExCollective_120W_2017.jpg\"\r\n"
-                        + "      }\r\n" + "    },\r\n" + "    {\"barcode\": {\r\n"
-                        + "        \"alignment\": \"Center\",\r\n" + "        \"data\": [13.122,2.0,1.23,4],\r\n"
-                        + "        \"height\": 10000,\r\n" + "        \"symbology\": \"PDF41\",\r\n"
-                        + "        \"textPosition\": \"dfg\",\r\n" + "        \"width\": \"1000\"\r\n" + "      },\r\n"
-                        + "      \"receiptText\": {\r\n" + "        \"alignment\": \"Center\",\r\n"
-                        + "        \"text\": \"This is a text line to be printed on receipt\"\r\n" + "      }\r\n"
-                        + "    }\r\n" + "  ]}\r\n" + "}";
-
-        // {"output":{
-        // "claimId": "1d3d0dbe-3b24-4dd8-87b2-44114d83619b",
-        // "receiptElements": [
-        // {
-        // "barcode": {
-        // "alignment": "Center",
-        // "data": [1,2,3],
-        // "height": 100,
-        // "symbology": "PDF41",
-        // "textPosition": "Below",
-        // "width": 100
-        // },
-        // "cut": {
-        // "cutReceipt": true
-        // }
-        // },
-        // {
-        // "image": {
-        // "alignment": "Center",
-        // "requestURL":
-        // "https://home.fedex.com/Corporate/SiteAssets/Lists/FedEx%20News%20Articles/NewForm/FedExCollective_120W_2017.jpg"
-        // }
-        // },
-        // {"barcode": {
-        // "alignment": "Center",
-        // "data": [1,2,3,4],
-        // "height": 10000,
-        // "symbology": "PDF41",
-        // "textPosition": "dfg",
-        // "width": "1000"
-        // },
-        // "receiptText": {
-        // "alignment": "Center",
-        // "text": "This is a text line to be printed on receipt"
-        // }
-        // }
-        // ]}
-        // }
-
-        Map<String, String> inputMap = new LinkedHashMap<>();
-//        inputMap.put("output.claimId", "notNull();isNotNull();contains(\"-\")");
-        inputMap.put("output.receiptElements[x].barcode.data", "contains(1.23)");
-//        inputMap.put("output.receiptElements[x]", "isEqual()");
-//        inputMap.put("output.receiptElements[0].barcode.data", "isEqual()");
-//        inputMap.put("output.receiptElements[x]", "ignore()");
-//
-//        inputMap.put("output.receiptElements[x].barcode",
-//                        "containsKey(\"data\");containsEntry(\"alignment\",\"Centr\")");
-//        inputMap.put("output", "containsKeys(\"receiptElements\",\"claimId\")");
-
-        customKeysValidation = inputMap;
-
-        boolean testCaseResult;
-        try {
-            JSONParser jsonParser = new JSONParser();
-            Object jsonObjectExpectedOutput = jsonParser.parse(expected);
-            Object jsonObjectActualOutput = jsonParser.parse(actual);
-            testCaseResult = compareJSONs(jsonObjectExpectedOutput, jsonObjectActualOutput);
-            System.out.println(comments.toString());
-        } catch (ParseException e) {
-            testCaseResult = false;
-        }
-        System.out.println("result: " + testCaseResult);
+    private AutomationValidationUtility() {
     }
 
+    /*
+     * public static void main(String[] args) { //to be removed String expected = "{\"output\":{\r\n" +
+     * "  \"claimId\": \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n" + "  \"receiptElements\": [\r\n" + "    {\r\n" +
+     * "      \"barcode\": {\r\n" + "        \"alignment\": \"Center\",\r\n" + "        \"data\": [1.23],\r\n" +
+     * "        \"height\": 100,\r\n" + "        \"symbology\": \"PDF41\",\r\n" +
+     * "        \"textPosition\": \"Below\",\r\n" + "        \"width\": 100\r\n" + "      },\r\n" +
+     * "      \"cut\": {\r\n" + "        \"cutReceipt\": true\r\n" + "      }\r\n" + "    },\r\n" + "    {\r\n" +
+     * "      \"image\": {\r\n" + "        \"alignment\": \"Center\",\r\n" +
+     * "        \"requestURL\": \"https://home.Infogain.com/Corporate/SiteAssets/Lists/Infogain%20News%20Articles/NewForm/InfogainCollective_120W_2017.jpg\"\r\n"
+     * + "      }\r\n" + "    },\r\n" + "    {\"barcode\": {\r\n" + "        \"alignment\": \"Center\",\r\n" +
+     * "        \"data\": [13.122,2.0,3,4],\r\n" + "        \"height\": 10000,\r\n" +
+     * "        \"symbology\": \"PDF41\",\r\n" + "        \"textPosition\": \"dfg\",\r\n" +
+     * "        \"width\": \"1000\"\r\n" + "      },\r\n" + "      \"receiptText\": {\r\n" +
+     * "        \"alignment\": \"Center\",\r\n" +
+     * "        \"text\": \"This is a text line to be printed on receipt\"\r\n" + "      }\r\n" + "    }\r\n" +
+     * "  ]}\r\n" + "}";
+     * 
+     * String actual = "{\"output\":{\r\n" + "  \"claimId\": \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n" +
+     * "  \"receiptElements\": [\r\n" + "    {\r\n" + "      \"barcode\": {\r\n" +
+     * "        \"alignment\": \"Center\",\r\n" + "        \"data\": [1.2],\r\n" + "        \"height\": 100,\r\n" +
+     * "        \"symbology\": \"PDF41\",\r\n" + "        \"textPosition\": \"Below\",\r\n" +
+     * "        \"width\": 100\r\n" + "      },\r\n" + "      \"cut\": {\r\n" + "        \"cutReceipt\": true\r\n" +
+     * "      }\r\n" + "    },\r\n" + "    {\r\n" + "      \"image\": {\r\n" + "        \"alignment\": \"Center\",\r\n"
+     * +
+     * "        \"requestURL\": \"https://home.Infogain.com/Corporate/SiteAssets/Lists/Infogain%20News%20Articles/NewForm/InfogainCollective_120W_2017.jpg\"\r\n"
+     * + "      }\r\n" + "    },\r\n" + "    {\"barcode\": {\r\n" + "        \"alignment\": \"Center\",\r\n" +
+     * "        \"data\": [13.122,2.0,1.23,4],\r\n" + "        \"height\": 10000,\r\n" +
+     * "        \"symbology\": \"PDF41\",\r\n" + "        \"textPosition\": \"dfg\",\r\n" +
+     * "        \"width\": \"1000\"\r\n" + "      },\r\n" + "      \"receiptText\": {\r\n" +
+     * "        \"alignment\": \"Center\",\r\n" +
+     * "        \"text\": \"This is a text line to be printed on receipt\"\r\n" + "      }\r\n" + "    }\r\n" +
+     * "  ]}\r\n" + "}";
+     * 
+     * // {"output":{ // "claimId": "1d3d0dbe-3b24-4dd8-87b2-44114d83619b", // "receiptElements": [ // { // "barcode": {
+     * // "alignment": "Center", // "data": [1,2,3], // "height": 100, // "symbology": "PDF41", // "textPosition":
+     * "Below", // "width": 100 // }, // "cut": { // "cutReceipt": true // } // }, // { // "image": { // "alignment":
+     * "Center", // "requestURL": //
+     * "https://home.Infogain.com/Corporate/SiteAssets/Lists/Infogain%20News%20Articles/NewForm/InfogainCollective_120W_2017.jpg"
+     * // } // }, // {"barcode": { // "alignment": "Center", // "data": [1,2,3,4], // "height": 10000, // "symbology":
+     * "PDF41", // "textPosition": "dfg", // "width": "1000" // }, // "receiptText": { // "alignment": "Center", //
+     * "text": "This is a text line to be printed on receipt" // } // } // ]} // }
+     * 
+     * Map<String, String> inputMap = new LinkedHashMap<>(); // inputMap.put("output.claimId",
+     * "notNull();isNotNull();contains(\"-\")"); inputMap.put("output.receiptElements[x].barcode.data",
+     * "contains(1.23)"); // inputMap.put("output.receiptElements[x]", "isEqual()"); //
+     * inputMap.put("output.receiptElements[0].barcode.data", "isEqual()"); // inputMap.put("output.receiptElements[x]",
+     * "ignore()"); // // inputMap.put("output.receiptElements[x].barcode", //
+     * "containsKey(\"data\");containsEntry(\"alignment\",\"Centr\")"); // inputMap.put("output",
+     * "containsKeys(\"receiptElements\",\"claimId\")");
+     * 
+     * customKeysValidation = inputMap;
+     * 
+     * boolean testCaseResult; try { JSONParser jsonParser = new JSONParser(); Object jsonObjectExpectedOutput =
+     * jsonParser.parse(expected); Object jsonObjectActualOutput = jsonParser.parse(actual); testCaseResult =
+     * compareJSONs(jsonObjectExpectedOutput, jsonObjectActualOutput); System.out.println(comments.toString()); } catch
+     * (ParseException e) { testCaseResult = false; } System.out.println("result: " + testCaseResult); }
+     */
     public static void performValidations(AutomationInputDTO automationInputDTO) {
         logger.traceEntry("performValidations method of AutomationValidationUtility class");
         boolean testCaseResult =
@@ -183,7 +143,7 @@ private static StringBuilder comments = new StringBuilder();
             try {
                 new AutomationCustomValidationUtility().validate(objectActual, objectExpected, customValidations);
             } catch (CustomValidationFailure e) {
-                if(comments.length() != 0) {
+                if (comments.length() != 0) {
                     comments.append("----------------------------------------\n");
                 }
                 comments.append(keyPath).append(":\n").append(e.getMessage());
@@ -198,7 +158,7 @@ private static StringBuilder comments = new StringBuilder();
             try {
                 assertThat(objectActual).isEqualTo(objectExpected);
             } catch (AssertionError e) {
-                if(comments.length() != 0) {
+                if (comments.length() != 0) {
                     comments.append("----------------------------------------\n");
                 }
                 comments.append(keyPath).append(":\n").append(e.getMessage());

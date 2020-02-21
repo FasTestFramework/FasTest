@@ -3,9 +3,9 @@ package com.infogain.automation.errors;
 import java.io.Serializable;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * <br>
- * Theme - Core Retail Peripheral Services<br>
+ * Theme - Automation<br>
  * Feature - Peripheral Services - Design and Architecture<br>
  * Description - This is an interface for error codes enum
  * 

@@ -1,13 +1,13 @@
 package com.infogain.automation.constants;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class contains all the application constants
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Nov 27, 2019
  */
@@ -17,25 +17,6 @@ public final class AutomationConstants {
         throw new UnsupportedOperationException(AutomationConstants.class.getName());
     }
 
-    public static final String INPUT_JSON_COLUMN_NAME = "Input json";
-    public static final String EXPECTED_OUTPUT_COLUMN_NAME = "Expected Output";
-    public static final String HEADER_JSON_COLUMN_NAME = "Header Json";
-    public static final String EXPECTED_HTTP_STATUS_COLUMN_NAME = "Expected http status";
-    public static final String KEYS_VALIDATION = "Key Validation";
-    public static final String SERIAL_NO_COLUMN_NAME = "Sno";
-    public static final String TEST_CASE_DESCRIPTION_COLUMN_NAME = "Test case Description";
-    public static final String URL_PARAMETER = "URL Parameter";
-    public static final String EXECUTION_DATE_TIME_COLUMN_NAME = "Execution date time";
-    public static final String TEST_CASE_RESULT_COLUMN_NAME = "Test case Result";
-    public static final String ACTUAL_HTTP_STATUS_COLUMN_NAME = "Actual http status";
-    public static final String ACTUAL_OUTPUT_COLUMN_NAME = "Actual Output";
-    public static final String EXPECTED_HTTP_STATUS = "Expected http status";
-    public static final String EXPECTED_OUTPUT = "Expected Output";
-    public static final String INPUT_JSON = "Input json";
-    public static final String HEADER_JSON = "Header Json";
-    public static final String PARAM = "Param";
-    public static final String SKIP_TEST = "Skip Test";
-    public static final String TEST_CASE_DESCRIPTION = "Test case Description";
     public static final String CLAIM_ID_JSON_PATH = "claimId/ClaimTest.json";
     public static final String CLAIM_TEST = "PeripheralClaimTest";
     public static final String TEST_CLASS_PACKAGE_NAME = "com.infogain.automation.tests.";
@@ -44,21 +25,13 @@ public final class AutomationConstants {
     public static final String TEST_CASE_RESULT_PASS = "PASS";
     public static final String TEST_CASE_RESULT_FAIL = "FAIL";
     public static final String AUTOMATIONSERVER_DEFAULT_TEST = "AutomationDefaultTest";
-    public static final String INPUT_TYPE_REQUEST_PARAM = "R";
-    public static final String INPUT_TYPE_EMPTY = "E";
-    public static final String INPUT_TYPE_PATH_PARAM = "P";
-    public static final String INPUT_TYPE_JSON = "J";
-    public static final String GET_REQUEST_TYPE = "GET";
-    public static final String DELETE_REQUEST_TYPE = "DELETE";
-    public static final String PUT_REQUEST_TYPE = "PUT";
-    public static final String POST_REQUEST_TYPE = "POST";
-
+    
     public static final String FASTEST_SERVER_PORT = "server.port";
     public static final String APPLICATION_PROPERTIES_SHEET_NAME = "fastest.testClass";
     public static final String FASTEST_EXCEL_SHEET_NAME = "fastest.excelSheetName";
-    public static final String FASTEST_INPUT_FOLDER_PATH = "fastest.inputFolderPath";
     public static final String FASTEST_OUTPUT_FOLDER_PATH = "fastest.outputFolderPath";
     public static final String FASTEST_INPUT_JSON_FOLDER_PATH = "fastest.inputJsonFolderPath";
+    public static final String FASTEST_INPUT_EXCEL_FOLDER_PATH = "fastest.inputExcelFolderPath";
     public static final String FASTEST_HEADER_TO_USE = "fastest.headersToUse";
     public static final String FASTEST_HOST_NAME = "fastest.HostName";
     public static final String FASTEST_PORT = "fastest.Port";

@@ -1,9 +1,6 @@
 package com.infogain.automation.utilities;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -24,16 +21,16 @@ import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.properties.AutomationProperties;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class generated Claim Id <br>
  * <ul>
  * <li>If Claim Id is already generated then it will release it</li>
  * </ul>
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Nov 27, 2019
  */
@@ -60,7 +57,7 @@ public class AutomationClaimsUtility {
                     final AutomationRequestBodyAndHeadersUtility automationRequestBodyAndHeadersUtility) {
         this.automationEndpointHitUtility = automationEndpointHitUtility;
         this.automationRequestBodyAndHeadersUtility = automationRequestBodyAndHeadersUtility;
-        Properties properties = automationProperties.getProps();
+        AutomationProperties properties = automationProperties;
         baseClaimUrl = properties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
                         + properties.getProperty(AutomationConstants.FASTEST_PORT);
         releaseUrl = properties.getProperty(AutomationConstants.FASTEST_RELEASE_URL).split("\\|")[0];
@@ -69,10 +66,9 @@ public class AutomationClaimsUtility {
         responseKey = properties.getProperty(AutomationConstants.FASTEST_RESPONSE_KEY);
         claimJsonType = properties.getProperty(AutomationConstants.FASTEST_ADD_TOKEN_IN);
         inputJSONfolderPath = properties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
-        tokenGenerateHeaderPath = inputJSONfolderPath
-                        + properties.getProperty(AutomationConstants.FASTEST_HEADER_TO_USE);
-        claimJsonPath = inputJSONfolderPath + "/"
-                        + properties.getProperty(AutomationConstants.FASTEST_BODY_TO_USE);
+        tokenGenerateHeaderPath =
+                        inputJSONfolderPath + properties.getProperty(AutomationConstants.FASTEST_HEADER_TO_USE);
+        claimJsonPath = inputJSONfolderPath + "/" + properties.getProperty(AutomationConstants.FASTEST_BODY_TO_USE);
         tokenPropertyName = properties.getProperty(AutomationConstants.FASTEST_TOKEN_PROPERTY_NAME);
     }
 
@@ -86,9 +82,7 @@ public class AutomationClaimsUtility {
     @SuppressWarnings("unchecked")
     public void updateToken(AutomationInputDTO automationInputDTO) {
         logger.traceEntry("updateClaimId method of AutomationClaimsUtility class");
-        if (claimId == null) {
-            generateClaimId();
-        }
+
         String[] tokenPropertyNameSplitted = tokenPropertyName.split("\\.");
         int lastPropertyIndex = tokenPropertyNameSplitted.length - 1;
         if (claimJsonType.equalsIgnoreCase("header") && automationInputDTO.getHeaders() != null) {
@@ -96,6 +90,9 @@ public class AutomationClaimsUtility {
             List<Header> headersList = headers.asList().stream().map(header -> {
                 if (header.getName().equals(tokenPropertyNameSplitted[lastPropertyIndex])
                                 && header.getValue().contains("{}")) {
+                    if (claimId == null) {
+                        generateClaimId();
+                    }
                     String tempValue = header.getValue().replace("{}", claimId);
                     header = new Header(header.getName(), tempValue);
                 }
@@ -119,6 +116,9 @@ public class AutomationClaimsUtility {
                 }
                 if (ob.get(tokenPropertyNameSplitted[lastPropertyIndex]) != null
                                 && ob.get(tokenPropertyNameSplitted[lastPropertyIndex]).toString().contains("{}")) {
+                    if (claimId == null) {
+                        generateClaimId();
+                    }
                     logger.info("Updating claim ID from JSON to generated claimID");
                     String tempValue = ob.get(tokenPropertyNameSplitted[lastPropertyIndex]).toString().replace("{}",
                                     claimId);

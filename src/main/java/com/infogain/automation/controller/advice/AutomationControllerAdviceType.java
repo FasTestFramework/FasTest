@@ -13,9 +13,9 @@ import com.infogain.automation.dto.AutomationError;
 import com.infogain.automation.dto.ErrorCodesDTO;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * <br>
- * Theme - Core Retail Peripheral Services<br>
+ * Theme - Automation<br>
  * Feature - Peripheral Services - Design and Architecture<br>
  * Description - This interface has the basic controller advice methods checks the status of scanner etc
  * 

@@ -3,8 +3,10 @@ package com.infogain.automation.service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.infogain.automation.constants.AutomationConstants;
+import com.infogain.automation.dto.AutomationRunTestCasesDTO;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.properties.AutomationProperties;
 import com.infogain.automation.tests.AutomationAbstractTests;
@@ -25,7 +28,7 @@ public class AutomationStartupService {
 
     private static final Logger logger = LogManager.getLogger(AutomationStartupService.class);
 
-    private final Properties automationProperties;
+    private final AutomationProperties automationProperties;
     private final AutomationReportService automationReportService;
     private final AutomationExcelUtility automationExcelUtility;
     private final AutomationEmailUtility automationEmailUtility;
@@ -35,59 +38,67 @@ public class AutomationStartupService {
                     final AutomationReportService automationReportService,
                     final AutomationExcelUtility automationExcelUtility,
                     final AutomationEmailUtility automationEmailUtility) {
-        this.automationProperties = automationProperties.getProps();
+        this.automationProperties = automationProperties;
         this.automationReportService = automationReportService;
         this.automationExcelUtility = automationExcelUtility;
         this.automationEmailUtility = automationEmailUtility;
     }
 
-    public void runTestCases(boolean sendMail, boolean saveDataToDatabase) {
+    public void runTestCases(AutomationRunTestCasesDTO automationRunTestCasesDTO) {
         logger.traceEntry("runTestCases method of AutomationStartupService class");
-        String[] excelFileNames = automationProperties
-                        .getProperty(AutomationConstants.FASTEST_EXCEL_SHEET_NAME).trim().split("\\|");
-        String[] allExcelSheetNames = automationProperties
-                        .getProperty(AutomationConstants.APPLICATION_PROPERTIES_SHEET_NAME).trim().split("\\|");
-        // For Loop to find the Test Cases Executed For Given excels and sheets
-        int lastExecutedTestCount = 0;
+        Map<String, List<String>> testInputFiles = automationRunTestCasesDTO.getTestInputFiles();
+        if (testInputFiles == null || testInputFiles.isEmpty()) {
+            testInputFiles = new HashMap<>();
+            String[] excelFileNames = automationProperties.getProperty(AutomationConstants.FASTEST_EXCEL_SHEET_NAME)
+                            .trim().split("\\|");
+            String[] allExcelSheetNames = automationProperties
+                            .getProperty(AutomationConstants.APPLICATION_PROPERTIES_SHEET_NAME).trim().split("\\|");
+            for (int i = 0; i < excelFileNames.length; i++) {
+                testInputFiles.put(excelFileNames[i], Arrays.asList(allExcelSheetNames[i].split(",")));
+            }
+        }
         List<String> attachments = new ArrayList<>();
-        for (int i = 0; i < excelFileNames.length; i++) {
-            String[] excelSheetNames = allExcelSheetNames[i].split(",");
-            for (int j = 0; j < excelSheetNames.length; j++) {
-                lastExecutedTestCount = lastExecutedTestCount + automationReportService
-                                .getLastTestCaseExecuted(excelFileNames[i], excelSheetNames[j]);
+        int lastExecutedTestCount = 0;
+        for (Map.Entry<String, List<String>> entry : testInputFiles.entrySet()) {
+            String excelFileName = entry.getKey();
+            List<String> excelSheetNames = entry.getValue();
+            for (String value : excelSheetNames) {
+                lastExecutedTestCount = lastExecutedTestCount
+                                + automationReportService.getLastTestCaseExecuted(excelFileName, value);
                 Class<?> classFound;
                 try {
-                    classFound = Class.forName(AutomationConstants.TEST_CLASS_PACKAGE_NAME + excelSheetNames[j]);
+                    classFound = Class.forName(AutomationConstants.TEST_CLASS_PACKAGE_NAME + value);
                 } catch (ClassNotFoundException | NoClassDefFoundError e) {
                     classFound = AutomationDefaultTest.class;
                 }
                 try {
                     AutomationAbstractTests automationAbstractTests =
                                     (AutomationAbstractTests) classFound.newInstance();
-                    automationAbstractTests.init(excelFileNames[i], excelSheetNames[j]);
+                    automationAbstractTests.init(excelFileName, value);
                     automationAbstractTests.test();
                     automationAbstractTests.performValidations();
-                    automationAbstractTests.publishResults(saveDataToDatabase);
+                    automationAbstractTests.publishResults(automationRunTestCasesDTO.isSaveToDatabase());
                 } catch (AutomationException e) {
                     throw e;
                 } catch (Exception e) {
                     if (e.getCause() instanceof AutomationException) {
                         throw (AutomationException) e.getCause();
                     } else {
-                        logger.debug("Exception Occured While testing sheet {} : {} ", excelSheetNames[j],
+                        logger.debug("Exception Occured While testing sheet {} : {} ", value,
                                         ExceptionUtils.getStackTrace(e));
                     }
                 }
             }
-            String outputExcelFileName = generateOutputExcelFileName(excelFileNames[i]);
+            String outputExcelFileName = generateOutputExcelFileName(excelFileName);
             automationExcelUtility.saveDataToExcel(outputExcelFileName, excelSheetNames);
             attachments.add(outputExcelFileName);
         }
+
         new AutomationDefaultTest().cleanup();
-        if (sendMail) {
+        if (automationRunTestCasesDTO.isSendMail()) {
             automationEmailUtility.addAttachments(attachments);
             automationEmailUtility.setLastExecutedTestCount(lastExecutedTestCount);
-            if (!saveDataToDatabase) {
+            if (!automationRunTestCasesDTO.isSaveToDatabase()) {
                 automationEmailUtility.sendMail();
             }
         }

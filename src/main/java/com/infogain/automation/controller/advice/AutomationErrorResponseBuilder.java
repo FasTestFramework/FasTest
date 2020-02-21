@@ -15,13 +15,13 @@ import com.infogain.automation.dto.ErrorCodesDTO;
 import com.infogain.automation.errors.AutomationErrorCodes;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * <br>
- * Theme - Core Retail Peripheral Services<br>
+ * Theme - Automation<br>
  * Feature - Peripheral Services - Design and Architecture<br>
  * Description - This class is responsible for building the error response.
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since 09-Jul-2019
  */

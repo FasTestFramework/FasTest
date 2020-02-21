@@ -1,114 +1,33 @@
 package com.infogain.automation.dto;
 
-import java.util.Objects;
-
 public class AutomationExcelInputDTO {
 
-    String serialNo;
     String testCaseDescription;
-    String urlParameter;
+    String requestUrl;
+    String requestType;
     String headerJson;
     String inputJson;
     String expectedOutput;
     Integer expectedHttpStatus;
-    String actualOutput;
-    Integer actualHttpStatus;
-    String testCaseResult;
-    String param;
+    String params;
+    String inputExcelFileName;
+    String inputExcelSheetName;
+    String inputExcelFolderName;
 
-    public AutomationExcelInputDTO(String serialNo, String testCaseDescription, String urlParameter, String headerJson,
-                    String inputJson, String expectedOutput, Integer expectedHttpStatus, String actualOutput,
-                    Integer actualHttpStatus, String testCaseResult, String param) {
-        super();
-        this.serialNo = serialNo;
+    public AutomationExcelInputDTO(String testCaseDescription, String requestUrl, String requestType, String headerJson,
+                    String inputJson, String expectedOutput, Integer expectedHttpStatus, String params,
+                    String inputExcelFileName, String inputExcelSheetName, String inputExcelFolderName) {
         this.testCaseDescription = testCaseDescription;
-        this.urlParameter = urlParameter;
+        this.requestUrl = requestUrl;
+        this.requestType = requestType;
         this.headerJson = headerJson;
         this.inputJson = inputJson;
         this.expectedOutput = expectedOutput;
         this.expectedHttpStatus = expectedHttpStatus;
-        this.actualOutput = actualOutput;
-        this.actualHttpStatus = actualHttpStatus;
-        this.testCaseResult = testCaseResult;
-        this.param = param;
-    }
-
-
-    /**
-     * This method
-     * 
-     * @return
-     * @since Jan 8, 2020
-     */
-    @Override
-    public String toString() {
-        return "AutomationExcelInputDTO [serialNo=" + serialNo + ", testCaseDescription=" + testCaseDescription
-                        + ", urlParameter=" + urlParameter + ", headerJson=" + headerJson + ", inputJson=" + inputJson
-                        + ", expectedOutput=" + expectedOutput + ", expectedHttpStatus=" + expectedHttpStatus
-                        + ", actualOutput=" + actualOutput + ", actualHttpStatus=" + actualHttpStatus
-                        + ", testCaseResult=" + testCaseResult + ", param=" + param + "]";
-
-
-    }
-
-
-
-    /**
-     * This method
-     * 
-     * @return
-     * @since Jan 8, 2020
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(actualHttpStatus, actualOutput, expectedHttpStatus, expectedOutput, headerJson, inputJson,
-                        param, serialNo, testCaseDescription, testCaseResult, urlParameter);
-    }
-
-
-    /**
-     * This method
-     * 
-     * @param obj
-     * @return
-     * @since Jan 8, 2020
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof AutomationExcelInputDTO)) {
-            return false;
-        }
-        AutomationExcelInputDTO other = (AutomationExcelInputDTO) obj;
-        return Objects.equals(actualHttpStatus, other.actualHttpStatus)
-                        && Objects.equals(actualOutput, other.actualOutput)
-                        && Objects.equals(expectedHttpStatus, other.expectedHttpStatus)
-                        && Objects.equals(expectedOutput, other.expectedOutput)
-                        && Objects.equals(headerJson, other.headerJson) && Objects.equals(inputJson, other.inputJson)
-                        && Objects.equals(param, other.param) && Objects.equals(serialNo, other.serialNo)
-                        && Objects.equals(testCaseDescription, other.testCaseDescription)
-                        && Objects.equals(testCaseResult, other.testCaseResult)
-                        && Objects.equals(urlParameter, other.urlParameter);
-    }
-
-
-    /**
-     * @return the serialNo
-     */
-    public String getSerialNo() {
-        return serialNo;
-    }
-
-    /**
-     * @param serialNo the serialNo to set
-     */
-    public void setSerialNo(String serialNo) {
-        this.serialNo = serialNo;
+        this.params = params;
+        this.inputExcelFileName = inputExcelFileName;
+        this.inputExcelSheetName = inputExcelSheetName;
+        this.inputExcelFolderName = inputExcelFolderName;
     }
 
     /**
@@ -126,17 +45,31 @@ public class AutomationExcelInputDTO {
     }
 
     /**
-     * @return the urlParameter
+     * @return the requestUrl
      */
-    public String getUrlParameter() {
-        return urlParameter;
+    public String getRequestUrl() {
+        return requestUrl;
     }
 
     /**
-     * @param urlParameter the urlParameter to set
+     * @param requestUrl the requestUrl to set
      */
-    public void setUrlParameter(String urlParameter) {
-        this.urlParameter = urlParameter;
+    public void setRequestUrl(String requestUrl) {
+        this.requestUrl = requestUrl;
+    }
+
+    /**
+     * @return the requestType
+     */
+    public String getRequestType() {
+        return requestType;
+    }
+
+    /**
+     * @param requestType the requestType to set
+     */
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
     }
 
     /**
@@ -196,60 +129,62 @@ public class AutomationExcelInputDTO {
     }
 
     /**
-     * @return the actualOutput
+     * @return the params
      */
-    public String getActualOutput() {
-        return actualOutput;
+    public String getParams() {
+        return params;
     }
 
     /**
-     * @param actualOutput the actualOutput to set
+     * @param params the params to set
      */
-    public void setActualOutput(String actualOutput) {
-        this.actualOutput = actualOutput;
+    public void setParams(String params) {
+        this.params = params;
     }
 
     /**
-     * @return the actualHttpStatus
+     * @return the inputExcelFileName
      */
-    public Integer getActualHttpStatus() {
-        return actualHttpStatus;
+    public String getInputExcelFileName() {
+        return inputExcelFileName;
     }
 
     /**
-     * @param actualHttpStatus the actualHttpStatus to set
+     * @param inputExcelFileName the inputExcelFileName to set
      */
-    public void setActualHttpStatus(Integer actualHttpStatus) {
-        this.actualHttpStatus = actualHttpStatus;
+    public void setInputExcelFileName(String inputExcelFileName) {
+        this.inputExcelFileName = inputExcelFileName;
     }
 
     /**
-     * @return the testCaseResult
+     * @return the inputExcelSheetName
      */
-    public String getTestCaseResult() {
-        return testCaseResult;
+    public String getInputExcelSheetName() {
+        return inputExcelSheetName;
     }
 
     /**
-     * @param testCaseResult the testCaseResult to set
+     * @param inputExcelSheetName the inputExcelSheetName to set
      */
-    public void setTestCaseResult(String testCaseResult) {
-        this.testCaseResult = testCaseResult;
+    public void setInputExcelSheetName(String inputExcelSheetName) {
+        this.inputExcelSheetName = inputExcelSheetName;
     }
 
     /**
-     * @return the param
+     * @return the inputExcelFolderName
      */
-    public String getParam() {
-        return param;
+    public String getInputExcelFolderName() {
+        return inputExcelFolderName;
     }
 
     /**
-     * @param param the param to set
+     * @param inputExcelFolderName the inputExcelFolderName to set
      */
-    public void setParam(String param) {
-        this.param = param;
+    public void setInputExcelFolderName(String inputExcelFolderName) {
+        this.inputExcelFolderName = inputExcelFolderName;
     }
+
+
 
 }
 

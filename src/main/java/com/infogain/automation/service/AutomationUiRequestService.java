@@ -1,5 +1,6 @@
 package com.infogain.automation.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -13,6 +14,7 @@ import io.restassured.response.Response;
 import com.infogain.automation.constants.AutomationConstants;
 import com.infogain.automation.dto.AutomationInputDTO;
 import com.infogain.automation.dto.AutomationUiRequestDTO;
+import com.infogain.automation.dto.AutomationUiResponseDTO;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.properties.AutomationProperties;
 import com.infogain.automation.utilities.AutomationClaimsUtility;
@@ -28,6 +30,7 @@ public class AutomationUiRequestService {
     private final AutomationRequestBodyAndHeadersUtility automationRequestBodyAndHeadersUtility;
     private final AutomationClaimsUtility automationClaimsUtility;
 
+
     @Autowired
     public AutomationUiRequestService(final AutomationEndpointHitUtility automationEndpointHitUtility,
                     final AutomationProperties automationProperties,
@@ -39,7 +42,9 @@ public class AutomationUiRequestService {
         this.automationClaimsUtility = automationClaimsUtility;
     }
 
-    public String hitEndpointFromUI(AutomationUiRequestDTO automationUiRequestDTO) {
+    public AutomationUiResponseDTO hitEndpointFromUI(AutomationUiRequestDTO automationUiRequestDTO) {
+        String requestUrl = automationUiRequestDTO.getRequestURL();
+        String baseClaimUrl;
         String body = automationUiRequestDTO.getBody();
         JSONObject bodyJson = null;
         if (body != null) {
@@ -52,10 +57,15 @@ public class AutomationUiRequestService {
                 }
             }
         }
+        if (requestUrl.toLowerCase().startsWith("http")) {
+            baseClaimUrl = requestUrl.substring(0, StringUtils.ordinalIndexOf(requestUrl, "/", 3));
+
+        } else {
+            baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
+                            + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
+        }
         Headers headers = automationRequestBodyAndHeadersUtility.fetchHeaders(automationUiRequestDTO.getHeader());
-        String baseClaimUrl = automationProperties.getProps()
-                        .getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
-                        + automationProperties.getProps().getProperty(AutomationConstants.FASTEST_PORT);
+
 
         AutomationInputDTO automationInputDTO = new AutomationInputDTO();
         automationInputDTO.setTestCaseInputJson(bodyJson);
@@ -71,7 +81,8 @@ public class AutomationUiRequestService {
             resp = automationEndpointHitUtility.hitEndpoint(baseClaimUrl, automationUiRequestDTO.getRequestURL(),
                             automationInputDTO.getHeaders(), automationUiRequestDTO.getRequestType(), body);
         }
-        return logger.traceExit(resp.asString());
+        automationClaimsUtility.releaseAutomationServer();
+        return logger.traceExit(new AutomationUiResponseDTO(resp.asString(), resp.getStatusCode()));
     }
 
 }

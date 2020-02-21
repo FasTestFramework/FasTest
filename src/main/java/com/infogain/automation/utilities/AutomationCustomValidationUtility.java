@@ -4,9 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import com.infogain.automation.dto.SendMailRequestDTO;
 import com.infogain.automation.exception.CustomValidationFailure;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,40 +28,26 @@ public class AutomationCustomValidationUtility {
     private Object actualObj;
     private Object expectedObj;
 
-    public static void main(String[] args) {
-        //to be removed
-        Map<Object, String> inputMap = new LinkedHashMap<>();
-        inputMap.put(null, "notNull();isNotNull();containsOnlyDigits()");
-        inputMap.put("myName",
-                        "contains(\"Name\",\"my22\");matches(\".*\");isEqualTo(\"aa\");startsWith(\"my\");asdgdf();hasSizeBetween(10,12);matches(234);isSubstringOf(\"hellomyName is Namit\")");
-        inputMap.put(true, "isNotEqualTo(\"false\");isNotNull()");
-        inputMap.put(12, "isGreaterThan(13);isLessThan(13)");
-        inputMap.put(12.55, "isEqualTo(12.5)");
-        inputMap.put(new SendMailRequestDTO(), "hasFieldOrProperty(\"base64String\")");
-        AutomationCustomValidationUtility testObject = new AutomationCustomValidationUtility();
-        inputMap.forEach((k, v) -> {
-            try {
-                testObject.validate(k, k, v);
-                System.out.println("Success");
-            } catch (CustomValidationFailure cvf) {
-                System.out.print(cvf.getMessage());
-            }
-            System.out.println("------------------------------");
-        });
-
-
-        //
-        // Map<String, String> inputMap = new LinkedHashMap<>();
-        // inputMap.put("output.claim", "1");
-        // inputMap.put("output.claim[x].idle", "2");
-        // inputMap.put("output.claim[1].saap", "3");
-        // inputMap.put("output.claim[1].needle[1]", "4");
-        // inputMap.put("output.claim[5].needle.money[x]", "5");
-        // inputMap.put("output.claim[x].needle[9]", "6");
-        // inputMap.put("output.claim[x].needle[x]", "7");
-        // String tocheck = "output.claim[5].needle.money[0]";
-
-    }
+    /*
+     * public static void main(String[] args) { //to be removed Map<Object, String> inputMap = new LinkedHashMap<>();
+     * inputMap.put(null, "notNull();isNotNull();containsOnlyDigits()"); inputMap.put("myName",
+     * "contains(\"Name\",\"my22\");matches(\".*\");isEqualTo(\"aa\");startsWith(\"my\");asdgdf();hasSizeBetween(10,12);matches(234);isSubstringOf(\"hellomyName is Namit\")"
+     * ); inputMap.put(true, "isNotEqualTo(\"false\");isNotNull()"); inputMap.put(12,
+     * "isGreaterThan(13);isLessThan(13)"); inputMap.put(12.55, "isEqualTo(12.5)"); inputMap.put(new
+     * SendMailRequestDTO(), "hasFieldOrProperty(\"base64String\")"); AutomationCustomValidationUtility testObject = new
+     * AutomationCustomValidationUtility(); inputMap.forEach((k, v) -> { try { testObject.validate(k, k, v);
+     * System.out.println("Success"); } catch (CustomValidationFailure cvf) { System.out.print(cvf.getMessage()); }
+     * System.out.println("------------------------------"); });
+     * 
+     * 
+     * // // Map<String, String> inputMap = new LinkedHashMap<>(); // inputMap.put("output.claim", "1"); //
+     * inputMap.put("output.claim[x].idle", "2"); // inputMap.put("output.claim[1].saap", "3"); //
+     * inputMap.put("output.claim[1].needle[1]", "4"); // inputMap.put("output.claim[5].needle.money[x]", "5"); //
+     * inputMap.put("output.claim[x].needle[9]", "6"); // inputMap.put("output.claim[x].needle[x]", "7"); // String
+     * tocheck = "output.claim[5].needle.money[0]";
+     * 
+     * }
+     */
 
     public void validate(Object actualObj, Object expectedObj, String methodsToExecute) throws CustomValidationFailure {
         logger.info("\nValidating value: {} against custom validations: {}", String.valueOf(actualObj),

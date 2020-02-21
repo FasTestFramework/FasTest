@@ -32,7 +32,8 @@ public class AutomationAlert {
 
     @Override
     public String toString() {
-        return "AutomationAlert{" + "code='" + code + '\'' + ", message='" + message + '\'' + ", alertType=" + alertType + '}';
+        return "AutomationAlert{" + "code='" + code + '\'' + ", message='" + message + '\'' + ", alertType=" + alertType
+                        + '}';
     }
 
     @Override

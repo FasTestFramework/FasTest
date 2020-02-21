@@ -5,256 +5,204 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.Properties;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.infogain.automation.constants.AutomationConstants;
-import com.infogain.automation.dto.AutomationExcelInputDTO;
-import com.infogain.automation.dto.AutomationRequestDTO;
+import com.infogain.automation.constants.FastTestExcelHeaders;
+import com.infogain.automation.dto.AutomationExcelRequestDTO;
 import com.infogain.automation.exception.AutomationException;
+import com.infogain.automation.mapper.AutomationExcelRequestDTOtoAutomationExcelRequestModelList;
+import com.infogain.automation.model.AutomationExcelRequestModel;
+import com.infogain.automation.model.AutomationExcelRowModel;
 import com.infogain.automation.properties.AutomationProperties;
+import com.infogain.automation.utilities.AutomationExcelUtility;
 
 @Service
 public class AutomationInputExcelService {
 
     private static final Logger logger = LogManager.getLogger(AutomationInputExcelService.class);
-    private Properties automationProperties;
+    private final AutomationProperties automationProperties;
+    private final AutomationExcelUtility automationExcelUtility;
 
     @Autowired
-    public AutomationInputExcelService(final AutomationProperties automationProperties) {
-        this.automationProperties = automationProperties.getProps();
+    public AutomationInputExcelService(final AutomationProperties automationProperties,
+                    final AutomationExcelUtility automationExcelUtility) {
+        this.automationProperties = automationProperties;
+        this.automationExcelUtility = automationExcelUtility;
     }
 
-    public void insertDataToExcel(AutomationRequestDTO automationRequestDTO) {
-        String inputExcelName = automationRequestDTO.getInputExcelFileName();
-        String inputExcelSheetName = automationRequestDTO.getInputExcelSheetName();
-        String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_FOLDER_PATH) + "/"
-                                        + inputExcelName;
-
-        File excelFile = new File(inputExcelFilePath);
-        if (excelFile.exists() && !excelFile.isDirectory()) {
-            try (FileInputStream fis = new FileInputStream(excelFile);
-                            XSSFWorkbook workbookInput = new XSSFWorkbook(fis);) {
-                CellStyle styleBorder = workbookInput.createCellStyle();
-                setBorders(styleBorder);
-                int sheets = workbookInput.getNumberOfSheets();
-                logger.info("Total Number of sheets  {} in {}", sheets, inputExcelName);
-
-                for (int i = 0; i < sheets; i++) {
-                    if (workbookInput.getSheetName(i).equalsIgnoreCase(inputExcelSheetName)) {
-                        XSSFSheet sheet = workbookInput.getSheetAt(i);
-                        insertDataInExcelSheet(automationRequestDTO, styleBorder, sheet);
-                        saveDataToExcel(inputExcelFilePath, workbookInput);
-
-                    }
-                }
-                if (null == workbookInput.getSheet(inputExcelSheetName)) {
-                    createNewSheet(automationRequestDTO, inputExcelSheetName, workbookInput);
-                }
-            } catch (IOException e) {
-                logger.debug("Exception Occured While Writing in existing Excel {} ", ExceptionUtils.getStackTrace(e));
-                throw new AutomationException("Exception Occured While Writing Excel", e);
+    public void insertDataToExcel(AutomationExcelRequestDTO automationExcelRequestDTO) {
+        List<AutomationExcelRequestModel> automationExcelRequestModelList =
+                        AutomationExcelRequestDTOtoAutomationExcelRequestModelList
+                                        .mapExcelRequestDtoToExcelRequestModelList(automationExcelRequestDTO);
+        automationExcelRequestModelList.forEach(automationExcelRequestModel -> {
+            String inputExcelFolderName = automationExcelRequestModel.getInputExcelFolderName();
+            String inputExcelName = automationExcelRequestModel.getInputExcelFileName();
+            Map<String, List<AutomationExcelRowModel>> inputExcelSheetsMap = automationExcelRequestModel.getSheets();
+            String inputExcelFolderPath =
+                            automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
+            if (StringUtils.isNotEmpty(inputExcelFolderName)) {
+                inputExcelFolderPath = inputExcelFolderPath + "/" + inputExcelFolderName;
             }
-        } else {
-            XSSFWorkbook workbookInput = new XSSFWorkbook();
-            createNewSheet(automationRequestDTO, inputExcelSheetName, workbookInput);
+            String inputExcelFilePath = inputExcelFolderPath + "/" + inputExcelName;
+            try {
+                Files.createDirectories(Paths.get(inputExcelFolderPath));
+            } catch (IOException e1) {
+                throw new AutomationException("Unable to create directory " + inputExcelFolderName, e1);
+            }
 
-        }
+            File excelFile = new File(inputExcelFilePath);
+            XSSFWorkbook workbookInput = null;
+            if (excelFile.exists() && !excelFile.isDirectory()) {
+                try (FileInputStream fis = new FileInputStream(excelFile)) {
+                    workbookInput = new XSSFWorkbook(fis);
+                } catch (POIXMLException | IOException e) {
+                    logger.debug("Exception Occured While Reading existing Excel {} ", ExceptionUtils.getStackTrace(e));
+                    throw new AutomationException("Exception Occured While Reading Excel", e);
+                }
+            } else {
+                try {
+                    workbookInput = new XSSFWorkbook();
+                } catch (POIXMLException e) {
+                    logger.debug("Exception Occured While creating new existing Excel {} ",
+                                    ExceptionUtils.getStackTrace(e));
+                    throw new AutomationException("Exception Occured While creating Excel File.", e);
+                }
+            }
+            insertRowsInAllExcels(inputExcelSheetsMap, inputExcelFilePath, workbookInput,
+                            workbookInput.createCellStyle());
+            saveDataToExcel(inputExcelFilePath, workbookInput);
+        });
         logger.info("Data entered in Excel Successfully");
         logger.traceExit();
+
     }
 
-    private void createNewSheet(AutomationRequestDTO automationRequestDTO, String inputExcelSheetName,
-                    XSSFWorkbook workbookInput) {
-        CellStyle styleBorder;
-        String inputExcelName = automationRequestDTO.getInputExcelFileName();
-        String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_FOLDER_PATH) + "/"
-                                        + inputExcelName;
-        XSSFSheet sheet = workbookInput.createSheet(inputExcelSheetName);
-        styleBorder = workbookInput.createCellStyle();
-        setBorders(styleBorder);
-        int rowCount = 0;
-        int columnCount = 0;
-        Row row = sheet.createRow(rowCount);
-        ArrayList<Object> headerRow = new ArrayList<>();
-        headerRow.add("Sno");
-        headerRow.add("Test case Description");
-        headerRow.add("URL Parameter");
-        headerRow.add("Header Json");
-        headerRow.add("Param");
-        headerRow.add("Input json");
-        headerRow.add("Expected Output");
-        headerRow.add("Expected http status");
-        headerRow.add("Actual Output");
-        headerRow.add("Actual http status");
-        headerRow.add("Test case Result");
-        headerRow.add("Execution date time");
-
-        XSSFFont boldFont = workbookInput.createFont();
-        boldFont.setBold(true);
-        CellStyle cellStyleForHeaderRow = workbookInput.createCellStyle();
-        // Creating cell Style i.e. Bold Font for Header ROW
-        Cell cell = row.createCell(++columnCount);
-        cellStyleForHeaderRow.setFont(boldFont);
-        for (int i = 0; i < 12; i++) {
-
-            cell = createCell(row, i, cellStyleForHeaderRow);
-            setHeaderColumnNameInCell(headerRow.get(i), cell);
+    private void insertRowsInAllExcels(Map<String, List<AutomationExcelRowModel>> inputExcelSheetsMap,
+                    String inputExcelFilePath, XSSFWorkbook workbookInput, CellStyle cellStyle) {
+        for (Map.Entry<String, List<AutomationExcelRowModel>> entry : inputExcelSheetsMap.entrySet()) {
+            String excelSheetName = entry.getKey();
+            XSSFSheet excelSheet = workbookInput.getSheet(excelSheetName);
+            if (excelSheet == null) {
+                excelSheet = createNewSheet(excelSheetName, workbookInput);
+            }
+            insertDataInExcelSheet(entry.getValue(), cellStyle, excelSheet);
         }
-
-        insertDataInExcelSheet(automationRequestDTO, styleBorder, sheet);
-        saveDataToExcel(inputExcelFilePath, workbookInput);
     }
 
-    private void insertDataInExcelSheet(AutomationRequestDTO automationRequestDTO, CellStyle styleBorder,
+    private XSSFSheet createNewSheet(String inputExcelSheetName, XSSFWorkbook workbookInput) {
+        XSSFSheet sheet = workbookInput.createSheet(inputExcelSheetName);
+        Row row = sheet.createRow(0);
+        CellStyle cellStyleForHeaderRow = automationExcelUtility.getCellStyleForBold(workbookInput);
+        int i = 0;
+        for (FastTestExcelHeaders header : FastTestExcelHeaders.values()) {
+            createCell(row, i++, cellStyleForHeaderRow).setCellValue(header.getText());
+        }
+        return sheet;
+    }
+
+
+
+    private void insertDataInExcelSheet(List<AutomationExcelRowModel> automationExcelRowModelList, CellStyle cellStyle,
                     XSSFSheet sheet) {
         Iterator<Row> row = sheet.iterator();
-        int totalRows = sheet.getLastRowNum() + 1;
-        Row firstRow = row.next();
-        Iterator<Cell> cell = firstRow.iterator();
-        int serialNumberColumn = 0;
-        int testCaseDescriptionColumn = 0;
-        int urlParameterColumn = 0;
-        int headerJsonColumn = 0;
-        int inputJsonColumn = 0;
-        int expectedOutputColumn = 0;
-        int expectedHttpStatusColumn = 0;
-        int actualOutputColumn = 0;
-        int actualHttpStatusColumn = 0;
-        int testCaseResultColumn = 0;
-        int paramColumn = 0;
-        int cellNumber = 0;
-
-        while (cell.hasNext()) {
-            Cell c = cell.next();
-            CellStyle cellStyleBorder = c.getCellStyle();
-            setBorders(cellStyleBorder);
-            c.setCellStyle(cellStyleBorder);
-            switch (c.getStringCellValue()) {
-                case AutomationConstants.SERIAL_NO_COLUMN_NAME:
-                    serialNumberColumn = cellNumber;
-                    break;
-
-                case AutomationConstants.TEST_CASE_DESCRIPTION:
-                    testCaseDescriptionColumn = cellNumber;
-                    break;
-
-                case AutomationConstants.URL_PARAMETER:
-                    urlParameterColumn = cellNumber;
-                    break;
-
-                case AutomationConstants.HEADER_JSON:
-                    headerJsonColumn = cellNumber;
-                    break;
-
-                case AutomationConstants.INPUT_JSON:
-                    inputJsonColumn = cellNumber;
-                    break;
-
-                case AutomationConstants.EXPECTED_OUTPUT:
-                    expectedOutputColumn = cellNumber;
-                    break;
-
-                case AutomationConstants.EXPECTED_HTTP_STATUS:
-                    expectedHttpStatusColumn = cellNumber;
-                    break;
-
-                case AutomationConstants.ACTUAL_OUTPUT_COLUMN_NAME:
-                    actualOutputColumn = cellNumber;
-                    break;
-                case AutomationConstants.ACTUAL_HTTP_STATUS_COLUMN_NAME:
-                    actualHttpStatusColumn = cellNumber;
-                    break;
-                case AutomationConstants.TEST_CASE_RESULT_COLUMN_NAME:
-                    testCaseResultColumn = cellNumber;
-                    break;
-                case AutomationConstants.PARAM:
-                    paramColumn = cellNumber;
-                    break;
-
-                default:
+        Map<String, Integer> headerIndexes = automationExcelUtility.getHeaderIndexes(row.next());
+        int lastSNoCount = sheet.getLastRowNum();
+        for (AutomationExcelRowModel automationExcelRowModel : automationExcelRowModelList) {
+            Row currentRow = sheet.createRow(++lastSNoCount);
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.SERIAL_NO.getText()), cellStyle)
+                            .setCellValue(lastSNoCount);
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.TEST_CASE_DESCRIPTION.getText()), cellStyle)
+                            .setCellValue(automationExcelRowModel.getTestCaseDescription());
+            Integer skipTestColumnIndex = headerIndexes.get(FastTestExcelHeaders.SKIP_TEST.getText());
+            if (skipTestColumnIndex != null) {
+                createCell(currentRow, skipTestColumnIndex, cellStyle).setCellValue("N");
             }
-            cellNumber++;
-        }
-        int j = 0;
-        int lastSNoCount = totalRows - 1;
-        while (automationRequestDTO.getAutomationExcelInputDTO().size() > j) {
-            AutomationExcelInputDTO automationExcelInputDTO = automationRequestDTO.getAutomationExcelInputDTO().get(j);
-            Row currentRow = sheet.getRow(totalRows); // Last row of existing sheet
-
-            if (currentRow == null) {
-                currentRow = sheet.createRow(totalRows);
-                Cell serialNumberCell = createCell(currentRow, serialNumberColumn, styleBorder);
-                serialNumberCell.setCellValue(Integer.parseInt(automationExcelInputDTO.getSerialNo()) + lastSNoCount);
-                serialNumberCell.getCellStyle().setWrapText(true);
-
-                Cell testCaseDescriptionCell = createCell(currentRow, testCaseDescriptionColumn, styleBorder);
-                testCaseDescriptionCell.setCellValue(automationExcelInputDTO.getTestCaseDescription());
-                testCaseDescriptionCell.getCellStyle().setWrapText(true);
-
-                Cell urlParameterCell = createCell(currentRow, urlParameterColumn, styleBorder);
-                urlParameterCell.setCellValue(automationExcelInputDTO.getUrlParameter());
-                urlParameterCell.getCellStyle().setWrapText(true);
-
-                Cell headerJsonCell = createCell(currentRow, headerJsonColumn, styleBorder);
-                headerJsonCell.setCellValue(automationExcelInputDTO.getHeaderJson());
-                headerJsonCell.getCellStyle().setWrapText(true);
-
-                Cell inputJsonCell = createCell(currentRow, inputJsonColumn, styleBorder);
-                inputJsonCell.setCellValue(automationExcelInputDTO.getInputJson());
-                inputJsonCell.getCellStyle().setWrapText(true);
-
-                Cell expectedOutputCell = createCell(currentRow, expectedOutputColumn, styleBorder);
-                expectedOutputCell.setCellValue(automationExcelInputDTO.getExpectedOutput());
-                expectedOutputCell.getCellStyle().setWrapText(true);
-
-                Cell expectedHttpStatusCell = createCell(currentRow, expectedHttpStatusColumn, styleBorder);
-                expectedHttpStatusCell.setCellValue(automationExcelInputDTO.getExpectedHttpStatus());
-                expectedHttpStatusCell.getCellStyle().setWrapText(true);
-
-                Cell actualOutputCell = createCell(currentRow, actualOutputColumn, styleBorder);
-                actualOutputCell.setCellValue(automationExcelInputDTO.getActualOutput());
-                actualOutputCell.getCellStyle().setWrapText(true);
-
-                Cell actualHttpStatusCell = createCell(currentRow, actualHttpStatusColumn, styleBorder);
-                actualHttpStatusCell.setCellValue(automationExcelInputDTO.getActualHttpStatus());
-                actualHttpStatusCell.getCellStyle().setWrapText(true);
-
-                Cell testCaseResultCell = createCell(currentRow, testCaseResultColumn, styleBorder);
-                testCaseResultCell.setCellValue(automationExcelInputDTO.getTestCaseResult());
-                testCaseResultCell.getCellStyle().setWrapText(true);
-
-                Cell paramCell = createCell(currentRow, paramColumn, styleBorder);
-                paramCell.setCellValue(automationExcelInputDTO.getParam());
-                paramCell.getCellStyle().setWrapText(true);
-
-                j++;
-                totalRows++;
+            Cell urlParameterCell = createCell(currentRow,
+                            headerIndexes.get(FastTestExcelHeaders.URL_PARAMETER.getText()), cellStyle);
+            String requestType = automationExcelRowModel.getRequestType();
+            String requestUrl = automationExcelRowModel.getRequestUrl();
+            if (requestUrl != null && requestType != null) {
+                String urlwithRequestType = fetchrequestUrl(requestUrl) + "|" + requestType;
+                String urlParameterKey = automationProperties.getKeyNameByValue(urlwithRequestType);
+                String urlParameter = urlParameterKey != null ? StringUtils.substringAfterLast(urlParameterKey, ".")
+                                : urlwithRequestType;
+                urlParameterCell.setCellValue(urlParameter);
             }
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.PARAMS.getText()), cellStyle)
+                            .setCellValue(automationExcelRowModel.getParams());
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.HEADERS.getText()), cellStyle)
+                            .setCellValue(automationExcelRowModel.getHeaderJson());
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.INPUT_JSON.getText()), cellStyle)
+                            .setCellValue(automationExcelRowModel.getInputJson());
+            Integer keysValidationColumnIndex = headerIndexes.get(FastTestExcelHeaders.KEYS_VALIDATION.getText());
+            if (keysValidationColumnIndex != null) {
+                createCell(currentRow, keysValidationColumnIndex, cellStyle);
+            }
+            Cell expectedOutputCell = createCell(currentRow,
+                            headerIndexes.get(FastTestExcelHeaders.EXPECTED_OUTPUT.getText()), cellStyle);
+            String expectedOutput = automationExcelRowModel.getExpectedOutput();
+            if (StringUtils.isNotBlank(expectedOutput)) {
+                JsonParser jsonParser = new JsonParser();
+                try {
+                    JsonElement outputObject = jsonParser.parse(expectedOutput);
+                    if (!outputObject.isJsonPrimitive()) {
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+                        expectedOutput = gson.toJson(outputObject);
+                    }
+                } catch (Exception e) {
+                    // no futher handling needed
+                }
+            }
+            expectedOutputCell.setCellValue(expectedOutput);
+            expectedOutputCell.getCellStyle().setWrapText(true);
+
+            Integer expectedHttpStatus = automationExcelRowModel.getExpectedHttpStatus();
+            String expectedHttpStatusString = "";
+            if (expectedHttpStatus != null) {
+                expectedHttpStatusString = String.valueOf(expectedHttpStatus);
+            }
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.EXPECTED_HTTP_STATUS.getText()), cellStyle)
+                            .setCellValue(expectedHttpStatusString);
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.ACTUAL_OUTPUT.getText()), cellStyle);
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.ACTUAL_HTTP_STATUS.getText()), cellStyle);
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.TEST_CASE_RESULT.getText()), cellStyle);
+            createCell(currentRow, headerIndexes.get(FastTestExcelHeaders.EXECUTION_DATE_TIME.getText()), cellStyle);
         }
+    }
+
+    private String fetchrequestUrl(String requestUrl) {
+        return requestUrl.toLowerCase().startsWith("http")
+                        ? requestUrl.substring(StringUtils.ordinalIndexOf(requestUrl, "/", 3))
+                        : requestUrl;
     }
 
     private void setBorders(CellStyle styleBorder) {
         logger.traceEntry("setBorders method of AutomationExcelUtility class");
-
         styleBorder.setBorderBottom(BorderStyle.THIN);
         styleBorder.setBorderLeft(BorderStyle.THIN);
         styleBorder.setBorderRight(BorderStyle.THIN);
@@ -278,25 +226,20 @@ public class AutomationInputExcelService {
         return logger.traceExit(cell);
     }
 
-    public void setHeaderColumnNameInCell(Object field, Cell cell) {
-        if (field instanceof String) {
-            cell.setCellValue((String) field);
-        } else if (field instanceof Integer) {
-            cell.setCellValue((Integer) field);
-        }
-    }
-
     public void saveDataToExcel(String inputExcelFilePath, XSSFWorkbook workbookInput) {
         logger.traceEntry("saveDataToExcel method of AutomationExcelUtility class");
-
         try (FileOutputStream fos = new FileOutputStream(inputExcelFilePath)) {
             workbookInput.write(fos);
-            workbookInput.close();
-            workbookInput = null;
-        } catch (IOException e) {
+        } catch (POIXMLException | IOException e) {
             logger.debug("Exception Occured While Writing Excel  as the file is OPEN{} ",
                             ExceptionUtils.getStackTrace(e));
             throw new AutomationException("Exception Occured While Writing Excel", e);
+        } finally {
+            try {
+                workbookInput.close();
+            } catch (IOException e) {
+                logger.error("Exception Occured While Closing Excel", e);
+            }
         }
         logger.traceExit();
     }

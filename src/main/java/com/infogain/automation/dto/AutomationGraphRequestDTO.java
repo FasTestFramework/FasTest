@@ -3,13 +3,13 @@ package com.infogain.automation.dto;
 import java.util.Objects;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class is Peripheral Graph Request DTO which contains start Date and End Date for creating graph
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Dec 12, 2019
  */
@@ -25,17 +25,18 @@ public class AutomationGraphRequestDTO {
         this.endDate = endDate;
     }
 
-    public AutomationGraphRequestDTO() {}
+    public AutomationGraphRequestDTO() {
+    }
 
     /**
-     * @return the sheets
+     * @return the testInputFiles
      */
     public String getSheets() {
         return sheets;
     }
 
     /**
-     * @param sheets the sheets to set
+     * @param testInputFiles the testInputFiles to set
      */
     public void setSheets(String sheets) {
         this.sheets = sheets;
@@ -77,8 +78,8 @@ public class AutomationGraphRequestDTO {
      */
     @Override
     public String toString() {
-        return "AutomationGraphRequestDTO [sheets=" + sheets + ", startDate=" + startDate + ", endDate=" + endDate
-                        + "]";
+        return "AutomationGraphRequestDTO [testInputFiles=" + sheets + ", startDate=" + startDate + ", endDate="
+                        + endDate + "]";
     }
 
     /**

@@ -12,13 +12,13 @@ import com.infogain.automation.dto.AutomationGraphRequestDTO;
 import com.infogain.automation.model.TestCaseDAOInputModel;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class is for mapping data from Graph Request DTO to Test Case DAO Input Model
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Dec 16, 2019
  */

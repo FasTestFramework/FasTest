@@ -11,7 +11,8 @@ public class AutomationResponse<T extends AutomationOutput> {
 
     private T output;
 
-    private AutomationResponse() {}
+    private AutomationResponse() {
+    }
 
     private AutomationResponse(final T output) {
         this.output = output;

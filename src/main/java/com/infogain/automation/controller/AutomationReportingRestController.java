@@ -2,7 +2,6 @@ package com.infogain.automation.controller;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 
 import javax.validation.Valid;
 
@@ -28,13 +27,13 @@ import com.infogain.automation.service.AutomationReportService;
 import com.infogain.automation.service.MailService;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
- * Theme - Core Retail Peripheral Services<br>
- * Feature - Peripheral Services - Automation and Testing<br>
+ * Theme - Automation<br>
+ * Feature - Automation and Testing<br>
  * Description - This class contains all Rest Endpoints
  * 
- * @author Rudhra Koul [5173824]
+ * @author Rudhra Koul [103264]
  * @version 1.0.0
  * @since Dec 12, 2019
  */
@@ -43,7 +42,7 @@ public class AutomationReportingRestController {
 
     private static final Logger logger = LogManager.getLogger(AutomationReportingRestController.class);
 
-    private final Properties automationProperties;
+    private final AutomationProperties automationProperties;
     private final AutomationReportService automationReportService;
     private final MailService mailService;
 
@@ -52,7 +51,7 @@ public class AutomationReportingRestController {
                     final AutomationReportService automationReportService, final MailService mailService) {
         this.automationReportService = automationReportService;
         this.mailService = mailService;
-        this.automationProperties = automationProperties.getProps();
+        this.automationProperties = automationProperties;
     }
 
     /**
@@ -69,10 +68,10 @@ public class AutomationReportingRestController {
     }
 
     /**
-     * This method receives the sheets name, start and end Date and gives total count of Pass Test Cases
+     * This method receives the testInputFiles name, start and end Date and gives total count of Pass Test Cases
      * 
-     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give sheets name, start and
-     *        end Date
+     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give testInputFiles name,
+     *        start and end Date
      * @return list of total count of Pass Test Cases
      * @since Dec 12, 2019
      */
@@ -87,10 +86,10 @@ public class AutomationReportingRestController {
     }
 
     /**
-     * This method receives the sheets name, start and end Date and gives total count of Fail Test Cases
+     * This method receives the testInputFiles name, start and end Date and gives total count of Fail Test Cases
      * 
-     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give sheets name, start and
-     *        end Date
+     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give testInputFiles name,
+     *        start and end Date
      * @return list of total count of Fail Test Cases
      * @since Dec 12, 2019
      */
@@ -106,10 +105,10 @@ public class AutomationReportingRestController {
     }
 
     /**
-     * This method receives the sheets name, start and end Date and gives total count of Test Cases
+     * This method receives the testInputFiles name, start and end Date and gives total count of Test Cases
      * 
-     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give sheets name, start and
-     *        end Date
+     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give testInputFiles name,
+     *        start and end Date
      * @return list of total count of Test Cases
      * @since Dec 12, 2019
      */
@@ -126,8 +125,8 @@ public class AutomationReportingRestController {
     /**
      * This method receives the Excel File name, start and end Date and gives Last Executed Test Cases
      * 
-     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give sheets name, start and
-     *        end Date
+     * @param automationGraphRequestDTO of {@link AutomationGraphRequestDTO} Request body to give testInputFiles name,
+     *        start and end Date
      * @return list of Last Executed Test Cases
      * @since Dec 12, 2019
      */

@@ -10,10 +10,12 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -32,8 +34,6 @@ import com.infogain.automation.properties.AutomationProperties;
 @Component
 public class AutomationEmailUtility {
     private static final Logger logger = LogManager.getLogger(AutomationEmailUtility.class);
-
-    private Properties props;
     public static final String EMAIL_FROM = "emailFrom";
     public static final String PORT = "emailport";
     public static final String EMAIL_HOST = "emailHost";
@@ -54,13 +54,12 @@ public class AutomationEmailUtility {
 
     @Autowired
     public AutomationEmailUtility(final AutomationProperties automationProperties) {
-        props = automationProperties.getProps();
-        this.emailFrom = (String) props.get(EMAIL_FROM);
-        this.emailPort = Integer.parseInt((String) props.get(PORT));
-        this.emailHost = (String) props.get(EMAIL_HOST);
-        this.emailTo = (String) props.get(EMAIL_TO);
-        this.emailSubject = (String) props.get(EMAIL_SUBJECT);
-        this.messageBody = (String) props.get(MESSAGE_BODY);
+        this.emailFrom = (String) automationProperties.getProperty(EMAIL_FROM);
+        this.emailPort = Integer.parseInt((String) automationProperties.getProperty(PORT));
+        this.emailHost = (String) automationProperties.getProperty(EMAIL_HOST);
+        this.emailTo = (String) automationProperties.getProperty(EMAIL_TO);
+        this.emailSubject = (String) automationProperties.getProperty(EMAIL_SUBJECT);
+        this.messageBody = (String) automationProperties.getProperty(MESSAGE_BODY);
     }
 
     /**
@@ -134,8 +133,17 @@ public class AutomationEmailUtility {
         emailProps.put("mail.smtp.host", this.emailHost);
         emailProps.put("mail.smtp.port", Integer.valueOf(this.emailPort));
 
+        emailProps.put("mail.smtp.auth", true);
+        emailProps.put("mail.smtp.starttls.enable", true);
+
+        /* emailProps.put("mail.debug", "true"); */
+
         // Setting up a mail session
-        Session session = Session.getInstance(emailProps);
+        Session session = Session.getInstance(emailProps, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("frameworkfastest@gmail.com", "Titans@123");
+            }
+        });
 
         try {
             InternetAddress[] receiversAddress = InternetAddress.parse(this.emailTo, true);
@@ -177,8 +185,7 @@ public class AutomationEmailUtility {
             logger.info("Mail sent successfully");
         } catch (MessagingException | UnknownHostException e) {
             logger.debug("Exception Occured While sending mail {} ", ExceptionUtils.getStackTrace(e));
-        }
-        finally {
+        } finally {
             resetMailData();
         }
         logger.traceExit();
@@ -189,7 +196,7 @@ public class AutomationEmailUtility {
         lastExecutedTestCount = 0;
         totalPassTestCases = 0;
         totalFailedTestCases = 0;
-        
+
     }
 
     /**

@@ -1,9 +1,9 @@
 package com.infogain.automation.errors;
 
 /**
- * Copyright (c) 2019 FedEx. All Rights Reserved.<br>
+ * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * <br>
- * Theme - Core Retail Peripheral Services<br>
+ * Theme - Automation<br>
  * Description - This class consists of automation testing framework related error codes. Description - This class is
  * 
  * @author Namit Jain [3696360]
@@ -27,7 +27,14 @@ public enum AutomationErrorCodes implements ErrorCodes {
     AUTOMATION_REQUEST_METHOD_NOT_SUPPORTED("AUTOMATION.REQUESTMETHOD.NOTSUPPORTEDEXCEPTION",
                     "Requested Method not supported"),
     AUTOMATION_INERNAL_SERVER_ERROR("AUTOMATION.INTERNALSERVER.ERROR", "An exception occured. Please try again"),
-    AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE("AUTOMATION.INTERNALSERVER.ERROR", "{0}");
+    AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE("AUTOMATION.INTERNALSERVER.ERROR", "{0}"),
+    
+    EXCEL_ROW_DATA_EMPTY_EXCEPTION("FASTTEST.ROWDATA.EMPTYEXCEPTION",
+                    "'rowData' cannot be empty. Please try again."),
+    INPUT_EXCEL_FILE_NAME_EXCEPTION("FASTTEST.EXCELFILENAME.MISSINGEXCEPTION",
+                    "'inputExcelFileName' field in 'rowData' is required. Please try again."),
+    INPUT_EXCEL_SHEET_NAME_EXCEPTION("FASTTEST.EXCELSHEETNAME.MISSINGEXCEPTION",
+                    "'inputExcelSheetName' field in 'rowData' is required. Please try again.");
 
     private String message;
     private String code;
