@@ -61,7 +61,7 @@ public class AutomationFileDetailsService {
             }
             automationExcelUtility.closeExcel(workbookInput);
             if (!excelSheetNames.isEmpty()) {
-                allExcelSheetsNames.put(excelFilePath.substring(inputExcelFolderPath.length() + 1), excelSheetNames);
+                allExcelSheetsNames.put(excelFilePath.substring(inputExcelFolderPath.length() + 1).replaceAll("\\\\", "/"), excelSheetNames);
             }
         }
         return new AutomationFilePathAndNameDTO(inputJSonFolderPath, inputExcelFolderPath, allExcelSheetsNames);

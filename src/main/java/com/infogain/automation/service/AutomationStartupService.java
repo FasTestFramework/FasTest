@@ -84,9 +84,11 @@ public class AutomationStartupService {
                     automationAbstractTests.performValidations();
                     automationAbstractTests.publishResults(workbook, automationRunTestCasesDTO.isSaveToDatabase());
                 } catch (AutomationException e) {
+                    automationExcelUtility.closeExcel(workbook);
                     throw e;
                 } catch (Exception e) {
                     if (e.getCause() instanceof AutomationException) {
+                        automationExcelUtility.closeExcel(workbook);
                         throw (AutomationException) e.getCause();
                     } else {
                         logger.debug("Exception Occured While testing sheet {} : {} ", excelSheetName,

@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class AutomationFilePathAndNameDTO {
 
-    String inputJSonFolderPath;
+    String inputJsonFolderPath;
     String inputExcelFolderPath;
     Map<String, List<String>> testInputFiles;
 
@@ -15,25 +15,25 @@ public class AutomationFilePathAndNameDTO {
 
     public AutomationFilePathAndNameDTO(String inputJSonFolderPath, String inputExcelFolderPath,
                     Map<String, List<String>> testInputFiles) {
-        this.inputJSonFolderPath = inputJSonFolderPath;
+        this.inputJsonFolderPath = inputJSonFolderPath;
         this.inputExcelFolderPath = inputExcelFolderPath;
         this.testInputFiles = testInputFiles;
     }
 
 
     /**
-     * @return the inputJSonFolderPath
+     * @return the inputJsonFolderPath
      */
-    public String getInputJSonFolderPath() {
-        return inputJSonFolderPath;
+    public String getInputJsonFolderPath() {
+        return inputJsonFolderPath;
     }
 
 
     /**
-     * @param inputJSonFolderPath the inputJSonFolderPath to set
+     * @param inputJsonFolderPath the inputJsonFolderPath to set
      */
-    public void setInputJSonFolderPath(String inputJSonFolderPath) {
-        this.inputJSonFolderPath = inputJSonFolderPath;
+    public void setInputJsonFolderPath(String inputJsonFolderPath) {
+        this.inputJsonFolderPath = inputJsonFolderPath;
     }
 
 

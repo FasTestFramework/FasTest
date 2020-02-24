@@ -42,14 +42,24 @@ public class AutomationUtility {
         JsonParser jsonParser = new JsonParser();
         try {
             JsonElement outputObject = jsonParser.parse(actualOutput);
-            if (!outputObject.isJsonPrimitive()) {
+            if (!outputObject.isJsonNull() && !outputObject.isJsonPrimitive()) {
                 Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
                 actualOutput = gson.toJson(outputObject);
             }
         } catch (Exception e) {
-            // no futher handling needed
+            // no further handling needed
         }
         return actualOutput;
+    }
+    
+    public Integer extractIntegerOfString(String text) {
+        Integer integer = null;
+        try {
+            integer = Double.valueOf(text).intValue();
+        } catch (NumberFormatException e) {
+            // do nothing
+        }
+        return integer;
     }
 
 }
