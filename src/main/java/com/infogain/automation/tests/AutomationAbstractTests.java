@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
@@ -72,15 +73,11 @@ public abstract class AutomationAbstractTests {
         automationRequestBodyAndHeadersUtility = BeanUtil.getBean(AutomationRequestBodyAndHeadersUtility.class);
     }
 
-    public void init(String inputExcelFileName, String testSheetName) {
+    public void init(XSSFWorkbook workbook, String inputExcelFileName, String testSheetName) {
         this.testSheetName = testSheetName;
         this.inputExcelFileName = inputExcelFileName;
-        String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
-                                        + inputExcelFileName;
         // Reading Data from Excel Utility Method and setting it to Automation Input DTO
-        automationInputDTOList = automationExcelUtility.readInputExcelFile(inputExcelFilePath, testSheetName);
-
+        automationInputDTOList = automationExcelUtility.readInputExcelFile(workbook, inputExcelFileName, testSheetName);
         String inputjsonFolderPath =
                         automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         setRequestBodyAndHeaders(inputjsonFolderPath);
@@ -142,12 +139,10 @@ public abstract class AutomationAbstractTests {
      * 
      * @since Nov 27, 2019
      */
-    public void publishResults(boolean saveToDatabase) {
+    public void publishResults(XSSFWorkbook workbook, boolean saveToDatabase) {
         logger.traceEntry("publishResults method of {} class", testSheetName);
-        String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
-                                        + inputExcelFileName;
-        automationExcelUtility.writeOutputExcelFile(inputExcelFilePath, testSheetName, automationInputDTOList);
+
+        automationExcelUtility.writeOutputExcelFile(workbook, testSheetName, automationInputDTOList);
         AutomationOutputModel automationOutputModel =
                         AutomationInputDtoToAutomationModelMapper.convertAutomationDtoToAutomationOutputModel(
                                         automationInputDTOList, outputExcelSheet, testSheetName, inputExcelFileName);

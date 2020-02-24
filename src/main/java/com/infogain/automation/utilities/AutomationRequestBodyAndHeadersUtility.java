@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 
-import com.infogain.automation.dto.AutomationInputDTO;
 import com.infogain.automation.exception.AutomationException;
 
 /**

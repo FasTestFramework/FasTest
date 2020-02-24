@@ -25,7 +25,7 @@ public final class AutomationConstants {
     public static final String TEST_CASE_RESULT_PASS = "PASS";
     public static final String TEST_CASE_RESULT_FAIL = "FAIL";
     public static final String AUTOMATIONSERVER_DEFAULT_TEST = "AutomationDefaultTest";
-    
+
     public static final String FASTEST_SERVER_PORT = "server.port";
     public static final String APPLICATION_PROPERTIES_SHEET_NAME = "fastest.testClass";
     public static final String FASTEST_EXCEL_SHEET_NAME = "fastest.excelSheetName";

@@ -54,7 +54,7 @@ public class AutomationUIController {
     @PostMapping(value = "/createExcel", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void generateExcel(@Valid  @RequestBody AutomationExcelRequestDTO automationExcelRequestDTO) {
+    public void generateExcel(@Valid @RequestBody AutomationExcelRequestDTO automationExcelRequestDTO) {
         automationInputExcelService.insertDataToExcel(automationExcelRequestDTO);
     }
 

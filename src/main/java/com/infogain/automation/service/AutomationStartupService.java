@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,36 +62,40 @@ public class AutomationStartupService {
         int lastExecutedTestCount = 0;
         for (Map.Entry<String, List<String>> entry : testInputFiles.entrySet()) {
             String excelFileName = entry.getKey();
+            String inputExcelFilePath =
+                            automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
+                                            + excelFileName;
+            XSSFWorkbook workbook = automationExcelUtility.readExcelFile(inputExcelFilePath);
             List<String> excelSheetNames = entry.getValue();
-            for (String value : excelSheetNames) {
+            for (String excelSheetName : excelSheetNames) {
                 lastExecutedTestCount = lastExecutedTestCount
-                                + automationReportService.getLastTestCaseExecuted(excelFileName, value);
+                                + automationReportService.getLastTestCaseExecuted(excelFileName, excelSheetName);
                 Class<?> classFound;
                 try {
-                    classFound = Class.forName(AutomationConstants.TEST_CLASS_PACKAGE_NAME + value);
+                    classFound = Class.forName(AutomationConstants.TEST_CLASS_PACKAGE_NAME + excelSheetName);
                 } catch (ClassNotFoundException | NoClassDefFoundError e) {
                     classFound = AutomationDefaultTest.class;
                 }
                 try {
                     AutomationAbstractTests automationAbstractTests =
                                     (AutomationAbstractTests) classFound.newInstance();
-                    automationAbstractTests.init(excelFileName, value);
+                    automationAbstractTests.init(workbook, excelFileName, excelSheetName);
                     automationAbstractTests.test();
                     automationAbstractTests.performValidations();
-                    automationAbstractTests.publishResults(automationRunTestCasesDTO.isSaveToDatabase());
+                    automationAbstractTests.publishResults(workbook, automationRunTestCasesDTO.isSaveToDatabase());
                 } catch (AutomationException e) {
                     throw e;
                 } catch (Exception e) {
                     if (e.getCause() instanceof AutomationException) {
                         throw (AutomationException) e.getCause();
                     } else {
-                        logger.debug("Exception Occured While testing sheet {} : {} ", value,
+                        logger.debug("Exception Occured While testing sheet {} : {} ", excelSheetName,
                                         ExceptionUtils.getStackTrace(e));
                     }
                 }
             }
             String outputExcelFileName = generateOutputExcelFileName(excelFileName);
-            automationExcelUtility.saveDataToExcel(outputExcelFileName, excelSheetNames);
+            automationExcelUtility.generateExcel(workbook, outputExcelFileName, excelSheetNames);
             attachments.add(outputExcelFileName);
         }
 

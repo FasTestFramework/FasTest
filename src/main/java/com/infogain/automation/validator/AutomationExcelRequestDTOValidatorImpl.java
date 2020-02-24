@@ -34,8 +34,7 @@ public class AutomationExcelRequestDTOValidatorImpl
     @Override
     public boolean isValid(AutomationExcelRequestDTO value, ConstraintValidatorContext context) {
         if (value == null || value.getRowData() == null) {
-            throw new FastTestBadRequestException(
-                            AutomationErrorCodes.AUTOMATION_REQUESTBODY_MISSING_EXCEPTION);
+            throw new FastTestBadRequestException(AutomationErrorCodes.AUTOMATION_REQUESTBODY_MISSING_EXCEPTION);
         } else {
             errorCodes = new ArrayList<>();
             if (value.getRowData().isEmpty()) {

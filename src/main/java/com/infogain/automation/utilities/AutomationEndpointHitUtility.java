@@ -11,8 +11,6 @@ import io.restassured.http.Headers;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-import com.infogain.automation.dto.AutomationInputDTO;
-
 import static io.restassured.RestAssured.given;
 
 @Component

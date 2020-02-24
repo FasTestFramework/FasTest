@@ -26,8 +26,7 @@ public class AutomationValidationUtility {
     private static Map<String, String> customKeysValidation;
     private static StringBuilder comments = new StringBuilder();
 
-    private AutomationValidationUtility() {
-    }
+    private AutomationValidationUtility() {}
 
     /*
      * public static void main(String[] args) { //to be removed String expected = "{\"output\":{\r\n" +

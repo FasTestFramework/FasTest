@@ -7,6 +7,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
@@ -30,6 +35,21 @@ public class AutomationUtility {
         } catch (IOException e) {
             logger.debug("Exception occured while opening UI {} ", ExceptionUtils.getStackTrace(e));
         }
+    }
+
+    public String beautifyJson(String text) {
+        String actualOutput = text;
+        JsonParser jsonParser = new JsonParser();
+        try {
+            JsonElement outputObject = jsonParser.parse(actualOutput);
+            if (!outputObject.isJsonPrimitive()) {
+                Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+                actualOutput = gson.toJson(outputObject);
+            }
+        } catch (Exception e) {
+            // no futher handling needed
+        }
+        return actualOutput;
     }
 
 }
