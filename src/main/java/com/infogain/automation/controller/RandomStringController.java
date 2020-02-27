@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.infogain.automation.dto.RandomAttributeDTO;
+import com.infogain.automation.dto.AutomationRandomGeneratorDTO;
 import com.infogain.automation.service.RandomService;
 
 @RestController
@@ -19,8 +19,10 @@ public class RandomStringController {
         this.randomService = randomService;
     }
 
-    @PostMapping(path = "/random", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    public String ramdomString(@RequestBody RandomAttributeDTO randomAttributeDTO) {
-        return randomService.generateRandomString(randomAttributeDTO);
+    @PostMapping(path = "/random", consumes = MediaType.APPLICATION_JSON_VALUE,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
+    public String ramdomString(@RequestBody AutomationRandomGeneratorDTO regexDTO) {
+        System.out.println(regexDTO);
+        return randomService.generateRandomString(regexDTO);
     }
 }

@@ -1,5 +1,11 @@
 package com.infogain.automation.exception;
 
+import java.util.Collections;
+import java.util.List;
+
+import com.infogain.automation.dto.ErrorCodesDTO;
+import com.infogain.automation.errors.AutomationErrorCodes;
+
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
@@ -13,20 +19,35 @@ package com.infogain.automation.exception;
  */
 public class RandomGenerationAutomationException extends RuntimeException {
 
-    private static final long serialVersionUID = 1955733436336278411L;
+    private static final long serialVersionUID = 1L;
+    private final List<ErrorCodesDTO> errorCodesList;
 
-    /**
-     * @param message User defined Exception Message
-     * @param cause Exception cause
-     */
-    public RandomGenerationAutomationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * @param message User defined Exception Message
-     */
     public RandomGenerationAutomationException(String message) {
         super(message);
+        this.errorCodesList = null;
+    }
+
+    public RandomGenerationAutomationException(String message, Throwable cause) {
+        super(message, cause);
+        this.errorCodesList = null;
+    }
+
+    public RandomGenerationAutomationException(List<ErrorCodesDTO> errorCodesList) {
+        super(errorCodesList.toString());
+        this.errorCodesList = errorCodesList;
+    }
+
+    public RandomGenerationAutomationException(ErrorCodesDTO errorCodesList) {
+        super(errorCodesList.toString());
+        this.errorCodesList = Collections.singletonList(errorCodesList);
+    }
+
+    public RandomGenerationAutomationException(AutomationErrorCodes automationErrorCodes) {
+        super(automationErrorCodes.getCode() + automationErrorCodes.getMessage());
+        this.errorCodesList = Collections.singletonList(new ErrorCodesDTO(automationErrorCodes));
+    }
+
+    public List<ErrorCodesDTO> getErrorCodes() {
+        return errorCodesList;
     }
 }

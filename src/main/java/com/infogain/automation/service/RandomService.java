@@ -1,19 +1,23 @@
 package com.infogain.automation.service;
 
-import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.infogain.automation.dto.RandomAttributeDTO;
+import com.infogain.automation.dto.AutomationRandomGeneratorDTO;
+import com.infogain.automation.utilities.RegexConverter;
 
 @Service
 public class RandomService {
 
-    public String generateRandomString(RandomAttributeDTO randomAttributeDTO) {
-        if (!(randomAttributeDTO.isUseLetters() || randomAttributeDTO.isUseNumbers())) {
-            return "Invalid Request";
-        }
-        return RandomStringUtils.random(randomAttributeDTO.getLength(), randomAttributeDTO.isUseLetters(),
-                        randomAttributeDTO.isUseNumbers());
 
+    private RegexConverter regexConverter;
+
+    @Autowired
+    public RandomService(RegexConverter regexConverter) {
+        this.regexConverter = regexConverter;
+    }
+
+    public String generateRandomString(AutomationRandomGeneratorDTO automationRandomGeneratorDTO) {
+        return regexConverter.start(automationRandomGeneratorDTO.getinstructionsToGenerateRandomData());
     }
 }

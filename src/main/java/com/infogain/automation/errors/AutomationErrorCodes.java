@@ -28,13 +28,14 @@ public enum AutomationErrorCodes implements ErrorCodes {
                     "Requested Method not supported"),
     AUTOMATION_INERNAL_SERVER_ERROR("AUTOMATION.INTERNALSERVER.ERROR", "An exception occured. Please try again"),
     AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE("AUTOMATION.INTERNALSERVER.ERROR", "{0}"),
-    
-    EXCEL_ROW_DATA_EMPTY_EXCEPTION("FASTTEST.ROWDATA.EMPTYEXCEPTION",
-                    "'rowData' cannot be empty. Please try again."),
+
+    EXCEL_ROW_DATA_EMPTY_EXCEPTION("FASTTEST.ROWDATA.EMPTYEXCEPTION", "'rowData' cannot be empty. Please try again."),
     INPUT_EXCEL_FILE_NAME_EXCEPTION("FASTTEST.EXCELFILENAME.MISSINGEXCEPTION",
                     "'inputExcelFileName' field in 'rowData' is required. Please try again."),
     INPUT_EXCEL_SHEET_NAME_EXCEPTION("FASTTEST.EXCELSHEETNAME.MISSINGEXCEPTION",
-                    "'inputExcelSheetName' field in 'rowData' is required. Please try again.");
+                    "'inputExcelSheetName' field in 'rowData' is required. Please try again."),
+    REGEX_FORMAT_EXCEPTION("FASTTEST.REGEXFORMAT.EXCEPTION",
+                    "'instructionsToGenerateRandomData' field has invalid data please refer to message: ' {0} ' . Please try again.");
 
     private String message;
     private String code;

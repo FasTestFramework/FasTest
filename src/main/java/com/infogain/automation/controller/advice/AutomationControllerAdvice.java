@@ -22,6 +22,7 @@ import com.infogain.automation.dto.ErrorCodesDTO;
 import com.infogain.automation.errors.AutomationErrorCodes;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.exception.FastTestBadRequestException;
+import com.infogain.automation.exception.RandomGenerationAutomationException;
 
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
@@ -130,6 +131,18 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
                                             AutomationErrorCodes.AUTOMATION_REQUESTBODY_MISSING_EXCEPTION.getMessage());
         }
         final AutomationResponse automationResponse = AutomationResponse.error(automationError);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
+    }
+
+    @ExceptionHandler(RandomGenerationAutomationException.class)
+    public ResponseEntity<AutomationResponse> handleRandomGenerationAutomationException(
+                    final RandomGenerationAutomationException randomGenerationAutomationException,
+                    HttpServletRequest request) {
+        logger.error("RandomGenerationAutomationException has occured for request from: '{}' Exception: {}",
+                        getRequestOriginAddress(request.getRemoteAddr()),
+                        ExceptionUtils.getStackTrace(randomGenerationAutomationException));
+        final AutomationResponse automationResponse = AutomationResponse.error(
+                        convertErrorCodesDtoListToCXSErrorList(randomGenerationAutomationException.getErrorCodes()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
     }
 
