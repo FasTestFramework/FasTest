@@ -21,6 +21,7 @@ import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.properties.AutomationProperties;
 import com.infogain.automation.tests.AutomationAbstractTests;
 import com.infogain.automation.tests.AutomationDefaultTest;
+import com.infogain.automation.utilities.AutomationClaimsUtility;
 import com.infogain.automation.utilities.AutomationEmailUtility;
 import com.infogain.automation.utilities.AutomationExcelUtility;
 
@@ -33,20 +34,25 @@ public class AutomationStartupService {
     private final AutomationReportService automationReportService;
     private final AutomationExcelUtility automationExcelUtility;
     private final AutomationEmailUtility automationEmailUtility;
+    private final AutomationClaimsUtility automationClaimsUtility;
 
     @Autowired
     public AutomationStartupService(final AutomationProperties automationProperties,
                     final AutomationReportService automationReportService,
                     final AutomationExcelUtility automationExcelUtility,
-                    final AutomationEmailUtility automationEmailUtility) {
+                    final AutomationEmailUtility automationEmailUtility,
+                    final AutomationClaimsUtility automationClaimsUtility) {
         this.automationProperties = automationProperties;
         this.automationReportService = automationReportService;
         this.automationExcelUtility = automationExcelUtility;
         this.automationEmailUtility = automationEmailUtility;
+        this.automationClaimsUtility = automationClaimsUtility;
     }
 
     public void runTestCases(AutomationRunTestCasesDTO automationRunTestCasesDTO) {
         logger.traceEntry("runTestCases method of AutomationStartupService class");
+        String generateTokenAt = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);
+
         Map<String, List<String>> testInputFiles = automationRunTestCasesDTO.getTestInputFiles();
         if (testInputFiles == null || testInputFiles.isEmpty()) {
             testInputFiles = new HashMap<>();
@@ -60,7 +66,15 @@ public class AutomationStartupService {
         }
         List<String> attachments = new ArrayList<>();
         int lastExecutedTestCount = 0;
+        String generateToken = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN);
+        if (generateTokenAt.equalsIgnoreCase("beforeStartUp") && generateToken.equalsIgnoreCase("true")) {
+            automationClaimsUtility.generateClaimId();
+        }
         for (Map.Entry<String, List<String>> entry : testInputFiles.entrySet()) {
+            if (generateTokenAt.equalsIgnoreCase("beforeFile") && generateToken.equalsIgnoreCase("true")) {
+                automationClaimsUtility.releaseAutomationServer();
+                automationClaimsUtility.generateClaimId();
+            }
             String excelFileName = entry.getKey();
             String inputExcelFilePath =
                             automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
@@ -100,8 +114,9 @@ public class AutomationStartupService {
             automationExcelUtility.generateExcel(workbook, outputExcelFileName, excelSheetNames);
             attachments.add(outputExcelFileName);
         }
-
-        new AutomationDefaultTest().cleanup();
+        if (generateTokenAt.equalsIgnoreCase("beforeStartUp")) {
+            automationClaimsUtility.releaseAutomationServer();
+        }
         if (automationRunTestCasesDTO.isSendMail()) {
             automationEmailUtility.addAttachments(attachments);
             automationEmailUtility.setLastExecutedTestCount(lastExecutedTestCount);

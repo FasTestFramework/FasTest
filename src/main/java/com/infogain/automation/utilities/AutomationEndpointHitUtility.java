@@ -55,15 +55,4 @@ public class AutomationEndpointHitUtility {
         return hitEndpoint(baseUrl, url, headers, methodType, jsonString);
     }
 
-    /**
-     * This method takes Endpoint URL and its Type and return response after
-     * 
-     * @param automationInputDTO of {@link AutomationInputDTO}
-     * @return response
-     * @since Dec 11, 2019
-     */
-    public Response hitEndpoint(String baseUrl, String url, Headers headers, HttpMethod methodType) {
-        String jsonBody = null;
-        return hitEndpoint(baseUrl, url, headers, methodType, jsonBody);
-    }
 }

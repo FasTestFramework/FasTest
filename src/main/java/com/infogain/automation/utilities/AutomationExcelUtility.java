@@ -139,7 +139,7 @@ public class AutomationExcelUtility {
                         requestType = printJsonReceiptUrlArray[1];
                         AutomationInputDTO automationInput = new AutomationInputDTO(serialNumber, testCaseDescription,
                                         headerJson, inputJson, inputParam, expectedOutput, expectedHttpStatus,
-                                        requestUrl, getRequestMethodType(requestType), keyValidationMap);
+                                        requestUrl, automationUtility.getRequestMethodType(requestType), keyValidationMap);
                         jsonFileList.add(automationInput);
 
                     } else {
@@ -352,13 +352,7 @@ public class AutomationExcelUtility {
     }
 
 
-    private HttpMethod getRequestMethodType(String requestType) {
-        try {
-            return HttpMethod.valueOf(requestType.toUpperCase());
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new AutomationException("Wrong Http Method is defined in Properties file i.e. " + requestType);
-        }
-    }
+    
 
     private String extractValueFromCell(Cell serialNumberCell) {
         String serialNumber;

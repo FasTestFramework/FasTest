@@ -90,21 +90,24 @@ public abstract class AutomationAbstractTests {
      */
     public void test() {
         logger.traceEntry("test method of {} class", testSheetName);
-        if (testSheetName.equals(AutomationConstants.CLAIM_TEST)) {
+        String generateToken = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN);
+
+        String generateTokenAt = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);
+        if (generateTokenAt.equalsIgnoreCase("beforeSheet") && generateToken.equalsIgnoreCase("true")) {
             automationClaimsUtility.releaseAutomationServer();
-            logger.info("generated claim ID released");
-        } else {
-            // Updating ClaimId by new Generated Claim ID in JSON File
             automationInputDTOList
                             .forEach(automationInputDTO -> automationClaimsUtility.updateToken(automationInputDTO));
         }
         automationInputDTOList.forEach(automationInputDTO -> {
             try {
                 logger.info("Testing {} :", this.getClass().getSimpleName());
-                Response resp = getActualResponse(baseClaimUrl, automationInputDTO);
-                if (testSheetName.equals(AutomationConstants.CLAIM_TEST)) {
-                    automationClaimsUtility.releaseAutomationServer(resp);
+                if (generateTokenAt.equalsIgnoreCase("beforeTest") && generateToken.equalsIgnoreCase("true")) {
+                    automationClaimsUtility.releaseAutomationServer();
                 }
+                if (!generateTokenAt.equalsIgnoreCase("beforeSheet") && generateToken.equalsIgnoreCase("true")) {
+                    automationClaimsUtility.updateToken(automationInputDTO);
+                }
+                getActualResponse(baseClaimUrl, automationInputDTO);
             } catch (Exception e) {
                 logger.debug("Exception Occured While hitting endpoint {} of type {} : {}",
                                 automationInputDTO.getRequestURL(), automationInputDTO.getRequestType(),
@@ -162,10 +165,6 @@ public abstract class AutomationAbstractTests {
         logger.traceExit();
     }
 
-    public void cleanup() {
-        automationClaimsUtility.releaseAutomationServer();
-    }
-
     /**
      * This method takes Endpoint URL and its Type and return response after
      * 
@@ -173,7 +172,7 @@ public abstract class AutomationAbstractTests {
      * @return response
      * @since Dec 11, 2019
      */
-    private Response getActualResponse(String baseUrl, AutomationInputDTO automationInputDTO) {
+    private void getActualResponse(String baseUrl, AutomationInputDTO automationInputDTO) {
         logger.traceEntry("hitEndpoint method of AutomationEndpointHitUtility class");
         logger.info("Expected Response Status code - {}, response body : {}",
                         automationInputDTO.getExpectedHttpStatus(), automationInputDTO.getExpectedOutput());
@@ -184,7 +183,7 @@ public abstract class AutomationAbstractTests {
         automationInputDTO.setActualHttpStatus(resp.statusCode());
         automationInputDTO.setActualOutput(resp.asString());
         automationInputDTO.setExecutionDateTime(LocalDateTime.now());
-        return logger.traceExit(resp);
+        logger.traceExit();
     }
 
     private void setRequestBodyAndHeaders(String inputjsonFolderPath) {
@@ -192,19 +191,16 @@ public abstract class AutomationAbstractTests {
             String inputJson = automationInputDTO.getInputJson();
             String headerJson = automationInputDTO.getHeaderJson();
             if (StringUtils.isNotBlank(inputJson)) {
-                inputJson = inputJson.toLowerCase().endsWith(".json")
-                                ? inputjsonFolderPath + "/" + inputJson
+                inputJson = inputJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + inputJson
                                 : inputJson;
-                automationInputDTO.setTestCaseInputJson(automationRequestBodyAndHeadersUtility
-                                .fetchJSONObject(inputJson));
+                automationInputDTO.setTestCaseInputJson(
+                                automationRequestBodyAndHeadersUtility.fetchJSONObject(inputJson));
             }
             // sets Header Object in AutomationInputDTO
             if (StringUtils.isNotBlank(headerJson)) {
-                 headerJson = headerJson.toLowerCase().endsWith(".json")
-                                ? inputjsonFolderPath + "/" + headerJson
+                headerJson = headerJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + headerJson
                                 : headerJson;
-                Headers fetchHeaders = automationRequestBodyAndHeadersUtility
-                                .fetchHeaders(headerJson);
+                Headers fetchHeaders = automationRequestBodyAndHeadersUtility.fetchHeaders(headerJson);
                 automationInputDTO.setHeaders(fetchHeaders);
             }
         });

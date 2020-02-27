@@ -32,18 +32,25 @@ public final class AutomationConstants {
     public static final String FASTEST_OUTPUT_FOLDER_PATH = "fastest.outputFolderPath";
     public static final String FASTEST_INPUT_JSON_FOLDER_PATH = "fastest.inputJsonFolderPath";
     public static final String FASTEST_INPUT_EXCEL_FOLDER_PATH = "fastest.inputExcelFolderPath";
-    public static final String FASTEST_HEADER_TO_USE = "fastest.headersToUse";
     public static final String FASTEST_HOST_NAME = "fastest.HostName";
     public static final String FASTEST_PORT = "fastest.Port";
     public static final String FASTEST_URL_PREFIX = "fastest.";
-    public static final String FASTEST_URL_TO_USE = "fastest.tokenGenerateUrl";
-    public static final String FASTEST_BODY_TO_USE = "fastest.bodyToUse";
-    public static final String FASTEST_RESPONSE_KEY = "fastest.tokenFetchResponseKey";
-    public static final String FASTEST_ADD_TOKEN_IN = "fastest.addTokenIn";
-    public static final String FASTEST_TOKEN_PROPERTY_NAME = "fastest.tokenReplaceRequestKey";
 
-    public static final String FASTEST_RELEASE_URL = "fastest.releaseUrl";
+    public static final String FASTEST_GENERATE_TOKEN = "fastest.tokenGenerate"; 
+    public static final String FASTEST_GENERATE_TOKEN_INSTANCE = "fastest.tokenGenerationInstance";
+    public static final String FASTEST_GENERATE_TOKEN_URL = "fastest.tokenGenerateUrl";
+    public static final String FASTEST_GENERATE_TOKEN_BODY_TO_USE = "fastest.tokenGenerateBody";
+    public static final String FASTEST_GENERATE_TOKEN_HEADER_TO_USE = "fastest.headersToUse";
+
+    public static final String FASTEST_RELEASE_TOKEN = "fastest.tokenRelease";
+    public static final String FASTEST_TOKEN_RELEASE_URL = "fastest.tokenReleaseUrl";
+    public static final String FASTEST_RELEASE_TOKEN_BODY_TO_USE = "fastest.tokenReleaseBody";
+    public static final String FASTEST_RELEASE_TOKEN_HEADER_TO_USE = "fastest.tokenReleaseHeaders";
+    public static final String FASTEST_TOKEN_RELEASE_PROPERTY_NAMES = "fastest.tokenReleaseReplaceRequestKeys";
+    
+    public static final String FASTEST_TOKEN_REPLACE_PROPERTY_NAMES = "fastest.tokenReplaceRequestKeys";
     public static final String FASTEST_CLAIM_URL = "fastest.claimUrl";
+    public static final String FASTEST_RELEASE_URL = "fastest.releaseUrl";
     public static final String FASTEST_SERVER_INFO_URL = "fastest.serverInfoUrl";
     public static final String FASTEST_HEALTH_CHECK_URL = "fastest.serverHealthCheckUrl";
     public static final String FASTEST_CONNECTED_DEVICE_URL = "fastest.serverConnectedDeviceUrl";
@@ -56,4 +63,5 @@ public final class AutomationConstants {
     public static final String FASTEST_PRINT_JSON_RECEIPT_URL = "fastest.printJsonReceiptUrl";
     public static final String FASTEST_PRINT_XML_RECEIPT_URL = "fastest.printXMLReceiptUrl";
     public static final String FASTEST_PRINT_DELIVERY_LABEL_URL = "fastest.printDymoDeliveryLabelUrl";
+    
 }

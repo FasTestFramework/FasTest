@@ -5,12 +5,14 @@ import java.io.IOException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.infogain.automation.exception.AutomationException;
 
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
@@ -60,6 +62,14 @@ public class AutomationUtility {
             // do nothing
         }
         return integer;
+    }
+    
+    public HttpMethod getRequestMethodType(String requestType) {
+        try {
+            return HttpMethod.valueOf(requestType.toUpperCase());
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new AutomationException("Wrong Http Method is defined in Properties file i.e. " + requestType);
+        }
     }
 
 }
