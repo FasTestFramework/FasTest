@@ -117,7 +117,7 @@ public class AutomationInputExcelService {
             cellData.put(FastTestExcelHeaders.FAILURES, null);
             cellData.put(FastTestExcelHeaders.EXECUTION_DATE_TIME, null);
             cellData.put(FastTestExcelHeaders.COMMENTS, null);
-            automationExcelUtility.insertRowData(workbookInput, currentRow, headerIndexes, cellData);
+            automationExcelUtility.insertRowData(workbookInput, sheet, currentRow, headerIndexes, cellData);
         }
     }
 

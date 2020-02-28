@@ -45,7 +45,10 @@ public class AutomationUiRequestService {
     public AutomationUiResponseDTO hitEndpointFromUI(AutomationUiRequestDTO automationUiRequestDTO) {
         String requestUrl = automationUiRequestDTO.getRequestURL();
         String baseClaimUrl;
+        String inputjsonFolderPath =
+                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         String body = automationUiRequestDTO.getBody();
+        body = body.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + body : body;
         JSONObject bodyJson = null;
         if (body != null) {
             try {

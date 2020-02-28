@@ -34,7 +34,6 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import com.infogain.automation.constants.AutomationConstants;
@@ -139,7 +138,8 @@ public class AutomationExcelUtility {
                         requestType = printJsonReceiptUrlArray[1];
                         AutomationInputDTO automationInput = new AutomationInputDTO(serialNumber, testCaseDescription,
                                         headerJson, inputJson, inputParam, expectedOutput, expectedHttpStatus,
-                                        requestUrl, automationUtility.getRequestMethodType(requestType), keyValidationMap);
+                                        requestUrl, automationUtility.getRequestMethodType(requestType),
+                                        keyValidationMap);
                         jsonFileList.add(automationInput);
 
                     } else {
@@ -148,6 +148,10 @@ public class AutomationExcelUtility {
                     }
                 }
             }
+        }
+        if (jsonFileList.isEmpty()) {
+            throw new AutomationException("Excel Sheet " + sheetName + " in file " + fileName
+                            + " is not found or is not having any valid row data");
         }
         return jsonFileList;
     }
@@ -158,17 +162,18 @@ public class AutomationExcelUtility {
         int lastCellNum = headerRow.getLastCellNum();
         int i = lastCellNum >= 0 ? lastCellNum - 1 : lastCellNum;
         FastTestExcelHeaders[] headersValues = FastTestExcelHeaders.values();
-        if (headerIndexes.size() != headersValues.length) {
-            for (FastTestExcelHeaders header : headersValues) {
-                if (!headerIndexes.containsKey(header)) {
-                    headerIndexes.put(header, ++i);
-                    Cell cell = createCell(headerRow, i);
-                    setStyle(cell, getCellStyleForBGColorWithBold(workbookInput, IndexedColors.LIGHT_CORNFLOWER_BLUE),
-                                    BorderStyle.THICK);
-                    cell.setCellValue(header.getName());
-                    sheet.setColumnWidth(headerIndexes.get(header), header.getWidth());
-                }
+        for (FastTestExcelHeaders header : headersValues) {
+            Cell cell;
+            if (headerIndexes.containsKey(header)) {
+                cell = getCell(headerRow, headerIndexes.get(header));
+            } else {
+                headerIndexes.put(header, ++i);
+                cell = createCell(headerRow, i);
+                cell.setCellValue(header.getName());
             }
+            setStyle(cell, getCellStyleForBGColorWithBold(workbookInput, IndexedColors.LIGHT_CORNFLOWER_BLUE),
+                            BorderStyle.THICK);
+            sheet.setColumnWidth(i, header.getWidth());
         }
         sheet.createFreezePane(0, 1);
         return headerIndexes;
@@ -218,8 +223,8 @@ public class AutomationExcelUtility {
         }
     }
 
-    public void insertRowData(XSSFWorkbook workbook, Row row, Map<FastTestExcelHeaders, Integer> headerIndexes,
-                    Map<FastTestExcelHeaders, Object> cellData) {
+    public void insertRowData(XSSFWorkbook workbook, XSSFSheet sheet, Row row,
+                    Map<FastTestExcelHeaders, Integer> headerIndexes, Map<FastTestExcelHeaders, Object> cellData) {
         cellData.forEach((columnName, data) -> {
             Cell cell = createCell(row, headerIndexes.get(columnName));
             XSSFCellStyle defaultCellStyle = workbook.createCellStyle();
@@ -274,6 +279,10 @@ public class AutomationExcelUtility {
                 default:
             }
         });
+        for (FastTestExcelHeaders header : FastTestExcelHeaders.values()) {
+            sheet.setColumnWidth(headerIndexes.get(header), header.getWidth());
+        }
+
     }
 
     /**
@@ -306,7 +315,7 @@ public class AutomationExcelUtility {
                     cellData.put(FastTestExcelHeaders.TEST_CASE_RESULT, automationInputDTO.getTestCaseResult());
                     cellData.put(FastTestExcelHeaders.EXECUTION_DATE_TIME, LocalDateTime.now());
 
-                    insertRowData(workbook, currentRow, headerIndexes, cellData);
+                    insertRowData(workbook, sheet, currentRow, headerIndexes, cellData);
                     j++;
                 } else {
                     rowToBeRemovedIndex.add(currentRow.getRowNum());
@@ -319,7 +328,7 @@ public class AutomationExcelUtility {
         }
         logger.traceExit();
     }
-    
+
     public CellStyle getCellStyleForBold(CellStyle cellStyleForHeaderRow, XSSFWorkbook workbook) {
         XSSFFont boldFont = workbook.createFont();
         boldFont.setBold(true);
@@ -352,7 +361,6 @@ public class AutomationExcelUtility {
     }
 
 
-    
 
     private String extractValueFromCell(Cell serialNumberCell) {
         String serialNumber;
@@ -414,7 +422,7 @@ public class AutomationExcelUtility {
         return getCellStyleForBold(boldWithBgColor, workbook);
     }
 
- 
+
 
     /**
      * This method is to set Border Style in Output Excel File
@@ -448,11 +456,15 @@ public class AutomationExcelUtility {
     }
 
     private Cell createCell(Row row, int columnIndex) {
-        Cell cell = row.getCell(columnIndex);
+        Cell cell = getCell(row, columnIndex);
         if (cell == null) {
             cell = row.createCell(columnIndex);
         }
         return cell;
+    }
+
+    private Cell getCell(Row row, int columnIndex) {
+        return row.getCell(columnIndex);
     }
 
     private boolean checkIfRowIsEmpty(Row row) {

@@ -25,7 +25,7 @@ public class ErrorCodesDTO implements Serializable {
     private static final long serialVersionUID = -2580883535345000380L;
     private static Logger logger = LogManager.getLogger(ErrorCodesDTO.class);
 
-    private static final int MAX_ERROR_DATA_LENGTH = 100;
+    private static final int MAX_ERROR_DATA_LENGTH = 200;
 
     private ErrorCodes errorCode;
     private String message;
