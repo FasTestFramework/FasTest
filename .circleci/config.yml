@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Major deploy tasks
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ];
+            if [ "${CIRCLE_BRANCH}" == "master" && "${CIRCLE_USERNAME}" !="CI_CD" ];
             then
               echo "The release version published on jitpack visit https://jitpack.io/#FasTestFramework/fastest"
               echo "jenkins"
