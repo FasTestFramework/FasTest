@@ -44,13 +44,18 @@ jobs:
       - run:
           name: Major deploy tasks
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" && "${CIRCLE_USERNAME}" !="CI_CD" ];
+            if [ "${CIRCLE_BRANCH}" == "master" &&];
             then
+               if["${CIRCLE_USERNAME}" != "CI_CD"]
+               then
+                 echo "Build not required ppush by release plugin"
+               else 
               echo "The release version published on jitpack visit https://jitpack.io/#FasTestFramework/fastest"
               echo "jenkins"
               git config user.name CI_CD
               git config user.email CI_CD@infogain.com
               mvn release:clean release:prepare --batch-mode -s settings.xml
+               fi
             else
              echo "The Snapshot build has already been sent to jitpack.io  visit https://jitpack.io/#FasTestFramework/fastest"
             fi
