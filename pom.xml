@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.Infogain.fastest</groupId>
 	<artifactId>fastest-automation</artifactId>
-	<version>1.0.20</version>
+	<version>1.0.21-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -50,7 +50,7 @@
 	<scm>
 		<url>https://github.com/FasTestFramework/FasTest.git</url>
 		<connection>scm:git:git@github.com:FasTestFramework/FasTest.git</connection>
-		<tag>fastest-automation-1.0.20</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 
