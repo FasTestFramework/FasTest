@@ -1,6 +1,7 @@
 package com.infogain.automation.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @version 1.0.0
  * @since Dec 12, 2019
  */
+@CrossOrigin(origins = "*")
 @Controller
 public class AutomationIndexController {
 

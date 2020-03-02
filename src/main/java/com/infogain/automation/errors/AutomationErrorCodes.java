@@ -33,7 +33,9 @@ public enum AutomationErrorCodes implements ErrorCodes {
     INPUT_EXCEL_FILE_NAME_EXCEPTION("FASTTEST.EXCELFILENAME.MISSINGEXCEPTION",
                     "'inputExcelFileName' field in 'rowData' is required. Please try again."),
     INPUT_EXCEL_SHEET_NAME_EXCEPTION("FASTTEST.EXCELSHEETNAME.MISSINGEXCEPTION",
-                    "'inputExcelSheetName' field in 'rowData' is required. Please try again.");
+                    "'inputExcelSheetName' field in 'rowData' is required. Please try again."),
+    REGEX_FORMAT_EXCEPTION("FASTTEST.REGEXFORMAT.EXCEPTION",
+                    "'instructionsToGenerateRandomData' field has invalid data please refer to message: ' {0} ' . Please try again.");
 
     private String message;
     private String code;
