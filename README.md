@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/FasTestFramework/FasTest.svg?style=svg&circle-token=1ff03134d9fce4946cfb541634eacffd8dc5456b)](https://circleci.com/gh/FasTestFramework/FasTest)
 ## Introduction
 The FasTest Automation project is designed to test the Restful API's by using Rest Assured and TestNG.
 ### Uses:
