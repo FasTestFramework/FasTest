@@ -46,7 +46,7 @@ jobs:
           name: Major deploy tasks
           command: |
             GIT_COMMIT_MSG=`git log --format=%B -n 1 $CIRCLE_SHA1`
-            if [[ "${CIRCLE_BRANCH}" == "master" && "${CIRCLE_USERNAME}" != "CI_CD" ]];
+            if [[ "${CIRCLE_BRANCH}" == "master" && "${CIRCLE_USERNAME}" != "[maven-release-plugin] prepare release fastest-automation*" ]];
             then
               echo "The release version published on jitpack visit https://jitpack.io/#FasTestFramework/fastest"
               echo "jenkins"
