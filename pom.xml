@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.Infogain.fastest</groupId>
 	<artifactId>fastest-automation</artifactId>
-	<version>1.0.11-SNAPSHOT</version>
+	<version>1.0.16-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
