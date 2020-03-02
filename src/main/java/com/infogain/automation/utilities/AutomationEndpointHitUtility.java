@@ -11,6 +11,8 @@ import io.restassured.http.Headers;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import com.infogain.automation.dto.Pair;
+
 import static io.restassured.RestAssured.given;
 
 @Component
@@ -25,7 +27,7 @@ public class AutomationEndpointHitUtility {
      * @return response
      * @since Dec 11, 2019
      */
-    public Response hitEndpoint(String baseUrl, String url, Headers headers, HttpMethod methodType,
+    public Pair<Response, Double> hitEndpoint(String baseUrl, String url, Headers headers, HttpMethod methodType,
                     String requestBody) {
         RestAssured.baseURI = baseUrl;
         logger.traceEntry("hitEndpoint method of AutomationEndpointHitUtility class");
@@ -35,8 +37,11 @@ public class AutomationEndpointHitUtility {
             logger.info("Payload - {}", requestBody);
             requestSpecification = requestSpecification.body(requestBody);
         }
-        return logger.traceExit(
-                        requestSpecification.when().request(methodType.name(), url).then().extract().response());
+        Long startTime = System.currentTimeMillis();
+        Response response = requestSpecification.when().request(methodType.name(), url).then().extract().response();
+        Long endTime = System.currentTimeMillis();
+        return logger.traceExit(Pair.of(response, (double)(endTime- startTime)/1000));
+       
     }
 
     /**
@@ -46,7 +51,7 @@ public class AutomationEndpointHitUtility {
      * @return response
      * @since Dec 11, 2019
      */
-    public Response hitEndpoint(String baseUrl, String url, Headers headers, HttpMethod methodType,
+    public Pair<Response, Double> hitEndpoint(String baseUrl, String url, Headers headers, HttpMethod methodType,
                     JSONObject requestBody) {
         String jsonString = null;
         if (requestBody != null) {

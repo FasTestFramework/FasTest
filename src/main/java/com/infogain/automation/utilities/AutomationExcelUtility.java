@@ -276,6 +276,14 @@ public class AutomationExcelUtility {
                     if (data != null) {
                         cell.setCellValue(dateTime);
                     }
+                    break;
+                case RUNTIME:
+                    Double time = (Double) data;
+                    setStyle(cell, defaultCellStyle);
+                    if (data != null) {
+                        cell.setCellValue(time);
+                    }
+                    break;
                 default:
             }
         });
@@ -314,6 +322,7 @@ public class AutomationExcelUtility {
                     cellData.put(FastTestExcelHeaders.ACTUAL_HTTP_STATUS, automationInputDTO.getActualHttpStatus());
                     cellData.put(FastTestExcelHeaders.TEST_CASE_RESULT, automationInputDTO.getTestCaseResult());
                     cellData.put(FastTestExcelHeaders.EXECUTION_DATE_TIME, LocalDateTime.now());
+                    cellData.put(FastTestExcelHeaders.RUNTIME, automationInputDTO.getRuntime());
 
                     insertRowData(workbook, sheet, currentRow, headerIndexes, cellData);
                     j++;

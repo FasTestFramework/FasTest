@@ -309,7 +309,7 @@ public class AutomationClaimsUtility {
         String claimJsonPath = inputJSONfolderPath + "/"
                         + automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_BODY_TO_USE);
         return logger.traceExit(automationEndpointHitUtility.hitEndpoint(baseClaimUrl, claimUrl, headers, claimUrlType,
-                        automationRequestBodyAndHeadersUtility.fetchJSONObject(claimJsonPath)));
+                        automationRequestBodyAndHeadersUtility.fetchJSONObject(claimJsonPath)).getFirst());
     }
 
 }

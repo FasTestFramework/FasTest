@@ -39,6 +39,7 @@ public class AutomationInputDTO {
     String requestURL;
     HttpMethod requestType;
     Map<String, String> keyValidation;
+    Double runtime;
 
     /**
      * @return the inputParam
@@ -157,6 +158,21 @@ public class AutomationInputDTO {
         this.failureReason = failureReason;
     }
 
+
+    /**
+     * @return the runtime
+     */
+    public Double getRuntime() {
+        return runtime;
+    }
+
+    /**
+     * @param runtime the runtime to set
+     */
+    public void setRuntime(Double runtime) {
+        this.runtime = runtime;
+    }
+
     public AutomationInputDTO() {
 
     }
@@ -175,15 +191,14 @@ public class AutomationInputDTO {
         this.requestURL = requestURL;
         this.requestType = requestType;
         this.keyValidation = keyValidation;
+
     }
-
-
 
     /**
      * This method
      * 
      * @return
-     * @since Feb 12, 2020
+     * @since Mar 2, 2020
      */
     @Override
     public String toString() {
@@ -194,7 +209,7 @@ public class AutomationInputDTO {
                         + ", failureReason=" + failureReason + ", actualHttpStatus=" + actualHttpStatus
                         + ", testCaseResult=" + testCaseResult + ", executionDateTime=" + executionDateTime
                         + ", headers=" + headers + ", requestURL=" + requestURL + ", requestType=" + requestType
-                        + ", keyValidation=" + keyValidation + "]";
+                        + ", keyValidation=" + keyValidation + ", runtime=" + runtime + "]";
     }
 
     /**
@@ -207,7 +222,7 @@ public class AutomationInputDTO {
     public int hashCode() {
         return Objects.hash(actualHttpStatus, actualOutput, executionDateTime, expectedHttpStatus, expectedOutput,
                         failureReason, headerJson, headers, inputJson, inputParam, keyValidation, requestType,
-                        requestURL, serialNo, testCaseDescription, testCaseInputJson, testCaseResult);
+                        requestURL, runtime, serialNo, testCaseDescription, testCaseInputJson, testCaseResult);
     }
 
     /**
@@ -239,7 +254,8 @@ public class AutomationInputDTO {
                         && Objects.equals(inputJson, other.inputJson) && Objects.equals(inputParam, other.inputParam)
                         && Objects.equals(keyValidation, other.keyValidation)
                         && Objects.equals(requestType, other.requestType)
-                        && Objects.equals(requestURL, other.requestURL) && Objects.equals(serialNo, other.serialNo)
+                        && Objects.equals(requestURL, other.requestURL) && Objects.equals(runtime, other.runtime)
+                        && Objects.equals(serialNo, other.serialNo)
                         && Objects.equals(testCaseDescription, other.testCaseDescription)
                         && Objects.equals(testCaseInputJson, other.testCaseInputJson)
                         && Objects.equals(testCaseResult, other.testCaseResult);

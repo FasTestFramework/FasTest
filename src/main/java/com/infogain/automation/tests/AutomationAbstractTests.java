@@ -8,12 +8,14 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpMethod;
 
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
 
 import com.infogain.automation.constants.AutomationConstants;
 import com.infogain.automation.dto.AutomationInputDTO;
+import com.infogain.automation.dto.Pair;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.mapper.AutomationInputDtoToAutomationModelMapper;
 import com.infogain.automation.model.AutomationOutputModel;
@@ -176,13 +178,16 @@ public abstract class AutomationAbstractTests {
         logger.traceEntry("hitEndpoint method of AutomationEndpointHitUtility class");
         logger.info("Expected Response Status code - {}, response body : {}",
                         automationInputDTO.getExpectedHttpStatus(), automationInputDTO.getExpectedOutput());
-        Response resp = automationEndpointHitUtility.hitEndpoint(baseUrl,
+        Pair<Response, Double> responseAndRuntime =  automationEndpointHitUtility.hitEndpoint(baseUrl,
                         automationInputDTO.getRequestURL() + automationInputDTO.getInputParam(),
                         automationInputDTO.getHeaders(), automationInputDTO.getRequestType(),
                         automationInputDTO.getTestCaseInputJson());
+        Response resp = responseAndRuntime.getFirst();
+        Double testCaseRuntime = responseAndRuntime.getSecond();
         automationInputDTO.setActualHttpStatus(resp.statusCode());
         automationInputDTO.setActualOutput(resp.asString());
         automationInputDTO.setExecutionDateTime(LocalDateTime.now());
+        automationInputDTO.setRuntime(testCaseRuntime);
         logger.traceExit();
     }
 

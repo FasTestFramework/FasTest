@@ -16,8 +16,9 @@ public enum FastTestExcelHeaders {
     TEST_CASE_RESULT("Test case Result", 3600),
     FAILURES("Failures/Errors", 6000),
     EXECUTION_DATE_TIME("Execution date time", 4900),
+    RUNTIME("API Response Time", 5000),
     COMMENTS("Comments", 5000);
-
+    
     private String name;
     private int width;
 

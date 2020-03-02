@@ -79,10 +79,10 @@ public class AutomationUiRequestService {
         if (automationInputDTO.getTestCaseInputJson() != null) {
             resp = automationEndpointHitUtility.hitEndpoint(baseClaimUrl, automationUiRequestDTO.getRequestURL(),
                             automationInputDTO.getHeaders(), automationUiRequestDTO.getRequestType(),
-                            automationInputDTO.getTestCaseInputJson());
+                            automationInputDTO.getTestCaseInputJson()).getFirst();
         } else {
             resp = automationEndpointHitUtility.hitEndpoint(baseClaimUrl, automationUiRequestDTO.getRequestURL(),
-                            automationInputDTO.getHeaders(), automationUiRequestDTO.getRequestType(), body);
+                            automationInputDTO.getHeaders(), automationUiRequestDTO.getRequestType(), body).getFirst();
         }
         automationClaimsUtility.releaseAutomationServer();
         return logger.traceExit(new AutomationUiResponseDTO(resp.asString(), resp.getStatusCode()));
