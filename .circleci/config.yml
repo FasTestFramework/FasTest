@@ -46,7 +46,7 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" &&];
             then
-               if["${CIRCLE_USERNAME}" != "CI_CD"]
+               if["${CIRCLE_USERNAME}" != "CI_CD"];
                then
                  echo "Build not required ppush by release plugin"
                else 
