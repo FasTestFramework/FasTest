@@ -19,7 +19,7 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
-      GIT_COMMIT_DESC: $(git log --format=oneline -n 1 $CIRCLE_SHA1)
+      
 
     steps:
       - checkout
@@ -45,6 +45,7 @@ jobs:
       - run:
           name: Major deploy tasks
           command: |
+            GIT_COMMIT_MSG=`git log --format=oneline -n 1 $CIRCLE_SHA1`
             if [[ "${CIRCLE_BRANCH}" == "master" && "${CIRCLE_USERNAME}" != "CI_CD" ]];
             then
               echo "The release version published on jitpack visit https://jitpack.io/#FasTestFramework/fastest"
@@ -53,7 +54,7 @@ jobs:
               echo ${CIRCLE_JOB}
               echo ${CIRCLE_WORKFLOW_ID}
               echo ${CIRCLE_TAG}
-              echo ${GIT_COMMIT_DESC}
+              echo ${GIT_COMMIT_MSG}
               git config user.name CI_CD
               git config user.email CI_CD@infogain.com
               mvn release:clean release:prepare --batch-mode -s settings.xml
