@@ -45,15 +45,12 @@ jobs:
       - run:
           name: Major deploy tasks
           command: |
-            GIT_COMMIT_MSG=`git log --format=oneline -n 1 $CIRCLE_SHA1`
+            GIT_COMMIT_MSG=`git log --format=%B -n 1 $CIRCLE_SHA1`
             if [[ "${CIRCLE_BRANCH}" == "master" && "${CIRCLE_USERNAME}" != "CI_CD" ]];
             then
               echo "The release version published on jitpack visit https://jitpack.io/#FasTestFramework/fastest"
               echo "jenkins"
               echo ${CIRCLE_USERNAME}
-              echo ${CIRCLE_JOB}
-              echo ${CIRCLE_WORKFLOW_ID}
-              echo ${CIRCLE_TAG}
               echo ${GIT_COMMIT_MSG}
               git config user.name CI_CD
               git config user.email CI_CD@infogain.com
