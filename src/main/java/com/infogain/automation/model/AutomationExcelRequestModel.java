@@ -58,8 +58,7 @@ public class AutomationExcelRequestModel {
         this.sheets = sheets;
     }
 
-    public AutomationExcelRequestModel() {
-    }
+    public AutomationExcelRequestModel() {}
 
     /**
      * This method

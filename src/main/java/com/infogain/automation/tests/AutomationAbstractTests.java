@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
@@ -72,15 +73,11 @@ public abstract class AutomationAbstractTests {
         automationRequestBodyAndHeadersUtility = BeanUtil.getBean(AutomationRequestBodyAndHeadersUtility.class);
     }
 
-    public void init(String inputExcelFileName, String testSheetName) {
+    public void init(XSSFWorkbook workbook, String inputExcelFileName, String testSheetName) {
         this.testSheetName = testSheetName;
         this.inputExcelFileName = inputExcelFileName;
-        String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
-                                        + inputExcelFileName;
         // Reading Data from Excel Utility Method and setting it to Automation Input DTO
-        automationInputDTOList = automationExcelUtility.readInputExcelFile(inputExcelFilePath, testSheetName);
-
+        automationInputDTOList = automationExcelUtility.readInputExcelFile(workbook, inputExcelFileName, testSheetName);
         String inputjsonFolderPath =
                         automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         setRequestBodyAndHeaders(inputjsonFolderPath);
@@ -93,21 +90,24 @@ public abstract class AutomationAbstractTests {
      */
     public void test() {
         logger.traceEntry("test method of {} class", testSheetName);
-        if (testSheetName.equals(AutomationConstants.CLAIM_TEST)) {
+        String generateToken = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN);
+
+        String generateTokenAt = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);
+        if (generateTokenAt.equalsIgnoreCase("beforeSheet") && generateToken.equalsIgnoreCase("true")) {
             automationClaimsUtility.releaseAutomationServer();
-            logger.info("generated claim ID released");
-        } else {
-            // Updating ClaimId by new Generated Claim ID in JSON File
             automationInputDTOList
                             .forEach(automationInputDTO -> automationClaimsUtility.updateToken(automationInputDTO));
         }
         automationInputDTOList.forEach(automationInputDTO -> {
             try {
                 logger.info("Testing {} :", this.getClass().getSimpleName());
-                Response resp = getActualResponse(baseClaimUrl, automationInputDTO);
-                if (testSheetName.equals(AutomationConstants.CLAIM_TEST)) {
-                    automationClaimsUtility.releaseAutomationServer(resp);
+                if (generateTokenAt.equalsIgnoreCase("beforeTest") && generateToken.equalsIgnoreCase("true")) {
+                    automationClaimsUtility.releaseAutomationServer();
                 }
+                if (!generateTokenAt.equalsIgnoreCase("beforeSheet") && generateToken.equalsIgnoreCase("true")) {
+                    automationClaimsUtility.updateToken(automationInputDTO);
+                }
+                getActualResponse(baseClaimUrl, automationInputDTO);
             } catch (Exception e) {
                 logger.debug("Exception Occured While hitting endpoint {} of type {} : {}",
                                 automationInputDTO.getRequestURL(), automationInputDTO.getRequestType(),
@@ -142,12 +142,10 @@ public abstract class AutomationAbstractTests {
      * 
      * @since Nov 27, 2019
      */
-    public void publishResults(boolean saveToDatabase) {
+    public void publishResults(XSSFWorkbook workbook, boolean saveToDatabase) {
         logger.traceEntry("publishResults method of {} class", testSheetName);
-        String inputExcelFilePath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
-                                        + inputExcelFileName;
-        automationExcelUtility.writeOutputExcelFile(inputExcelFilePath, testSheetName, automationInputDTOList);
+
+        automationExcelUtility.writeOutputExcelFile(workbook, testSheetName, automationInputDTOList);
         AutomationOutputModel automationOutputModel =
                         AutomationInputDtoToAutomationModelMapper.convertAutomationDtoToAutomationOutputModel(
                                         automationInputDTOList, outputExcelSheet, testSheetName, inputExcelFileName);
@@ -167,10 +165,6 @@ public abstract class AutomationAbstractTests {
         logger.traceExit();
     }
 
-    public void cleanup() {
-        automationClaimsUtility.releaseAutomationServer();
-    }
-
     /**
      * This method takes Endpoint URL and its Type and return response after
      * 
@@ -178,7 +172,7 @@ public abstract class AutomationAbstractTests {
      * @return response
      * @since Dec 11, 2019
      */
-    private Response getActualResponse(String baseUrl, AutomationInputDTO automationInputDTO) {
+    private void getActualResponse(String baseUrl, AutomationInputDTO automationInputDTO) {
         logger.traceEntry("hitEndpoint method of AutomationEndpointHitUtility class");
         logger.info("Expected Response Status code - {}, response body : {}",
                         automationInputDTO.getExpectedHttpStatus(), automationInputDTO.getExpectedOutput());
@@ -189,7 +183,7 @@ public abstract class AutomationAbstractTests {
         automationInputDTO.setActualHttpStatus(resp.statusCode());
         automationInputDTO.setActualOutput(resp.asString());
         automationInputDTO.setExecutionDateTime(LocalDateTime.now());
-        return logger.traceExit(resp);
+        logger.traceExit();
     }
 
     private void setRequestBodyAndHeaders(String inputjsonFolderPath) {
@@ -197,13 +191,16 @@ public abstract class AutomationAbstractTests {
             String inputJson = automationInputDTO.getInputJson();
             String headerJson = automationInputDTO.getHeaderJson();
             if (StringUtils.isNotBlank(inputJson)) {
-                automationInputDTO.setTestCaseInputJson(automationRequestBodyAndHeadersUtility
-                                .fetchJSONObject(inputjsonFolderPath + "/" + inputJson));
+                inputJson = inputJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + inputJson
+                                : inputJson;
+                automationInputDTO.setTestCaseInputJson(
+                                automationRequestBodyAndHeadersUtility.fetchJSONObject(inputJson));
             }
             // sets Header Object in AutomationInputDTO
             if (StringUtils.isNotBlank(headerJson)) {
-                Headers fetchHeaders = automationRequestBodyAndHeadersUtility
-                                .fetchHeaders(inputjsonFolderPath + "/" + headerJson);
+                headerJson = headerJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + headerJson
+                                : headerJson;
+                Headers fetchHeaders = automationRequestBodyAndHeadersUtility.fetchHeaders(headerJson);
                 automationInputDTO.setHeaders(fetchHeaders);
             }
         });

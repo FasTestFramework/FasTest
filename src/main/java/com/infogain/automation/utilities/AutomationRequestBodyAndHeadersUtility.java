@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Component;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 
-import com.infogain.automation.dto.AutomationInputDTO;
 import com.infogain.automation.exception.AutomationException;
 
 /**
@@ -48,15 +48,23 @@ public class AutomationRequestBodyAndHeadersUtility {
     }
 
     public Headers fetchHeaders(String fileNameorHeadersJson) {
-        return fetchHeaders(fetchJSONArray(fileNameorHeadersJson));
+        if (StringUtils.isEmpty(fileNameorHeadersJson)) {
+            return new Headers();
+        } else {
+            return fetchHeaders(fetchJSONArray(fileNameorHeadersJson));
+        }
     }
 
     public JSONObject fetchJSONObject(String fileNameorHeadersJson) {
-        Object parseObj = extractObjectFromFileOrString(fileNameorHeadersJson);
-        if (parseObj instanceof JSONObject) {
-            return (JSONObject) parseObj;
+        if (StringUtils.isEmpty(fileNameorHeadersJson)) {
+            return null;
         } else {
-            throw new AutomationException("Object was not parsable to JSONObject");
+            Object parseObj = extractObjectFromFileOrString(fileNameorHeadersJson);
+            if (parseObj instanceof JSONObject) {
+                return (JSONObject) parseObj;
+            } else {
+                throw new AutomationException("Object was not parsable to JSONObject");
+            }
         }
 
     }

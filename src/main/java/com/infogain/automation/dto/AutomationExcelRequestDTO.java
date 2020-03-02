@@ -13,8 +13,7 @@ public class AutomationExcelRequestDTO {
         this.rowData = rowData;
     }
 
-    public AutomationExcelRequestDTO() {
-    }
+    public AutomationExcelRequestDTO() {}
 
     /**
      * @return the rowData

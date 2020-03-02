@@ -6,8 +6,7 @@ $(document).off('submit', 'form#runTestForm').on("submit", "form#runTestForm", f
 		event.preventDefault();
 		$('#runTest').attr("disabled", true);
 		$('#testingImg').css("display","block");
-		var saveDatabase = $("#SaveDatabase").is(":checked");
-		var sendEmail = $("#SendEmail").is(":checked");
-		var queryParam = "?sendMail=" + sendEmail + "&saveToDatabase=" + saveDatabase;
-	ajaxCall(uriFixedPath + "runtest"+ queryParam, "GET", null, successRunTest, failure);
+		var saveToDatabase = $("#SaveDatabase").is(":checked");
+		var sendMail = $("#SendEmail").is(":checked");
+	ajaxCall(uriFixedPath + "runtest", "POST", {sendMail, saveToDatabase }, successRunTest, failure);
 });

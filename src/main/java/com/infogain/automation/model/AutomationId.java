@@ -90,8 +90,7 @@ public class AutomationId implements Serializable {
         this.executionDataTime = executionDataTime;
     }
 
-    public AutomationId() {
-    }
+    public AutomationId() {}
 
     /**
      * This method generates Hash Code for Object of {@link AutomationId}

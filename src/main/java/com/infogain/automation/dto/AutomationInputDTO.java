@@ -165,7 +165,6 @@ public class AutomationInputDTO {
     public AutomationInputDTO(String serialNo, String testCaseDescription, String headerJson, String inputJson,
                     String inputParam, String expectedOutput, Integer expectedHttpStatus, String requestURL,
                     HttpMethod requestType, Map<String, String> keyValidation) {
-        super();
         this.serialNo = serialNo;
         this.testCaseDescription = testCaseDescription;
         this.headerJson = headerJson;

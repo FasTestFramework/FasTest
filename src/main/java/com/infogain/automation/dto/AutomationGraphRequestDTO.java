@@ -25,8 +25,7 @@ public class AutomationGraphRequestDTO {
         this.endDate = endDate;
     }
 
-    public AutomationGraphRequestDTO() {
-    }
+    public AutomationGraphRequestDTO() {}
 
     /**
      * @return the testInputFiles
