@@ -48,6 +48,7 @@ jobs:
             then
               echo "The release version published on jitpack visit https://jitpack.io/#FasTestFramework/fastest"
               echo "jenkins"
+              echo ${CIRCLE_USERNAME}
               git config user.name CI_CD
               git config user.email CI_CD@infogain.com
               mvn release:clean release:prepare --batch-mode -s settings.xml
