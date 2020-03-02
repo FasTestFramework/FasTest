@@ -27,6 +27,4 @@ public class AutomationRandomGeneratorDTO {
         return "AutomationRandomGeneratorDTO [instructionsToGenerateRandomData=" + instructionsToGenerateRandomData
                         + "]";
     }
-
 }
-
