@@ -120,6 +120,11 @@ public class AutomationRandomUtility {
             throw new RandomGenerationAutomationException("Upper bound of range must be greater than lower bound");
         }
     }
+    public String generateRandomStringSmallLetters()
+    {
+    	return RandomStringUtils.random(random.nextInt(20), 97, 122, true, false);
+    }
+    
 
     public String generateRandomStringSmallLettersWithExclusion(int length, char[] exclusions) {
         char[] smallLettersAllowed = test(exclusions, smallLetters);

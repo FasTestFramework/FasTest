@@ -23,6 +23,7 @@ import com.infogain.automation.errors.AutomationErrorCodes;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.exception.FastTestBadRequestException;
 import com.infogain.automation.exception.RandomGenerationAutomationException;
+import com.infogain.automation.exception.StringToJsonParseException;
 
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
@@ -143,6 +144,15 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
                         ExceptionUtils.getStackTrace(randomGenerationAutomationException));
         final AutomationResponse automationResponse = AutomationResponse.error(
                         convertErrorCodesDtoListToCXSErrorList(randomGenerationAutomationException.getErrorCodes()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
+    }
+
+    @ExceptionHandler(StringToJsonParseException.class)
+    public ResponseEntity<AutomationResponse> stringToJsonParseException(
+                    final StringToJsonParseException stringToJsonParseException) {
+        final AutomationResponse automationResponse = AutomationResponse.error(
+                        new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE,
+                                        stringToJsonParseException.getMessage()).convertToAutomationError());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
     }
 
