@@ -76,29 +76,34 @@ public class AutomationRandomUtility {
     }
 
     public int generateRandomIntRangeWithExclusion(int start, int end, int... exclude) {
-        java.util.Arrays.sort(exclude);
-        int randomValue = 0;
-        try {
-            System.out.println(end);
-            System.out.println(start);
-            System.out.println(end - start + 1);
-            System.out.println(exclude.length);
-            randomValue = start + random
-                            .nextInt((end - start + 1) == 0 ? Integer.MAX_VALUE : end - start + 1 - exclude.length);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println(illegalArgumentException.getMessage());
-            throw new RandomGenerationAutomationException("Upper bound must be greater than lower bound");
-        }
-        for (int ex : exclude) {
-            if (!(ex >= start && ex <= end)) {
-                throw new RandomGenerationAutomationException("Exclusions must be between specified range");
-            }
-            if (randomValue < ex) {
-                break;
-            }
-            randomValue++;
-        }
-        return randomValue;
+    	if(start > end)
+    	{
+    		throw new RandomGenerationAutomationException("Upper bound must be greater than lower bound");	
+    	}
+    	java.util.Arrays.sort(exclude);
+    	int randomValue = 0;
+    	int bound, tempStart = start;
+    	bound = end - start + 1 - exclude.length;
+    	if((Math.abs(start)+Math.abs(end))< 0)
+    	{
+    		tempStart = start/2;
+    	}
+    	try {
+    		randomValue = tempStart + random.nextInt((bound <= 0) ? end : bound);
+    	} catch (IllegalArgumentException illegalArgumentException) {
+    		//System.out.println(illegalArgumentException.getMessage());
+    		throw new RandomGenerationAutomationException("Range calculated is 0");
+    	}
+    	for (int ex : exclude) {
+    		if (!(ex >= start && ex <= end)) {
+    			throw new RandomGenerationAutomationException("Exclusions must be between specified range");
+    		}
+    		if (randomValue < ex) {
+    			break;
+    		}
+    		randomValue++;
+    	}
+    	return randomValue;
     }
 
     public String generateRandomStringSmallLetters(int length) {
@@ -359,14 +364,16 @@ public class AutomationRandomUtility {
 
     public static void main(String[] args) {
         AutomationRandomUtility obj = new AutomationRandomUtility();
-        /*
-         * int count = 0; for (int i = 0; i < 10000; i++) { int a = obj.generateRandomIntRangeWithExclusion(800, 8000,
-         * new int[] {1000}); System.out.println(a);
-         * 
-         * if (a < 800 || a > 8000) { System.out.println("galat"); count++; }
-         * 
-         * } System.out.println(count);
-         */
+        
+        //int count = 0; 
+        for (int i = 0; i < 100000; i++) { 
+        	int a = obj.generateRandomIntRangeWithExclusion(-8, -4, new int[] {10/0}); 
+        	System.out.println(a);
+        	if (a < -8 || a > -4) { 
+        		System.out.println("galat"); 
+        	}
+        } 
+         
         // System.out.println(obj.generateRandomStringSpecialCharacterWithExclusion(44, new char[]{'#','!','@'}));
         // System.out.println(obj.generateRandomNumericStringWithExclusions(20, exclusions));
 
