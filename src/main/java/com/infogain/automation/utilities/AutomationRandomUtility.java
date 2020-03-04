@@ -222,6 +222,10 @@ public class AutomationRandomUtility {
         return returnString.toString();
     }
 
+    public String generateRandomNumericStringWithExclusions(char[] exclusions) {
+        return generateRandomNumericStringWithExclusions(random.nextInt(40), exclusions);
+    }
+
     public String generateRandomNumericStringWithExclusions(int length, char[] exclusions) {
         char[] numbersAllowed = test(exclusions, numbers);
         StringBuilder returnString = new StringBuilder();
@@ -258,6 +262,10 @@ public class AutomationRandomUtility {
         return returnString.toString();
     }
 
+    public String generateRandomStringOutOfGivenCharacters(char... characterSet) {
+        return generateRandomStringOutOfGivenCharacters(random.nextInt(40), characterSet);
+    }
+
     public String generateRandomStringOutOfGivenCharacters(int length, char... characterSet) {
         return RandomStringUtils.random(length, characterSet);
     }
@@ -284,6 +292,10 @@ public class AutomationRandomUtility {
 
     public String generateRandomStringCapitalSmallMix(int length) {
         return RandomStringUtils.random(length, true, false);
+    }
+
+    public String generateRandomStringCapitalSmallMix(char[] exclusions) {
+        return generateRandomStringCapitalSmallMix(random.nextInt(40), exclusions);
     }
 
     public String generateRandomStringCapitalSmallMix(int length, char[] exclusions) {
@@ -354,6 +366,10 @@ public class AutomationRandomUtility {
         return RandomStringUtils.random(length, true, true);
     }
 
+    public String generateRandomStringAlphaNumericWithExclusions(char[] exclusions) {
+        return generateRandomStringAlphaNumericWithExclusions(random.nextInt(40), exclusions);
+    }
+
     public String generateRandomStringAlphaNumericWithExclusions(int length, char[] exclusions) {
         char[] allLettersAndNumbersAllowed = test(exclusions, allLettersAndNumbers);
         return RandomStringUtils.random(length, allLettersAndNumbersAllowed);
@@ -381,6 +397,10 @@ public class AutomationRandomUtility {
     public String generateRandomStringEverything(int length) {
         char[] allCharactersAllowed = test(new char[] {}, allCharacters);
         return RandomStringUtils.random(length, allCharactersAllowed);
+    }
+
+    public String generateRandomStringEverythingWithExclusions(char[] exclusions) {
+        return generateRandomStringEverythingWithExclusions(random.nextInt(40), exclusions);
     }
 
     public String generateRandomStringEverythingWithExclusions(int length, char[] exclusions) {
@@ -585,6 +605,8 @@ public class AutomationRandomUtility {
         System.out.println("------ Random String Start----------");
         System.out.println(obj.generateRandomStringEverything());
         System.out.println(obj.generateRandomStringEverything(12));
+        System.out.println(obj.generateRandomStringEverythingWithExclusions(
+                        new char[] {'g', 'G', 'l', 'S', '3', '7', '%', '?'}));
         System.out.println(obj.generateRandomStringEverythingWithExclusions(15,
                         new char[] {'g', 'G', 'l', 'S', '3', '7', '%', '?'}));
         System.out.println("-------Random String End---------");

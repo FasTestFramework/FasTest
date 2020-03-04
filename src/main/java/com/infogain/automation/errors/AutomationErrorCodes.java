@@ -35,8 +35,21 @@ public enum AutomationErrorCodes implements ErrorCodes {
     INPUT_EXCEL_SHEET_NAME_EXCEPTION("FASTTEST.EXCELSHEETNAME.MISSINGEXCEPTION",
                     "'inputExcelSheetName' field in 'rowData' is required. Please try again."),
     REGEX_FORMAT_EXCEPTION("FASTTEST.REGEXFORMAT.EXCEPTION",
-                    "'instructionsToGenerateRandomData' field has invalid data please refer to message: ' {0} ' . Please try again.");
-
+                    "'instructionsToGenerateRandomData' field has invalid data please refer to message: ' {0} ' . Please try again."),
+    
+    AUTOMATION_RANDOM_GENERATION_LENGTH_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDLENGTHEXCEPTION",
+                    "'length' field has invalid data : ' {0} '. It cannot be less than or equal to Zero"),
+    
+    AUTOMATION_RANDOM_GENERATION_INCLUSION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
+                    "'inclusion' field has invalid data. It contains a invalid character"),
+    
+    AUTOMATION_RANDOM_GENERATION_EXCLUSION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
+                    "'exclusion' field has invalid data. It contains a invalid character"),
+    
+    AUTOMATION_RANDOM_GENERATION_INCLUSION_EXCLUSION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
+                    "cannot have both inclusion and exclusion arrays.");
+    
+    
     private String message;
     private String code;
 
