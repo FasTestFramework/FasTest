@@ -138,6 +138,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
+		<swagger.version>2.9.2</swagger.version>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<spring.data>2.2.2.RELEASE</spring.data>
 		<hibernate.manager>4.3.0.Final</hibernate.manager>
@@ -249,6 +250,20 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 			<version>1.4.199</version>
+		</dependency>
+		
+		<!-- Swagger Implementation -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${swagger.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${swagger.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Use for MsSQL Database only -->
