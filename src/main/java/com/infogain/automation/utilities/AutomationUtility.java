@@ -6,12 +6,15 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.infogain.automation.dto.AutomationResponseStringDTO;
 import com.infogain.automation.exception.AutomationException;
 
 /**
@@ -28,6 +31,7 @@ import com.infogain.automation.exception.AutomationException;
 @Component
 public class AutomationUtility {
     private static final Logger logger = LogManager.getLogger(AutomationUtility.class);
+    public static final String COMMA_SEPERATED_REGEX = "(.,)*.";
 
     public void openUrlInBrowser(String url) {
         try {
@@ -53,7 +57,7 @@ public class AutomationUtility {
         }
         return actualOutput;
     }
-    
+
     public Integer extractIntegerOfString(String text) {
         Integer integer = null;
         try {
@@ -63,7 +67,7 @@ public class AutomationUtility {
         }
         return integer;
     }
-    
+
     public HttpMethod getRequestMethodType(String requestType) {
         try {
             return HttpMethod.valueOf(requestType.toUpperCase());
@@ -72,4 +76,11 @@ public class AutomationUtility {
         }
     }
 
+    public String fetchCommaSeperatedValueRegex(String value) {
+        return "(" + value + ",)*" + value;
+    }
+
+    public ResponseEntity<AutomationResponseStringDTO> generateResponse(String responseString) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AutomationResponseStringDTO(responseString));
+    }
 }

@@ -1,8 +1,12 @@
 package com.infogain.automation.service;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.infogain.automation.constants.AutomationConstants;
 import com.infogain.automation.dto.AutomationGenerateRandomSentenceDTO;
 import com.infogain.automation.dto.AutomationRandomDoubleGenerateDTO;
 import com.infogain.automation.dto.AutomationRandomGenerateAlphaNumericDTO;
@@ -12,216 +16,316 @@ import com.infogain.automation.dto.AutomationRandomSpecialCharGeneratorDTO;
 import com.infogain.automation.dto.AutomationRandomStringCapitalLetterGeneratorDTO;
 import com.infogain.automation.dto.AutomationRandomStringEverythingDTO;
 import com.infogain.automation.dto.AutomationRandomStringGeneratorDTO;
-import com.infogain.automation.dto.AutomationRandomStringOutOfGivenCharGeneratorDTO;
 import com.infogain.automation.dto.AutomationRandomStringSmallLetterGeneratorDTO;
 import com.infogain.automation.dto.AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO;
+import com.infogain.automation.model.AutomationRegexData;
 import com.infogain.automation.utilities.AutomationRandomUtility;
-import com.infogain.automation.utilities.RegexConverter;
 
 @Service
 public class RandomService {
 
-
-    private RegexConverter regexConverter;
     private AutomationRandomUtility automationRandomUtility;
 
     @Autowired
-    public RandomService(RegexConverter regexConverter, AutomationRandomUtility automationRandomUtility) {
-        this.regexConverter = regexConverter;
+    public RandomService(AutomationRandomUtility automationRandomUtility) {
         this.automationRandomUtility = automationRandomUtility;
     }
 
     public String generateRandomString(AutomationRandomGeneratorDTO automationRandomGeneratorDTO) {
-        return regexConverter.start(automationRandomGeneratorDTO.getinstructionsToGenerateRandomData());
+        return generateString(automationRandomGeneratorDTO.getAutomationRegexDatalist());
+    }
+
+    private String generateString(List<AutomationRegexData> automationRegexDataList) {
+        StringBuilder generatedString = new StringBuilder(automationRegexDataList.size());
+        for (AutomationRegexData automationRegexData : automationRegexDataList) {
+            generatedString.append(automationRegexData.getRegexSymbol().generate(automationRegexData.getLength(),
+                            automationRegexData.getOptions()));
+        }
+        return generatedString.toString();
     }
 
     public String generateRandomSpecialChar(
                     AutomationRandomSpecialCharGeneratorDTO automationRandomSpecialCharGeneratorDTO) {
-        char[] exclusions = automationRandomSpecialCharGeneratorDTO.getExclusions();
         Integer length = automationRandomSpecialCharGeneratorDTO.getLength();
-        if (length != 0 && exclusions == null) {
+        String exclusions = automationRandomSpecialCharGeneratorDTO.getExclusions();
+        String inclusions = automationRandomSpecialCharGeneratorDTO.getInclusions();
+        boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
+        boolean exclusionsFlag = exclusions != null && !exclusions.isEmpty();
+        char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
+        if (length != null) {
+            if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, exclusionsOrExclusions);
+            } else if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomSpecialCharactersWithExclusions(length,
+                                exclusionsOrExclusions);
+            }
             return automationRandomUtility.generateRandomSpecialCharacter(length);
-        } else if (length != 0 && exclusions != null) {
-            return automationRandomUtility.generateRandomSpecialCharacters(length, exclusions);
-        } else if (exclusions == null) {
-            return automationRandomUtility.generateRandomSpecialCharacter();
         } else {
-            return null;
+            if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(exclusionsOrExclusions);
+            } else if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomSpecialCharactersWithExclusions(exclusionsOrExclusions);
+            }
+            return automationRandomUtility.generateRandomSpecialCharacter();
         }
     }
 
     public int generateRandomInteger(AutomationRandomIntegerGeneratorDTO automationRandomIntegerGeneratorDTO) {
-        int minValue = automationRandomIntegerGeneratorDTO.getMinValue();
-        int maxValue = automationRandomIntegerGeneratorDTO.getMaxValue();
-        int[] exclude = automationRandomIntegerGeneratorDTO.getExclude();
-
-        if (minValue == 0 && maxValue == 0 && exclude.length == 0) {
+        Integer minValue = automationRandomIntegerGeneratorDTO.getMinValue();
+        Integer maxValue = automationRandomIntegerGeneratorDTO.getMaxValue();
+        String exclusions = automationRandomIntegerGeneratorDTO.getExclusions();
+        int[] exclusion = null;
+        if (exclusions != null && !exclusions.isEmpty()) {
+            exclusion = Arrays.stream(exclusions.split(AutomationConstants.COMMA_REGEX)).mapToInt(Integer::parseInt)
+                            .toArray();
+        }
+        if (minValue == null && maxValue == null && exclusion == null) {
             return automationRandomUtility.generateRandomInt();
-        } else if (minValue == 0 && maxValue != 0 && exclude.length == 0) {
-            return automationRandomUtility.generateRandomInt(maxValue);
-        } else if (minValue != 0 && maxValue != 0 && exclude.length == 0) {
+        } else if (minValue != null && maxValue != null && exclusion == null) {
             return automationRandomUtility.generateRandomIntRange(minValue, maxValue);
         } else {
-            return automationRandomUtility.generateRandomIntRangeWithExclusion(minValue, maxValue, exclude);
+            return automationRandomUtility.generateRandomIntRangeWithExclusion(minValue, maxValue, exclusion);
         }
     }
 
     public String generateRandomStringCapitalLetter(
                     AutomationRandomStringCapitalLetterGeneratorDTO automationRandomStringCapitalLetterGeneratorDTO) {
+        final char EMPTY = Character.MIN_VALUE;
         Integer length = automationRandomStringCapitalLetterGeneratorDTO.getLength();
         char startCharacter = automationRandomStringCapitalLetterGeneratorDTO.getStartCharacter();
         char endCharacter = automationRandomStringCapitalLetterGeneratorDTO.getEndCharacter();
-        char[] exclude = automationRandomStringCapitalLetterGeneratorDTO.getExclusions();
-        if (length == null && (int) startCharacter == 0 && (int) endCharacter == 0 && exclude == null) {
-            return automationRandomUtility.generateRandomStringCapitalLetters();
-        } else if (length != 0 && (int) startCharacter == 0 && (int) endCharacter == 0 && exclude == null) {
+        char constCharacter = automationRandomStringCapitalLetterGeneratorDTO.getConstantCharacter();
+        String exclusions = automationRandomStringCapitalLetterGeneratorDTO.getExclusions();
+        String inclusions = automationRandomStringCapitalLetterGeneratorDTO.getInclusions();
+        boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
+        boolean exclusionsFlag = exclusions != null && !exclusions.isEmpty();
+        char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
+        if (length != null) {
+            if (constCharacter != EMPTY) {
+                return automationRandomUtility.generateRandomStringCapitalLetters(length, constCharacter);
+            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+                if (exclusionsOrExclusions == null) {
+                    return automationRandomUtility.generateRandomStringCapitalLettersRange(length, startCharacter,
+                                    endCharacter);
+                } else if (inclusionsFlag) {
+                    return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(length,
+                                    startCharacter, endCharacter, exclusionsOrExclusions);
+                } else {
+                    return automationRandomUtility.generateRandomStringCapitalLettersRangeWithExclusion(length,
+                                    startCharacter, endCharacter, exclusionsOrExclusions);
+                }
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(length, startCharacter,
+                                endCharacter, exclusionsOrExclusions);
+            } else if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomStringCapitalLettersWithExclusion(length,
+                                exclusionsOrExclusions);
+            }
             return automationRandomUtility.generateRandomStringCapitalLetters(length);
-        } else if (length != 0 && (int) startCharacter != 0 && (int) endCharacter == 0 && exclude == null) {
-            return automationRandomUtility.generateRandomStringCapitalLetters(length, startCharacter);
-        } else if (length != 0 && (int) startCharacter != 0 && (int) endCharacter != 0 && exclude == null) {
-            return automationRandomUtility.generateRandomStringCapitalLettersRange(length, startCharacter,
-                            endCharacter);
-        } else if (length != 0 && (int) startCharacter == 0 && (int) endCharacter == 0 && exclude != null) {
-            return automationRandomUtility.generateRandomStringCapitalLettersWithExclusion(length, exclude);
         } else {
-            return automationRandomUtility.generateRandomStringCapitalLettersRangeWithExclusion(length, startCharacter,
-                            endCharacter, exclude);
+            if (constCharacter != EMPTY) {
+                return automationRandomUtility.generateRandomStringCapitalLetters(constCharacter);
+            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+                if (exclusionsOrExclusions == null) {
+                    return automationRandomUtility.generateRandomStringCapitalLettersRange(startCharacter,
+                                    endCharacter);
+                } else if (inclusionsFlag) {
+                    return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(startCharacter,
+                                    endCharacter, exclusionsOrExclusions);
+                } else {
+                    return automationRandomUtility.generateRandomStringCapitalLettersRangeWithExclusion(startCharacter,
+                                    endCharacter, exclusionsOrExclusions);
+                }
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(startCharacter,
+                                endCharacter, exclusionsOrExclusions);
+            } else if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomStringCapitalLettersWithExclusion(exclusionsOrExclusions);
+            }
+            return automationRandomUtility.generateRandomStringCapitalLetters();
         }
-
     }
 
     public String generateRandomStringSmallLetter(
                     AutomationRandomStringSmallLetterGeneratorDTO automationRandomStringSmallLetterGeneratorDTO) {
-        int length = automationRandomStringSmallLetterGeneratorDTO.getLength();
+        final char EMPTY = Character.MIN_VALUE;
+        Integer length = automationRandomStringSmallLetterGeneratorDTO.getLength();
         char startCharacter = automationRandomStringSmallLetterGeneratorDTO.getStartCharacter();
         char endCharacter = automationRandomStringSmallLetterGeneratorDTO.getEndCharacter();
-        char[] exclude = automationRandomStringSmallLetterGeneratorDTO.getExclusions();
-        if (length != 0 && (int) startCharacter == 0 && (int) endCharacter == 0 && exclude == null) {
+        char constCharacter = automationRandomStringSmallLetterGeneratorDTO.getConstantCharacter();
+        String exclusions = automationRandomStringSmallLetterGeneratorDTO.getExclusions();
+        String inclusions = automationRandomStringSmallLetterGeneratorDTO.getInclusions();
+        boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
+        boolean exclusionsFlag = exclusions != null && !exclusions.isEmpty();
+        char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
+        if (length != null) {
+            if (constCharacter != EMPTY) {
+                return automationRandomUtility.generateRandomStringSmallLetters(length, constCharacter);
+            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+                if (exclusionsOrExclusions == null) {
+                    return automationRandomUtility.generateRandomStringSmallLettersRange(length, startCharacter,
+                                    endCharacter);
+                } else if (inclusionsFlag) {
+                    return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(length,
+                                    startCharacter, endCharacter, exclusionsOrExclusions);
+                } else {
+                    return automationRandomUtility.generateRandomStringSmallLettersRangeWithExclusion(length,
+                                    startCharacter, endCharacter, exclusionsOrExclusions);
+                }
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(length, startCharacter,
+                                endCharacter, exclusionsOrExclusions);
+            } else if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomStringSmallLettersWithExclusion(length,
+                                exclusionsOrExclusions);
+            }
             return automationRandomUtility.generateRandomStringSmallLetters(length);
-        } else if (length != 0 && (int) startCharacter != 0 && (int) endCharacter == 0 && exclude == null) {
-            return automationRandomUtility.generateRandomStringSmallLetters(length, startCharacter);
-        } else if (length != 0 && (int) startCharacter != 0 && (int) endCharacter != 0 && exclude == null) {
-            return automationRandomUtility.generateRandomStringSmallLettersRange(length, startCharacter, endCharacter);
-        } else if (length != 0 && (int) startCharacter == 0 && (int) endCharacter == 0 && exclude != null) {
-            return automationRandomUtility.generateRandomStringSmallLettersWithExclusion(length, exclude);
-        } else if (length != 0 && (int) startCharacter != 0 && (int) endCharacter != 0 && exclude != null) {
-            return automationRandomUtility.generateRandomStringSmallLettersRangeWithExclusion(length, startCharacter,
-                            endCharacter, exclude);
         } else {
-            return null;
+            if (constCharacter != EMPTY) {
+                return automationRandomUtility.generateRandomStringSmallLetters(constCharacter);
+            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+                if (exclusionsOrExclusions == null) {
+                    return automationRandomUtility.generateRandomStringSmallLettersRange(startCharacter, endCharacter);
+                } else if (inclusionsFlag) {
+                    return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(startCharacter,
+                                    endCharacter, exclusionsOrExclusions);
+                } else {
+                    return automationRandomUtility.generateRandomStringSmallLettersRangeWithExclusion(startCharacter,
+                                    endCharacter, exclusionsOrExclusions);
+                }
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringAllLettersRangeWithInclusion(startCharacter,
+                                endCharacter, exclusionsOrExclusions);
+            } else if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomStringSmallLettersWithExclusion(exclusionsOrExclusions);
+            }
+            return automationRandomUtility.generateRandomStringSmallLetters();
         }
-
-    }
-
-    public String generateRandomStringOutOfGivenChar(
-                    AutomationRandomStringOutOfGivenCharGeneratorDTO automationRandomStringOutOfGivenCharGeneratorDTO) {
-        int length = automationRandomStringOutOfGivenCharGeneratorDTO.getLength();
-        char[] characters = automationRandomStringOutOfGivenCharGeneratorDTO.getCharacters();
-        String stringOfChars = automationRandomStringOutOfGivenCharGeneratorDTO.getStringOfChars();
-        if (length != 0 && characters != null && stringOfChars == null) {
-            return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, characters);
-        } else if (length == 0 && characters != null && stringOfChars == null) {
-            return automationRandomUtility.generateRandomStringOutOfGivenCharactersWithoutLength(characters);
-        } else {
-            return automationRandomUtility.generateRandomStringOutOfGivenCharactersFromString(length, stringOfChars);
-        }
-
     }
 
     public String generateRandomStringOfNumbers(AutomationRandomStringGeneratorDTO automationRandomStringGeneratorDTO) {
         Integer length = automationRandomStringGeneratorDTO.getLength();
-        char[] exclusions = automationRandomStringGeneratorDTO.getExclusions();
-        char[] inclusions = automationRandomStringGeneratorDTO.getExclusions();
-
-          if (length != null) {
-              if (inclusions == null && exclusions == null) {
-                  return automationRandomUtility.generateRandomStringOfNumbers(length);
-
-              } else if (inclusions != null && exclusions == null) {
-                  return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, inclusions);
-              } else if (inclusions == null && exclusions != null) {
-                  return automationRandomUtility.generateRandomNumericStringWithExclusions(length, exclusions);
-              }
-          } else {
-              if (inclusions != null && exclusions == null) {
-                  return automationRandomUtility.generateRandomStringOutOfGivenCharacters(inclusions);
-              } else if (inclusions == null && exclusions != null) {
-                  return automationRandomUtility.generateRandomNumericStringWithExclusions(exclusions);
-              }
-          }
-          return automationRandomUtility.generateRandomStringOfNumbers();
-      }
+        String exclusions = automationRandomStringGeneratorDTO.getExclusions();
+        String inclusions = automationRandomStringGeneratorDTO.getInclusions();
+        boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
+        char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
+        if (length != null) {
+            if (exclusionsOrExclusions == null) {
+                return automationRandomUtility.generateRandomStringOfNumbers(length);
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, exclusionsOrExclusions);
+            } else {
+                return automationRandomUtility.generateRandomNumericStringWithExclusions(length,
+                                exclusionsOrExclusions);
+            }
+        } else {
+            if (exclusionsOrExclusions == null) {
+                return automationRandomUtility.generateRandomStringOfNumbers();
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(exclusionsOrExclusions);
+            } else {
+                return automationRandomUtility.generateRandomNumericStringWithExclusions(exclusionsOrExclusions);
+            }
+        }
+    }
 
     public String generateRandomStringWithSmallAndCapitalChar(
                     AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO automationRandomStringWithSmallAndCapitalCharGeneratorDTO) {
         Integer length = automationRandomStringWithSmallAndCapitalCharGeneratorDTO.getLength();
-        char[] exclusions = automationRandomStringWithSmallAndCapitalCharGeneratorDTO.getExclusions();
-        char[] inclusions = automationRandomStringWithSmallAndCapitalCharGeneratorDTO.getInclusions();
+        String exclusions = automationRandomStringWithSmallAndCapitalCharGeneratorDTO.getExclusions();
+        String inclusions = automationRandomStringWithSmallAndCapitalCharGeneratorDTO.getInclusions();
+        boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
+        char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
         if (length != null) {
-            if (inclusions == null && exclusions == null) {
+            if (exclusionsOrExclusions == null) {
                 return automationRandomUtility.generateRandomStringCapitalSmallMix(length);
-
-            } else if (inclusions != null && exclusions == null) {
-                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, inclusions);
-            } else if (inclusions == null && exclusions != null) {
-                return automationRandomUtility.generateRandomStringCapitalSmallMix(length, exclusions);
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, exclusionsOrExclusions);
+            } else {
+                return automationRandomUtility.generateRandomStringCapitalSmallMix(length, exclusionsOrExclusions);
             }
         } else {
-            if (inclusions != null && exclusions == null) {
-                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(inclusions);
-            } else if (inclusions == null && exclusions != null) {
-                return automationRandomUtility.generateRandomStringCapitalSmallMix(exclusions);
+            if (exclusionsOrExclusions == null) {
+                return automationRandomUtility.generateRandomStringCapitalSmallMix();
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(exclusionsOrExclusions);
+            } else {
+                return automationRandomUtility.generateRandomStringCapitalSmallMix(exclusionsOrExclusions);
             }
         }
-        return automationRandomUtility.generateRandomStringCapitalSmallMix();
     }
 
     public String generateRandomEveryThing(AutomationRandomStringEverythingDTO automationRandomStringEverythingDTO) {
-
         Integer length = automationRandomStringEverythingDTO.getLength();
-        char[] exclusions = automationRandomStringEverythingDTO.getExclusions();
-        char[] inclusions = automationRandomStringEverythingDTO.getInclusions();
+        String exclusions = automationRandomStringEverythingDTO.getExclusions();
+        String inclusions = automationRandomStringEverythingDTO.getInclusions();
+        boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
+        char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
         if (length != null) {
-            if (inclusions == null && exclusions == null) {
+            if (exclusionsOrExclusions == null) {
                 return automationRandomUtility.generateRandomStringEverything(length);
-
-            } else if (inclusions != null && exclusions == null) {
-                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, inclusions);
-            } else if (inclusions == null && exclusions != null) {
-                return automationRandomUtility.generateRandomStringEverythingWithExclusions(length, exclusions);
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, exclusionsOrExclusions);
+            } else {
+                return automationRandomUtility.generateRandomStringEverythingWithExclusions(length,
+                                exclusionsOrExclusions);
             }
         } else {
-            if (inclusions != null && exclusions == null) {
-                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(inclusions);
-            } else if (inclusions == null && exclusions != null) {
-                return automationRandomUtility.generateRandomStringEverythingWithExclusions(exclusions);
+            if (exclusionsOrExclusions == null) {
+                return automationRandomUtility.generateRandomStringEverything();
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(exclusionsOrExclusions);
+            } else {
+                return automationRandomUtility.generateRandomStringEverythingWithExclusions(exclusionsOrExclusions);
             }
         }
-        return automationRandomUtility.generateRandomStringEverything();
     }
 
     public String generateRandomAlphaNumeric(
                     AutomationRandomGenerateAlphaNumericDTO automationRandomGenerateAlphaNumericDTO) {
         Integer length = automationRandomGenerateAlphaNumericDTO.getLength();
-        char[] exclusions = automationRandomGenerateAlphaNumericDTO.getExclusions();
+        String exclusions = automationRandomGenerateAlphaNumericDTO.getExclusions();
+        String inclusions = automationRandomGenerateAlphaNumericDTO.getInclusions();
+        boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
+        boolean exclusionsFlag = exclusions != null && !exclusions.isEmpty();
+        char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
         if (length != null) {
-            if (exclusions == null) {
-                return automationRandomUtility.generateRandomStringAlphaNumeric(length);
+            if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomStringAlphaNumericWithExclusions(length,
+                                exclusionsOrExclusions);
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(length, exclusionsOrExclusions);
             } else {
-                return automationRandomUtility.generateRandomStringAlphaNumericWithExclusions(length, exclusions);
+                return automationRandomUtility.generateRandomStringAlphaNumeric(length);
             }
         } else {
-            if (exclusions == null) {
-                return automationRandomUtility.generateRandomStringAlphaNumeric();
+            if (exclusionsFlag) {
+                return automationRandomUtility.generateRandomStringAlphaNumericWithExclusions(exclusionsOrExclusions);
+            } else if (inclusionsFlag) {
+                return automationRandomUtility.generateRandomStringOutOfGivenCharacters(exclusionsOrExclusions);
             } else {
-                return automationRandomUtility.generateRandomStringAlphaNumericWithExclusions(exclusions);
+                return automationRandomUtility.generateRandomStringAlphaNumeric();
             }
         }
     }
 
     public String generateRandomDouble(AutomationRandomDoubleGenerateDTO automationRandomDoubleGenerateDTO) {
-        return automationRandomUtility.getRandomDoubleBetweenRange(automationRandomDoubleGenerateDTO.getMin(),
-                        automationRandomDoubleGenerateDTO.getMax());
+        Double min = automationRandomDoubleGenerateDTO.getMin();
+        Double max = automationRandomDoubleGenerateDTO.getMax();
+        Integer precision = automationRandomDoubleGenerateDTO.getPrecision();
+        if (precision != null) {
+            if (min != null && max != null) {
+                return automationRandomUtility.getRandomDoubleBetweenRangeWithScale(min, max, precision);
+            } else {
+                return automationRandomUtility.getRandomDoubleBetweenRangeWithScaleAndRandomRange(precision);
+            }
+        } else {
+            if (min != null && max != null) {
+                return automationRandomUtility.getRandomDoubleBetweenRange(min, max);
+            } else {
+                return automationRandomUtility.getRandomDoubleBetweenRangeWithRandomRangeAndScale();
+            }
+        }
     }
 
     public String generateRandomSentence(AutomationGenerateRandomSentenceDTO automationGenerateRandomSentenceDTO) {
@@ -232,5 +336,15 @@ public class RandomService {
         }
     }
 
+    private char[] convertStringToCharArray(String stringToConvert) {
+        char[] charArray = null;
+        if (stringToConvert != null && !stringToConvert.isEmpty()) {
+            String[] spl = stringToConvert.split(AutomationConstants.COMMA_REGEX);
+            charArray = new char[spl.length];
+            for (int i = 0; i < charArray.length; i++) {
+                charArray[i] = spl[i].charAt(0);
+            }
+        }
+        return charArray;
+    }
 }
-

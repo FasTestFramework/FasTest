@@ -10,7 +10,8 @@ public class AutomationFilePathAndNameDTO {
     Map<String, List<String>> testInputFiles;
 
 
-    public AutomationFilePathAndNameDTO() {}
+    public AutomationFilePathAndNameDTO() {
+    }
 
 
     public AutomationFilePathAndNameDTO(String inputJSonFolderPath, String inputExcelFolderPath,

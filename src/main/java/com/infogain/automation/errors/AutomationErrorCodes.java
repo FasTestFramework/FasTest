@@ -35,21 +35,45 @@ public enum AutomationErrorCodes implements ErrorCodes {
     INPUT_EXCEL_SHEET_NAME_EXCEPTION("FASTTEST.EXCELSHEETNAME.MISSINGEXCEPTION",
                     "'inputExcelSheetName' field in 'rowData' is required. Please try again."),
     REGEX_FORMAT_EXCEPTION("FASTTEST.REGEXFORMAT.EXCEPTION",
-                    "'instructionsToGenerateRandomData' field has invalid data please refer to message: ' {0} ' . Please try again."),
-    
+                    "'instructionsToGenerateRandomData' field has invalid data please refer to message: '{0}' . Please try again."),
+
     AUTOMATION_RANDOM_GENERATION_LENGTH_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDLENGTHEXCEPTION",
-                    "'length' field has invalid data : ' {0} '. It cannot be less than or equal to Zero"),
-    
-    AUTOMATION_RANDOM_GENERATION_INCLUSION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
-                    "'inclusion' field has invalid data. It contains a invalid character"),
-    
-    AUTOMATION_RANDOM_GENERATION_EXCLUSION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
-                    "'exclusion' field has invalid data. It contains a invalid character"),
-    
+                    "'length' field has invalid data : '{0}'. Length must be positive"),
+
+    AUTOMATION_RANDOM_GENERATION_INVALID_DATA_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDDATAEXCEPTION",
+                    "'{0}' field has invalid data : {1}."),
+
     AUTOMATION_RANDOM_GENERATION_INCLUSION_EXCLUSION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
-                    "cannot have both inclusion and exclusion arrays.");
-    
-    
+                    "Cannot have both 'inclusion' and 'exclusion' arrays."),
+
+    AUTOMATION_RANDOM_FIELD_MISSING_EXCEPTION("FASTTEST.RANDOMGENERATION.MISSINGEXCEPTION",
+                    "'{0}' field is required. Please try again."),
+
+    AUTOMATION_RANDOM_GENERATION_RANGE_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
+                    "range operations must have both lower and upper bound"),
+
+    AUTOMATION_RANDOM_GENERATION_END_RANGE_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
+                    "must have an end range"),
+
+    AUTOMATION_RANDOM_STRING_GENERATION_CONSTANT_CHARACTER_EXCEPTION(
+                    "AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
+                    "cannot have constant char with any other char"),
+
+    AUTOMATION_RANDOM_STRING_GENERATION_INVALID_ALPHABETS_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
+                    "Characters in field(s) '{0}' should be '{1}' alphabets"),
+
+    AUTOMATION_RANDOM_GENERATION_PRECISION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDPRECISIONEXCEPTION",
+                    "'precision' field has invalid data : '{0}'. It cannot be negative"),
+
+    AUTOMATION_RANDOM_GENERATION_INVALID_RANGE_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
+                    "lower bound : '{0}' should be less than the  upper bound '{1}' "),
+
+    AUTOMATION_RANDOM_GENERATION_INVALID_INTEGER_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
+                    "One of numbers provided in '{0}' does not lie within permissible range of integers"),
+
+    AUTOMATION_RANDOM_GENERATION_CONSTANT_CHARACTER_STRING_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
+                    "cannot include inclusions,exclusions or range in case of constant character");
+
     private String message;
     private String code;
 

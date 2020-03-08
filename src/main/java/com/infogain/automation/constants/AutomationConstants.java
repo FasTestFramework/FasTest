@@ -25,6 +25,7 @@ public final class AutomationConstants {
     public static final String TEST_CASE_RESULT_PASS = "PASS";
     public static final String TEST_CASE_RESULT_FAIL = "FAIL";
     public static final String AUTOMATIONSERVER_DEFAULT_TEST = "AutomationDefaultTest";
+    public static final String EXCEL_EXTENSION = ".xlsx";
 
     public static final String FASTEST_SERVER_PORT = "server.port";
     public static final String APPLICATION_PROPERTIES_SHEET_NAME = "fastest.testClass";
@@ -36,7 +37,7 @@ public final class AutomationConstants {
     public static final String FASTEST_PORT = "fastest.Port";
     public static final String FASTEST_URL_PREFIX = "fastest.";
 
-    public static final String FASTEST_GENERATE_TOKEN = "fastest.tokenGenerate"; 
+    public static final String FASTEST_GENERATE_TOKEN = "fastest.tokenGenerate";
     public static final String FASTEST_GENERATE_TOKEN_INSTANCE = "fastest.tokenGenerationInstance";
     public static final String FASTEST_GENERATE_TOKEN_URL = "fastest.tokenGenerateUrl";
     public static final String FASTEST_GENERATE_TOKEN_BODY_TO_USE = "fastest.tokenGenerateBody";
@@ -47,7 +48,7 @@ public final class AutomationConstants {
     public static final String FASTEST_RELEASE_TOKEN_BODY_TO_USE = "fastest.tokenReleaseBody";
     public static final String FASTEST_RELEASE_TOKEN_HEADER_TO_USE = "fastest.tokenReleaseHeaders";
     public static final String FASTEST_TOKEN_RELEASE_PROPERTY_NAMES = "fastest.tokenReleaseReplaceRequestKeys";
-    
+
     public static final String FASTEST_TOKEN_REPLACE_PROPERTY_NAMES = "fastest.tokenReplaceRequestKeys";
     public static final String FASTEST_CLAIM_URL = "fastest.claimUrl";
     public static final String FASTEST_RELEASE_URL = "fastest.releaseUrl";
@@ -63,5 +64,15 @@ public final class AutomationConstants {
     public static final String FASTEST_PRINT_JSON_RECEIPT_URL = "fastest.printJsonReceiptUrl";
     public static final String FASTEST_PRINT_XML_RECEIPT_URL = "fastest.printXMLReceiptUrl";
     public static final String FASTEST_PRINT_DELIVERY_LABEL_URL = "fastest.printDymoDeliveryLabelUrl";
-    
+
+    public static final String COMMA_REGEX = "\\,";
+    public static final String INTEGER_REGEX = "-?\\d+";
+    public static final String SINGLE_DIGIT_REGEX = "\\d";
+    public static final String CAPS_REGEX = "[A-Z]";
+    public static final String SMALL_REGEX = "[a-z]";
+    public static final String ALPHA_REGEX = "[A-Za-z]";
+    public static final String ALPHANUMERIC_REGEX = "[a-zA-Z0-9]";
+    public static final String ANY_CHAR_REGEX = ".";
+    public static final String SPECIAL_CHARACTERS_REGEX = "[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E]";
+
 }

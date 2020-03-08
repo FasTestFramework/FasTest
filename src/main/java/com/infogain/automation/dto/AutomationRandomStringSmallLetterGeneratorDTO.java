@@ -1,15 +1,29 @@
 package com.infogain.automation.dto;
 
-import java.util.Arrays;
-
 import com.infogain.automation.validator.AutomationRandomStringSmallLetterGeneratorDTOValidator;
+
 @AutomationRandomStringSmallLetterGeneratorDTOValidator
 public class AutomationRandomStringSmallLetterGeneratorDTO {
 
     Integer length;
     char startCharacter;
     char endCharacter;
-    char[] exclusions;
+    String exclusions;
+    String inclusions;
+    char constantCharacter;
+
+    public AutomationRandomStringSmallLetterGeneratorDTO(Integer length, char startCharacter, char endCharacter,
+                    String exclusions, String inclusions, char constantCharacter) {
+        this.length = length;
+        this.startCharacter = startCharacter;
+        this.endCharacter = endCharacter;
+        this.exclusions = exclusions;
+        this.inclusions = inclusions;
+        this.constantCharacter = constantCharacter;
+    }
+
+    public AutomationRandomStringSmallLetterGeneratorDTO() {
+    }
 
     /**
      * @return the length
@@ -56,38 +70,57 @@ public class AutomationRandomStringSmallLetterGeneratorDTO {
     /**
      * @return the exclusions
      */
-    public char[] getExclusions() {
+    public String getExclusions() {
         return exclusions;
     }
 
     /**
      * @param exclusions the exclusions to set
      */
-    public void setExclusions(char[] exclusions) {
+    public void setExclusions(String exclusions) {
         this.exclusions = exclusions;
-    }
-
-    public AutomationRandomStringSmallLetterGeneratorDTO(Integer length, char startCharacter, char endCharacter,
-                    char[] exclusions) {
-        this.length = length;
-        this.startCharacter = startCharacter;
-        this.endCharacter = endCharacter;
-        this.exclusions = exclusions;
-    }
-
-    public AutomationRandomStringSmallLetterGeneratorDTO() {
     }
 
     /**
-     * This method 
+     * @return the inclusions
+     */
+    public String getInclusions() {
+        return inclusions;
+    }
+
+    /**
+     * @param inclusions the inclusions to set
+     */
+    public void setInclusions(String inclusions) {
+        this.inclusions = inclusions;
+    }
+
+    /**
+     * @return the constantCharacter
+     */
+    public char getConstantCharacter() {
+        return constantCharacter;
+    }
+
+    /**
+     * @param constantCharacter the constantCharacter to set
+     */
+    public void setConstantCharacter(char constantCharacter) {
+        this.constantCharacter = constantCharacter;
+    }
+
+    /**
+     * This method
      * 
      * @return
-     * @since Mar 3, 2020
+     * @since Mar 6, 2020
      */
     @Override
     public String toString() {
         return "AutomationRandomStringSmallLetterGeneratorDTO [length=" + length + ", startCharacter=" + startCharacter
-                        + ", endCharacter=" + endCharacter + ", exclusions=" + Arrays.toString(exclusions) + "]";
+                        + ", endCharacter=" + endCharacter + ", exclusions=" + exclusions + ", inclusions=" + inclusions
+                        + ", constantCharacter=" + constantCharacter + "]";
     }
+
 
 }

@@ -62,11 +62,11 @@ public class AutomationRandomUtility {
         return RandomStringUtils.random(count, 33, 48, false, false);
     }
 
-    public String generateRandomSpecialCharactersRandomLength(char[] exclusions) {
-        return generateRandomSpecialCharacters(random.nextInt(), exclusions);
+    public String generateRandomSpecialCharactersWithExclusions(char[] exclusions) {
+        return generateRandomSpecialCharactersWithExclusions(random.nextInt(40), exclusions);
     }
 
-    public String generateRandomSpecialCharacters(int length, char[] exclusions) {
+    public String generateRandomSpecialCharactersWithExclusions(int length, char[] exclusions) {
         char[] specialCharactersAllowed = generateCharactersWithExclusions(exclusions, specialCharcters);
         return RandomStringUtils.random(length, specialCharactersAllowed);
     }
@@ -80,22 +80,25 @@ public class AutomationRandomUtility {
     }
 
     public int generateRandomIntRange(int min, int max) {
-        return random.ints(min, (max + 1)).limit(1).findFirst().getAsInt();
+        return generateRandomIntRangeWithExclusion(min, max, new int[] {});
     }
 
     public int generateRandomIntRangeWithExclusion(int start, int end, int... exclude) {
+        if (start > end) {
+            throw new RandomGenerationAutomationException("Upper bound must be greater than lower bound");
+        }
         java.util.Arrays.sort(exclude);
         int randomValue = 0;
+        int bound, tempStart = start;
+        bound = end - start + 1 - exclude.length;
+        if ((Math.abs(start) + Math.abs(end)) < 0) {
+            tempStart = start / 2;
+        }
         try {
-            System.out.println(end);
-            System.out.println(start);
-            System.out.println(end - start + 1);
-            System.out.println(exclude.length);
-            randomValue = start + random
-                            .nextInt((end - start + 1) == 0 ? Integer.MAX_VALUE : end - start + 1 - exclude.length);
+            randomValue = tempStart + random.nextInt((bound <= 0) ? end : bound);
         } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println(illegalArgumentException.getMessage());
-            throw new RandomGenerationAutomationException("Upper bound must be greater than lower bound");
+            // System.out.println(illegalArgumentException.getMessage());
+            throw new RandomGenerationAutomationException("Range calculated is 0");
         }
         for (int ex : exclude) {
             if (!(ex >= start && ex <= end)) {
@@ -109,6 +112,7 @@ public class AutomationRandomUtility {
         return randomValue;
     }
 
+
     public String generateRandomStringSmallLetters() {
         return generateRandomStringSmallLetters(random.nextInt(40));
     }
@@ -117,11 +121,7 @@ public class AutomationRandomUtility {
         return RandomStringUtils.random(length, 97, 123, true, false);
     }
 
-    public String generateRandomStringSmallLettersConstantCharRandomLength(Character character) {
-        return generateRandomStringSmallLettersConstantChar(random.nextInt(40), character);
-    }
-
-    public String generateRandomStringSmallLettersConstantChar(int length, Character character) {
+    public String generateRandomStringSmallLetters(int length, Character character) {
         int ascii = character;
         if (ascii >= 97 || ascii < 123) {
             return RandomStringUtils.random(length, ascii, ascii + 1, true, false);
@@ -130,7 +130,7 @@ public class AutomationRandomUtility {
         }
     }
 
-    public String generateRandomStringSmallLettersRangeRandomLength(Character startCharacter, Character endCharacter) {
+    public String generateRandomStringSmallLettersRange(Character startCharacter, Character endCharacter) {
         return generateRandomStringSmallLettersRange(random.nextInt(40), startCharacter, endCharacter);
     }
 
@@ -144,7 +144,7 @@ public class AutomationRandomUtility {
         }
     }
 
-    public String generateRandomStringSmallLettersWithExclusionRandomLength(char[] exclusions) {
+    public String generateRandomStringSmallLettersWithExclusion(char[] exclusions) {
         return generateRandomStringSmallLettersWithExclusion(random.nextInt(40), exclusions);
     }
 
@@ -158,16 +158,16 @@ public class AutomationRandomUtility {
         return returnString.toString();
     }
 
-    public String generateRandomStringSmallLettersRangeWithInclusionRandomLength(Character startCharacter,
-                    Character endCharacter, char[] inclusions) {
-        return generateRandomStringSmallLettersRangeWithInclusion(random.nextInt(40), startCharacter, endCharacter,
+    public String generateRandomStringAllLettersRangeWithInclusion(Character startCharacter, Character endCharacter,
+                    char[] inclusions) {
+        return generateRandomStringAllLettersRangeWithInclusion(random.nextInt(40), startCharacter, endCharacter,
                         inclusions);
     }
 
-    public String generateRandomStringSmallLettersRangeWithInclusion(int length, Character startCharacter,
+    public String generateRandomStringAllLettersRangeWithInclusion(int length, Character startCharacter,
                     Character endCharacter, char[] inclusions) {
-        List<Object> smallLettersInitialList = Arrays.asList(smallLetters);
-        List<Object> smallLettersList = Arrays.asList(smallLetters);
+        List<Object> smallLettersInitialList = Arrays.asList(allLetters);
+        List<Object> smallLettersList = Arrays.asList(allLetters);
         int startCharacterascii = startCharacter;
         int endCharacterascii = endCharacter;
         for (Iterator iterator = smallLettersInitialList.iterator(); iterator.hasNext();) {
@@ -188,8 +188,8 @@ public class AutomationRandomUtility {
         return returnString.toString();
     }
 
-    public String generateRandomStringSmallLettersRangeWithExclusionRandomLength(Character startCharacter,
-                    Character endCharacter, char[] exclusions) {
+    public String generateRandomStringSmallLettersRangeWithExclusion(Character startCharacter, Character endCharacter,
+                    char[] exclusions) {
         return generateRandomStringSmallLettersRangeWithExclusion(random.nextInt(40), startCharacter, endCharacter,
                         exclusions);
     }
@@ -233,7 +233,7 @@ public class AutomationRandomUtility {
 
     }
 
-    public String generateRandomStringCapitalLettersRandomLength(Character character) {
+    public String generateRandomStringCapitalLetters(Character character) {
         return generateRandomStringCapitalLetters(random.nextInt(40), character);
     }
 
@@ -247,13 +247,11 @@ public class AutomationRandomUtility {
 
     }
 
-    public String generateRandomStringCapitalLettersRangeRandomLength(Character startCharacter,
-                    Character endCharacter) {
+    public String generateRandomStringCapitalLettersRange(Character startCharacter, Character endCharacter) {
         return generateRandomStringCapitalLettersRange(random.nextInt(40), startCharacter, endCharacter);
     }
 
-    public String generateRandomStringCapitalLettersRange(int length, Character startCharacter,
-                    Character endCharacter) {
+    public String generateRandomStringLettersRange(int length, Character startCharacter, Character endCharacter) {
         int startCharAscii = startCharacter;
         int endCharAscii = endCharacter;
         if (startCharAscii <= endCharAscii) {
@@ -263,8 +261,18 @@ public class AutomationRandomUtility {
         }
     }
 
-    public String generateRandomStringCapitalLettersWithExclusionRandomLength(char[] exclusions) {
-        return generateRandomStringCapitalLettersWithExclusion(random.nextInt(), exclusions);
+    public String generateRandomStringCapitalLettersWithExclusion(char[] exclusions) {
+        return generateRandomStringCapitalLettersWithExclusion(random.nextInt(40), exclusions);
+    }
+
+    public String generateRandomStringCapitalSmallMixWithExclusions(int length, char[] exclusions) {
+        char[] smallLettersAllowed = generateCharactersWithExclusions(exclusions, allLetters);
+        StringBuilder returnString = new StringBuilder();
+        while (length != 0) {
+            returnString.append(RandomStringUtils.random(1, smallLettersAllowed));
+            length--;
+        }
+        return returnString.toString();
     }
 
     public String generateRandomStringCapitalLettersWithExclusion(int length, char[] exclusions) {
@@ -301,9 +309,9 @@ public class AutomationRandomUtility {
         return returnString.toString();
     }
 
-    public String generateRandomStringCapitalLettersRangeWithExclusionRandomLength(Character startCharacter,
-                    Character endCharacter, char[] exclusions) {
-        return generateRandomStringCapitalLettersRangeWithExclusion(random.nextInt(), startCharacter, endCharacter,
+    public String generateRandomStringCapitalLettersRangeWithExclusion(Character startCharacter, Character endCharacter,
+                    char[] exclusions) {
+        return generateRandomStringCapitalLettersRangeWithExclusion(random.nextInt(40), startCharacter, endCharacter,
                         exclusions);
     }
 
@@ -325,12 +333,11 @@ public class AutomationRandomUtility {
             allowed[i] = (Integer) capitalLettersList.get(i);
         }
         char[] capitalLettersAllowed = generateCharactersWithExclusions(exclusions, allowed);
-        StringBuilder returnString = new StringBuilder();
-        while (length != 0) {
-            returnString.append(RandomStringUtils.random(1, capitalLettersAllowed));
-            length--;
+        try {
+            return RandomStringUtils.random(length, capitalLettersAllowed);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new RandomGenerationAutomationException("Range must have more characters than exclusions");
         }
-        return returnString.toString();
     }
 
     public String generateRandomStringOutOfGivenCharacters(char... characterSet) {
@@ -341,11 +348,7 @@ public class AutomationRandomUtility {
         return RandomStringUtils.random(length, characterSet);
     }
 
-    public String generateRandomStringOutOfGivenCharactersWithoutLength(char... characterSet) {
-        return RandomStringUtils.random(random.nextInt(40), characterSet);
-    }
-
-    public String generateRandomStringOutOfGivenCharactersFromStringWithoutLength(String characterSet) {
+    public String generateRandomStringOutOfGivenCharactersFromString(String characterSet) {
         return generateRandomStringOutOfGivenCharactersFromString(random.nextInt(40), characterSet);
     }
 
@@ -383,6 +386,53 @@ public class AutomationRandomUtility {
         return returnString.toString();
     }
 
+    public String generateRandomStringCapitalSmallMixRangeWithExclusions(int length, char startCharacter,
+                    char endCharacter, char[] exclusions) {
+        List<Object> mixedLettersInitialList = Arrays.asList(allLetters);
+        List<Object> mixedLettersList = Arrays.asList(allLetters);
+        int startCharacterascii = startCharacter;
+        int endCharacterascii = endCharacter;
+        for (Iterator iterator = mixedLettersInitialList.iterator(); iterator.hasNext();) {
+            int currentValue = (int) iterator.next();
+
+            if (currentValue < startCharacterascii || currentValue > endCharacterascii) {
+                mixedLettersList.remove(Integer.valueOf(currentValue));
+            }
+        }
+        int[] allowed = new int[mixedLettersList.size()];
+        for (int i = 0; i < allowed.length; i++) {
+            allowed[i] = (Integer) mixedLettersList.get(i);
+        }
+        char[] capitalLettersAllowed = generateCharactersWithExclusions(exclusions, allowed);
+        StringBuilder returnString = new StringBuilder();
+        while (length != 0) {
+            returnString.append(RandomStringUtils.random(1, capitalLettersAllowed));
+            length--;
+        }
+        return returnString.toString();
+    }
+
+    public String generateRandomStringCapitalSmallMixRange(int length, char startCharacter, char endCharacter) {
+        int startCharAscii = startCharacter;
+        int endCharAscii = endCharacter;
+        if (startCharAscii <= endCharAscii) {
+            return RandomStringUtils.random(length, startCharAscii, endCharAscii, true, false);
+        } else {
+            throw new RandomGenerationAutomationException("Upper bound of range must be greater than lower bound");
+        }
+    }
+
+    public String generateRandomStringCapitalLettersRange(int length, Character startCharacter,
+                    Character endCharacter) {
+        int startCharAscii = startCharacter;
+        int endCharAscii = endCharacter;
+        if (startCharAscii <= endCharAscii) {
+            return RandomStringUtils.random(length, startCharAscii, endCharAscii, true, false);
+        } else {
+            throw new RandomGenerationAutomationException("Upper bound of range must be greater than lower bound");
+        }
+    }
+
     public String generateRandomSentence(int length) {
         StringBuilder sentence = new StringBuilder();
         while (sentence.length() < length) {
@@ -393,7 +443,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomSentence() {
-        return generateRandomSentence(random.nextInt());
+        return generateRandomSentence(random.nextInt(40));
     }
     // public double getRandomDoubleBetweenRangeWith(double min, double max, RoundingMode roundingMode, int scale) {
     // // RandomStringUtils.
@@ -504,12 +554,25 @@ public class AutomationRandomUtility {
     }
 
     public static void main(String[] args) {
+        System.out.println("(([A-Z]-[A-Z])|((\\\\^,)((([A-Z],)+(([A-Z]-[A-Z])|[A-Z]))|[A-Z]))|(([A-Z],)+[A-Z])|([A-Z]))"
+                        .toLowerCase());
+        int b = -9;
+        int start = -6;
+        int end = 4;
         AutomationRandomUtility obj = new AutomationRandomUtility();
-        String abc = obj.generateRandomStringSmallLettersRangeWithInclusion(125, 'a', 'c', new char[] {'p'});
-        System.out.println(abc);
-        System.out.println(abc.matches("[^abcp]*"));
-
-        System.out.println(obj.getRandomDoubleBetweenRangeWithScale(Integer.MIN_VALUE, Integer.MAX_VALUE, 8));
+        int p = 0, n = 0;
+        for (int i = 0; i < 1000000; i++) {
+            int a = obj.generateRandomIntRangeWithExclusion(start, end, -2, -6, -5, -4, -1, 0);
+            if (a < start || a > end) {
+                System.out.println("fail: " + a);
+            }
+            if (a < 0) {
+                n++;
+            } else {
+                p++;
+            }
+        }
+        System.out.println(p + "<-posit neg->" + n);
         /*
          * int count = 0; for (int i = 0; i < 10000; i++) { int a = obj.generateRandomIntRangeWithExclusion(800, 8000,
          * new int[] {1000}); System.out.println(a);
@@ -525,10 +588,10 @@ public class AutomationRandomUtility {
          * double random = new Random().nextDouble(); double SP = 0.0 + (random * (700.0 - 0.0)); SP =
          * Double.parseDouble(String.format("%.6f", SP)); //now do format System.out.println(SP);
          */
-        /*
-         * DecimalFormat dm = new DecimalFormat("#.#"); dm.setMaximumIntegerDigits(330);
-         * dm.setMaximumFractionDigits(330); System.out.println(dm.format(222213222.2112));
-         */
+        // DecimalFormat dm = new DecimalFormat("#.#");
+        // dm.setMaximumIntegerDigits(330);
+        // dm.setMaximumFractionDigits(330);
+        // System.out.println(dm.format(222213222.2112));
         // System.out.println(Double.parseDouble(dm.format(22.2112)));
         // int count = 0;
         // for (int i = 0; i < 13600; i++) {
@@ -613,8 +676,9 @@ public class AutomationRandomUtility {
         // }
         // System.out.println();
         // System.out.println();
-        // System.out.println(outer);
+        // System.out.println(outer);git
         // AutomationRandomUtility.print();
+
     }
 
     public static void print() {
@@ -626,8 +690,7 @@ public class AutomationRandomUtility {
         // System.out.println(obj.generateRandomSpecialCharacter(5, '%'));
         System.out.println(obj.generateRandomSpecialCharacter());
         System.out.println(obj.generateRandomSpecialCharacter(5));
-        System.out.println(obj.generateRandomSpecialCharactersRandomLength(new char[] {'*', '/'}));
-        System.out.println(obj.generateRandomSpecialCharacters(22, new char[] {'*', '/'}));
+        System.out.println(obj.generateRandomSpecialCharactersWithExclusions(22, new char[] {'*', '/'}));
         System.out.println("-------Special Characters End---------");
         System.out.println();
         System.out.println();
@@ -642,16 +705,15 @@ public class AutomationRandomUtility {
         System.out.println("-------Capital Letters  Start---------");
         System.out.println(obj.generateRandomStringCapitalLetters());
         System.out.println(obj.generateRandomStringCapitalLetters(12));
-        System.out.println(obj.generateRandomStringCapitalLettersRandomLength('A'));
+        System.out.println(obj.generateRandomStringCapitalLetters('A'));
         System.out.println(obj.generateRandomStringCapitalLetters(12, 'A'));
-        System.out.println(obj.generateRandomStringCapitalLettersRangeRandomLength('A', 'L'));
-        System.out.println(obj.generateRandomStringCapitalLettersRange(14, 'A', 'L'));
-        System.out.println(obj.generateRandomStringCapitalLettersRangeWithExclusionRandomLength('F', 'T',
-                        new char[] {'G', 'J', ' '}));
+        System.out.println(obj.generateRandomStringCapitalLettersRange('A', 'L'));
+        System.out.println(obj.generateRandomStringLettersRange(14, 'A', 'L'));
+        System.out.println(
+                        obj.generateRandomStringCapitalLettersRangeWithExclusion('F', 'T', new char[] {'G', 'J', ' '}));
         System.out.println(obj.generateRandomStringCapitalLettersRangeWithExclusion(22, 'F', 'T',
                         new char[] {'G', 'J', ' '}));
-        System.out.println(obj.generateRandomStringCapitalLettersWithExclusionRandomLength(new char[] {'A', 'B', 'L'}));
-
+        System.out.println(obj.generateRandomStringCapitalLettersWithExclusion(new char[] {'A', 'B', 'L'}));
         System.out.println(obj.generateRandomStringCapitalLettersWithExclusion(10, new char[] {'A', 'B', 'L'}));
 
         System.out.println("-------Capital Letters End---------");
@@ -660,30 +722,28 @@ public class AutomationRandomUtility {
         System.out.println("-------Small Letters  Start---------");
         System.out.println(obj.generateRandomStringSmallLetters());
         System.out.println(obj.generateRandomStringSmallLetters(34));
-        System.out.println(obj.generateRandomStringSmallLettersConstantCharRandomLength('a'));
-        System.out.println(obj.generateRandomStringSmallLettersConstantChar(12, 'a'));
-        System.out.println(obj.generateRandomStringSmallLettersRangeRandomLength('b', 'k'));
+        System.out.println(obj.generateRandomStringSmallLetters(12, 'a'));
+        System.out.println(obj.generateRandomStringSmallLettersRange('b', 'k'));
         System.out.println(obj.generateRandomStringSmallLettersRange(14, 'b', 'k'));
-        System.out.println(obj.generateRandomStringSmallLettersWithExclusionRandomLength(new char[] {'a', 'c', 'l'}));
+        System.out.println(obj.generateRandomStringSmallLettersWithExclusion(new char[] {'a', 'c', 'l'}));
         System.out.println(obj.generateRandomStringSmallLettersWithExclusion(21, new char[] {'a', 'c', 'l'}));
-        System.out.println(obj.generateRandomStringSmallLettersRangeWithExclusionRandomLength('f', 't',
-                        new char[] {'g', 'j', 'l'}));
+        System.out.println(
+                        obj.generateRandomStringSmallLettersRangeWithExclusion('f', 't', new char[] {'g', 'j', 'l'}));
         System.out.println(obj.generateRandomStringSmallLettersRangeWithExclusion(21, 'f', 't',
                         new char[] {'g', 'j', 'l'}));
-        System.out.println(obj.generateRandomStringSmallLettersRangeWithInclusionRandomLength('f', 't',
-                        new char[] {'g', 'j', 'l'}));
-        System.out.println(obj.generateRandomStringSmallLettersRangeWithInclusion(21, 'f', 't',
-                        new char[] {'g', 'j', 'l'}));
+        System.out.println(obj.generateRandomStringAllLettersRangeWithInclusion('f', 't', new char[] {'g', 'j', 'l'}));
+        System.out.println(
+                        obj.generateRandomStringAllLettersRangeWithInclusion(21, 'f', 't', new char[] {'g', 'j', 'l'}));
         System.out.println("-------Small Letters End---------");
 
 
         System.out.println();
         System.out.println();
         System.out.println("-------Random String Out Of Given Characters Start---------");
-        System.out.println(obj.generateRandomStringOutOfGivenCharactersWithoutLength('a', 'c', 'U'));
+        System.out.println(obj.generateRandomStringOutOfGivenCharacters('a', 'c', 'U'));
         System.out.println(obj.generateRandomStringOutOfGivenCharacters(33, 'J', 'n', 'M'));
         System.out.println(obj.generateRandomStringOutOfGivenCharactersFromString(44, "AxDTk"));
-        System.out.println(obj.generateRandomStringOutOfGivenCharactersFromStringWithoutLength("AxDTk"));
+        System.out.println(obj.generateRandomStringOutOfGivenCharactersFromString("AxDTk"));
         System.out.println("-------Random String Out Of Given Characters End---------");
         System.out.println();
         System.out.println();

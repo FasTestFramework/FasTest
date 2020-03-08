@@ -5,12 +5,12 @@ import com.infogain.automation.validator.AutomationRandomSentenceGeneratorDTOVal
 @AutomationRandomSentenceGeneratorDTOValidator
 public class AutomationGenerateRandomSentenceDTO {
 
-	private Integer length;
+    private Integer length;
 
-	public AutomationGenerateRandomSentenceDTO() {
-	}
+    public AutomationGenerateRandomSentenceDTO() {
+    }
 
-	/**
+    /**
      * @return the length
      */
     public Integer getLength() {
@@ -30,8 +30,8 @@ public class AutomationGenerateRandomSentenceDTO {
 
 
     @Override
-	public String toString() {
-		return "AutomationGenerateRandomSentenceDTO [length=" + length + "]";
-	}
+    public String toString() {
+        return "AutomationGenerateRandomSentenceDTO [length=" + length + "]";
+    }
 
 }

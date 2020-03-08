@@ -1,22 +1,21 @@
 package com.infogain.automation.dto;
 
-import java.util.Arrays;
-
 import com.infogain.automation.validator.AutomationRandomStringGeneratorDTOValidator;
 
 @AutomationRandomStringGeneratorDTOValidator
 public class AutomationRandomStringGeneratorDTO {
 
     private Integer length;
-    private char[] exclusions;
-    private char[] inclusions;
+    private String exclusions;
+    private String inclusions;
 
-   
-
-    public AutomationRandomStringGeneratorDTO(Integer length, char[] exclusions, char[] inclusions) {
+    public AutomationRandomStringGeneratorDTO(Integer length, String exclusions, String inclusions) {
         this.length = length;
         this.exclusions = exclusions;
         this.inclusions = inclusions;
+    }
+
+    public AutomationRandomStringGeneratorDTO() {
     }
 
     /**
@@ -36,46 +35,42 @@ public class AutomationRandomStringGeneratorDTO {
     /**
      * @return the exclusions
      */
-    public char[] getExclusions() {
+    public String getExclusions() {
         return exclusions;
     }
 
     /**
      * @param exclusions the exclusions to set
      */
-    public void setExclusions(char[] exclusions) {
+    public void setExclusions(String exclusions) {
         this.exclusions = exclusions;
-    }
-
-    public AutomationRandomStringGeneratorDTO() {
     }
 
     /**
      * @return the inclusions
      */
-    public char[] getInclusions() {
+    public String getInclusions() {
         return inclusions;
     }
 
     /**
      * @param inclusions the inclusions to set
      */
-    public void setInclusions(char[] inclusions) {
+    public void setInclusions(String inclusions) {
         this.inclusions = inclusions;
     }
 
     /**
-     * This method 
+     * This method
      * 
      * @return
-     * @since Mar 4, 2020
+     * @since Mar 6, 2020
      */
     @Override
     public String toString() {
-        return "AutomationRandomStringGeneratorDTO [length=" + length + ", exclusions=" + Arrays.toString(exclusions)
-                        + ", inclusions=" + Arrays.toString(inclusions) + "]";
+        return "AutomationRandomStringGeneratorDTO [length=" + length + ", exclusions=" + exclusions + ", inclusions="
+                        + inclusions + "]";
     }
-
 
 
 

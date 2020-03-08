@@ -1,16 +1,20 @@
 package com.infogain.automation.dto;
 
-import java.util.Arrays;
-
 import com.infogain.automation.validator.AutomationRandomAplhaNumericGeneratorDTOValidator;
 
 @AutomationRandomAplhaNumericGeneratorDTOValidator
 public class AutomationRandomGenerateAlphaNumericDTO {
- 
-    private Integer length;
-    private char[] exclusions;
 
-    public AutomationRandomGenerateAlphaNumericDTO() {
+    private Integer length;
+    private String exclusions;
+    private String inclusions;
+
+    public AutomationRandomGenerateAlphaNumericDTO() {}
+
+    public AutomationRandomGenerateAlphaNumericDTO(Integer length, String exclusions, String inclusions) {
+        this.length = length;
+        this.exclusions = exclusions;
+        this.inclusions = inclusions;
     }
 
     /**
@@ -30,26 +34,35 @@ public class AutomationRandomGenerateAlphaNumericDTO {
     /**
      * @return the exclusions
      */
-    public char[] getExclusions() {
+    public String getExclusions() {
         return exclusions;
     }
 
     /**
      * @param exclusions the exclusions to set
      */
-    public void setExclusions(char[] exclusions) {
+    public void setExclusions(String exclusions) {
         this.exclusions = exclusions;
     }
 
-    public AutomationRandomGenerateAlphaNumericDTO(Integer length, char[] exclusions) {
-        this.length = length;
-        this.exclusions = exclusions;
+    public String getInclusions() {
+        return inclusions;
     }
 
+    public void setInclusions(String inclusions) {
+        this.inclusions = inclusions;
+    }
+
+    /**
+     * This method
+     * 
+     * @return
+     * @since Mar 6, 2020
+     */
     @Override
     public String toString() {
-        return "AutomationRandomGenerateAlphaNumericDTO [length=" + length + ", exclusions="
-                        + Arrays.toString(exclusions) + "]";
+        return "AutomationRandomGenerateAlphaNumericDTO [length=" + length + ", exclusions=" + exclusions + "]";
     }
+
 
 }

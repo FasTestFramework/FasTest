@@ -9,14 +9,12 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-@Constraint(validatedBy = AutomationRandomStringOutOfGivenCharGeneratorDTOValidatorImpl.class)
+@Constraint(validatedBy = AutomationRandomGeneratorDTOValidatorImpl.class)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AutomationRandomStringOutOfGivenCharGeneratorDTOValidator {
-
+public @interface AutomationRandomGeneratorDTOValidator {
     String message() default "";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
 }

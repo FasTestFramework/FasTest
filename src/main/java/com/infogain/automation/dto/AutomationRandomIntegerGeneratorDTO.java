@@ -1,7 +1,5 @@
 package com.infogain.automation.dto;
 
-import java.util.Arrays;
-
 import com.infogain.automation.validator.AutomationRandomIntegerGeneratorDTOValidator;
 
 @AutomationRandomIntegerGeneratorDTOValidator
@@ -9,7 +7,25 @@ public class AutomationRandomIntegerGeneratorDTO {
 
     Integer minValue;
     Integer maxValue;
-    int[] exclude;
+    String exclusions;
+
+    public AutomationRandomIntegerGeneratorDTO(Integer minValue, Integer maxValue, String exclusions) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.exclusions = exclusions;
+    }
+
+    /**
+     * This method
+     * 
+     * @return
+     * @since Mar 7, 2020
+     */
+    @Override
+    public String toString() {
+        return "AutomationRandomIntegerGeneratorDTO [minValue=" + minValue + ", maxValue=" + maxValue + ", exclusions="
+                        + exclusions + "]";
+    }
 
     /**
      * @return the minValue
@@ -40,38 +56,22 @@ public class AutomationRandomIntegerGeneratorDTO {
     }
 
     /**
-     * @return the exclude
+     * @return the exclusions
      */
-    public int[] getExclude() {
-        return exclude;
+    public String getExclusions() {
+        return exclusions;
     }
 
     /**
-     * @param exclude the exclude to set
+     * @param exclusions the exclusions to set
      */
-    public void setExclude(int[] exclude) {
-        this.exclude = exclude;
-    }
-
-    public AutomationRandomIntegerGeneratorDTO(Integer minValue, Integer maxValue, int[] exclude) {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.exclude = exclude;
+    public void setExclusions(String exclusions) {
+        this.exclusions = exclusions;
     }
 
     public AutomationRandomIntegerGeneratorDTO() {
     }
 
-    /**
-     * This method
-     * 
-     * @return
-     * @since Mar 3, 2020
-     */
-    @Override
-    public String toString() {
-        return "AutomationRandomIntegerGeneratorDTO [minValue=" + minValue + ", maxValue=" + maxValue + ", exclude="
-                        + Arrays.toString(exclude) + "]";
-    }
+
 
 }
