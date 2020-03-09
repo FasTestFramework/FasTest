@@ -1,15 +1,30 @@
 package com.infogain.automation.dto;
 
-import java.util.Arrays;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import com.infogain.automation.validator.AutomationRandomStringSmallCapitalMixGeneratorDTOValidator;
 
 @AutomationRandomStringSmallCapitalMixGeneratorDTOValidator
+@ApiModel(value = "AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO",
+description = "Request body required to set properties and request the controller of Automation to generate random string of small and capital letters.")
 public class AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO {
 
+    @ApiModelProperty(value = "length of random generated String", required = false, example = "25")
     private Integer length;
-    private char[] exclusions;
-    private char[] inclusions;
+    @ApiModelProperty(value = "String which contains numbers that must be excluded from the random generation string",
+                    required = false, readOnly = true, example = "a,A,i")
+    private String exclusions;
+    @ApiModelProperty(value = "String that contains numbers, from which random string of numbers is generated",
+                    required = false, example = "y,U,s")
+    private String inclusions;
+
+    public AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO(Integer length, String exclusions,
+                    String inclusions) {
+        this.length = length;
+        this.exclusions = exclusions;
+        this.inclusions = inclusions;
+    }
 
     /**
      * @return the length
@@ -28,35 +43,28 @@ public class AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO {
     /**
      * @return the exclusions
      */
-    public char[] getExclusions() {
+    public String getExclusions() {
         return exclusions;
     }
 
     /**
      * @param exclusions the exclusions to set
      */
-    public void setExclusions(char[] exclusions) {
+    public void setExclusions(String exclusions) {
         this.exclusions = exclusions;
     }
 
     /**
      * @return the inclusions
      */
-    public char[] getInclusions() {
+    public String getInclusions() {
         return inclusions;
     }
 
     /**
      * @param inclusions the inclusions to set
      */
-    public void setInclusions(char[] inclusions) {
-        this.inclusions = inclusions;
-    }
-
-    public AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO(Integer length, char[] exclusions,
-                    char[] inclusions) {
-        this.length = length;
-        this.exclusions = exclusions;
+    public void setInclusions(String inclusions) {
         this.inclusions = inclusions;
     }
 
@@ -67,13 +75,12 @@ public class AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO {
      * This method
      * 
      * @return
-     * @since Mar 4, 2020
+     * @since Mar 6, 2020
      */
     @Override
     public String toString() {
         return "AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO [length=" + length + ", exclusions="
-                        + Arrays.toString(exclusions) + ", inclusions=" + Arrays.toString(inclusions) + "]";
+                        + exclusions + ", inclusions=" + inclusions + "]";
     }
-
 
 }

@@ -4,7 +4,10 @@ import java.util.List;
 
 import com.infogain.automation.validator.AutomationExcelRequestDTOValidator;
 
+import io.swagger.annotations.ApiModel;
+
 @AutomationExcelRequestDTOValidator
+@ApiModel(value="AutomationExcelRequestDTO", description = "Request body encapsulating input properties to request the controller of Automation to generate Excels.")
 public class AutomationExcelRequestDTO {
 
     List<AutomationExcelInputDTO> rowData;
@@ -13,7 +16,8 @@ public class AutomationExcelRequestDTO {
         this.rowData = rowData;
     }
 
-    public AutomationExcelRequestDTO() {}
+    public AutomationExcelRequestDTO() {
+    }
 
     /**
      * @return the rowData

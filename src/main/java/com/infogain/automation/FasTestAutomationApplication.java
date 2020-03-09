@@ -38,7 +38,7 @@ public class FasTestAutomationApplication {
             }
         }
         SpringApplication.run(FasTestAutomationApplication.class, args);
-        logger.traceExit();
+        logger.info("*****************************FasTest Application has Started Successfully*******************************");
     }
 
 }

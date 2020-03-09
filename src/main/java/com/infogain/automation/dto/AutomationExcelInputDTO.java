@@ -1,30 +1,58 @@
 package com.infogain.automation.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value="AutomationExcelInputDTO", description = "Request body required to set properties and request the controller of Automation to generate Excels.")
 public class AutomationExcelInputDTO {
 
+	@ApiModelProperty(value = "This reflects the value of test case description", required = false,example="Print Receipt with Barcode Symbology ITF and height 1")
     String testCaseDescription;
-    String requestUrl;
-    String requestType;
-    String headerJson;
-    String inputJson;
-    String expectedOutput;
-    Integer expectedHttpStatus;
+	@ApiModelProperty(value = "whether to skip the test or not", required = false,example="true")
+	boolean skipTest;
+	@ApiModelProperty(value = "required parameters", required = false,example="123e4567-e89b-12d3-a456-556642440000")
     String params;
+	@ApiModelProperty(value = "Header Json in String", required = false,example="headers/headers.json")
+    String headerJson;
+	@ApiModelProperty(value = "Input Json in String", required = false,example="receiptPrinter/PrintReceiptJSON_BarcodeSymbology_ITF_Height_1.json")
+    String inputJson;
+	@ApiModelProperty(value = "Expected Output", required = false,example="\"{\n" + 
+			"  \"errors\": [\n" + 
+			"    {\n" + 
+			"      \"code\": \"PERIPHERALSERVER.CLAIMID.INVALIDDATAEXCEPTION\",\n" + 
+			"      \"message\": \"'claimId' field has invalid data({0}). Please try again.\"\n" + 
+			"    }\n" + 
+			"  ]\n" + 
+			"}\"")
+    String expectedOutput;
+	@ApiModelProperty(value = "Expected HTTP Status", required = false,example="405")
+    Integer expectedHttpStatus;
+	@ApiModelProperty(value = "URL to hit", required = false,example="http://localhost:8085/peripherals/fedexoffice/v1/claims/")
+    String requestUrl;
+	@ApiModelProperty(value = "Type of request", required = false,example="DELETE")
+    String requestType;
+	@ApiModelProperty(value = "Name of input excel file", required = true,example="file1.xlsx")
     String inputExcelFileName;
+	@ApiModelProperty(value = "Sheet name of input excel file", required = true,example="sheet1")
     String inputExcelSheetName;
+	@ApiModelProperty(value = "Folder name for input excel files", required = false,example="Barcode")
     String inputExcelFolderName;
 
-    public AutomationExcelInputDTO(String testCaseDescription, String requestUrl, String requestType, String headerJson,
-                    String inputJson, String expectedOutput, Integer expectedHttpStatus, String params,
-                    String inputExcelFileName, String inputExcelSheetName, String inputExcelFolderName) {
+
+
+    public AutomationExcelInputDTO(String testCaseDescription, boolean skipTest, String params, String headerJson,
+                    String inputJson, String expectedOutput, Integer expectedHttpStatus, String requestUrl,
+                    String requestType, String inputExcelFileName, String inputExcelSheetName,
+                    String inputExcelFolderName) {
         this.testCaseDescription = testCaseDescription;
-        this.requestUrl = requestUrl;
-        this.requestType = requestType;
+        this.skipTest = skipTest;
+        this.params = params;
         this.headerJson = headerJson;
         this.inputJson = inputJson;
         this.expectedOutput = expectedOutput;
         this.expectedHttpStatus = expectedHttpStatus;
-        this.params = params;
+        this.requestUrl = requestUrl;
+        this.requestType = requestType;
         this.inputExcelFileName = inputExcelFileName;
         this.inputExcelSheetName = inputExcelSheetName;
         this.inputExcelFolderName = inputExcelFolderName;
@@ -45,31 +73,31 @@ public class AutomationExcelInputDTO {
     }
 
     /**
-     * @return the requestUrl
+     * @return the skipTest
      */
-    public String getRequestUrl() {
-        return requestUrl;
+    public boolean isSkipTest() {
+        return skipTest;
     }
 
     /**
-     * @param requestUrl the requestUrl to set
+     * @param skipTest the skipTest to set
      */
-    public void setRequestUrl(String requestUrl) {
-        this.requestUrl = requestUrl;
+    public void setSkipTest(boolean skipTest) {
+        this.skipTest = skipTest;
     }
 
     /**
-     * @return the requestType
+     * @return the params
      */
-    public String getRequestType() {
-        return requestType;
+    public String getParams() {
+        return params;
     }
 
     /**
-     * @param requestType the requestType to set
+     * @param params the params to set
      */
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
+    public void setParams(String params) {
+        this.params = params;
     }
 
     /**
@@ -129,17 +157,31 @@ public class AutomationExcelInputDTO {
     }
 
     /**
-     * @return the params
+     * @return the requestUrl
      */
-    public String getParams() {
-        return params;
+    public String getRequestUrl() {
+        return requestUrl;
     }
 
     /**
-     * @param params the params to set
+     * @param requestUrl the requestUrl to set
      */
-    public void setParams(String params) {
-        this.params = params;
+    public void setRequestUrl(String requestUrl) {
+        this.requestUrl = requestUrl;
+    }
+
+    /**
+     * @return the requestType
+     */
+    public String getRequestType() {
+        return requestType;
+    }
+
+    /**
+     * @param requestType the requestType to set
+     */
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
     }
 
     /**
@@ -182,6 +224,25 @@ public class AutomationExcelInputDTO {
      */
     public void setInputExcelFolderName(String inputExcelFolderName) {
         this.inputExcelFolderName = inputExcelFolderName;
+    }
+
+    public AutomationExcelInputDTO() {
+    }
+
+    /**
+     * This method
+     * 
+     * @return
+     * @since Mar 5, 2020
+     */
+    @Override
+    public String toString() {
+        return "AutomationExcelInputDTO [testCaseDescription=" + testCaseDescription + ", skipTest=" + skipTest
+                        + ", params=" + params + ", headerJson=" + headerJson + ", inputJson=" + inputJson
+                        + ", expectedOutput=" + expectedOutput + ", expectedHttpStatus=" + expectedHttpStatus
+                        + ", requestUrl=" + requestUrl + ", requestType=" + requestType + ", inputExcelFileName="
+                        + inputExcelFileName + ", inputExcelSheetName=" + inputExcelSheetName
+                        + ", inputExcelFolderName=" + inputExcelFolderName + "]";
     }
 
 

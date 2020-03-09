@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.infogain.automation.constants.AutomationConstants;
@@ -26,6 +27,11 @@ import com.infogain.automation.model.TestCaseDAOOutputModel;
 import com.infogain.automation.properties.AutomationProperties;
 import com.infogain.automation.service.AutomationReportService;
 import com.infogain.automation.service.MailService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
@@ -40,6 +46,7 @@ import com.infogain.automation.service.MailService;
  */
 @CrossOrigin(origins = "*")
 @RestController
+@Api(value="")
 public class AutomationReportingRestController {
 
     private static final Logger logger = LogManager.getLogger(AutomationReportingRestController.class);
@@ -63,6 +70,11 @@ public class AutomationReportingRestController {
      * @since Dec 12, 2019
      */
     @GetMapping(value = "/distinctExcelNames", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "/distinctExcelNames", notes = "This API is used to show distinct Excel name", response = String.class, responseContainer = "List", protocols = "http,https")
+	@ApiResponses({ @ApiResponse(code = 200, message = "Distinct excel list displayed successfully"),
+			@ApiResponse(code = 500, message = "Internal Server Error"),
+			@ApiResponse(code = 400, message = "Bad Request") })
+	@ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<List<String>> distinctExcelNames() {
         logger.traceEntry("distinctExcelNames method of AutomationReportingRestController class");
         List<String> listexcel = automationReportService.distinctExcelName();
@@ -79,6 +91,13 @@ public class AutomationReportingRestController {
      */
     @PostMapping(value = "/graphDataPass", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/graphDataPass",
+    notes = "This API is used to count pass test case",
+    response = TestCaseDAOOutputModel.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 200, message = "Passed test case successfully counted"),
+    @ApiResponse(code = 500, message = "Internal Server Error"),
+    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<List<TestCaseDAOOutputModel>> graphDataSuccess(
                     @Valid @RequestBody AutomationGraphRequestDTO automationGraphRequestDTO) {
         logger.traceEntry("graphDataSuccess method of AutomationReportingRestController class");
@@ -97,6 +116,13 @@ public class AutomationReportingRestController {
      */
     @PostMapping(value = "/graphDataFail", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/graphDataFail",
+    notes = "This API is used to count fail test case",
+    response = TestCaseDAOOutputModel.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 200, message = "Failed test case successfully counted"),
+    @ApiResponse(code = 500, message = "Internal Server Error"),
+    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<List<TestCaseDAOOutputModel>> getFailGraphData(
                     @Valid @RequestBody AutomationGraphRequestDTO automationGraphRequestDTO) {
         logger.traceEntry("getFailGraphData method of AutomationReportingRestController class");
@@ -116,6 +142,13 @@ public class AutomationReportingRestController {
      */
     @PostMapping(value = "/graphDataTotal", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/graphDataTotal",
+    notes = "This API is used to count total no. test case",
+    response = TestCaseDAOOutputModel.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 200, message = "Total test case successfully counted"),
+    @ApiResponse(code = 500, message = "Internal Server Error"),
+    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<List<TestCaseDAOOutputModel>> getTotalGraphData(
                     @Valid @RequestBody AutomationGraphRequestDTO automationGraphRequestDTO) {
         logger.traceEntry("getTotalGraphData method of AutomationReportingRestController class");
@@ -134,6 +167,13 @@ public class AutomationReportingRestController {
      */
     @PostMapping(value = "/graphDataExecutedCount", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/graphDataExecutedCount",
+    notes = "This API is used to count total last executed test case",
+    response = TestCaseDAOOutputModel.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 200, message = "Total last executed test case successfully counted"),
+    @ApiResponse(code = 500, message = "Internal Server Error"),
+    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<List<TestCaseDAOOutputModel>> graphDataExecutedCount(
                     @Valid @RequestBody AutomationGraphRequestDTO automationGraphRequestDTO) {
         logger.traceEntry("graphDataExecutedCount method of AutomationReportingRestController class");
@@ -151,6 +191,14 @@ public class AutomationReportingRestController {
      */
     @PostMapping(value = "/sendmail", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/sendmail",
+    notes = "This API is used to write report data into a PDF",
+    response = String.class,
+    protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 204, message = "Report written in a PDF successfully"),
+    @ApiResponse(code = 500, message = "Internal Server Error"),
+    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<String> sendMail(@RequestBody SendMailRequestDTO sendMailRequestDTO) {
         logger.traceEntry("sendMail method of AutomationReportingRestController class");
         String automationReportFileName =
@@ -182,7 +230,13 @@ public class AutomationReportingRestController {
      * @return List of Last Executed Test Cases
      * @since Dec 12, 2019
      */
-    @GetMapping(value = "/allSprintInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/allSprintInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "/allSprintInfo", notes = "This API is used to give sprint information", 
+	response = AutomationSprintDTO.class, protocols = "http,https")
+	@ApiResponses({ @ApiResponse(code = 202, message = "Sprint information displayed successfully"),
+			@ApiResponse(code = 500, message = "Internal Server Error"),
+			@ApiResponse(code = 400, message = "Bad Request") })
+	@ResponseStatus(value = HttpStatus.ACCEPTED)
     public ResponseEntity<List<AutomationSprintDTO>> getSprintInfo() {
         logger.traceEntry("getSprintInfo method of AutomationReportingRestController class");
         List<AutomationSprintDTO> list = automationReportService.getAllSprintInfo();

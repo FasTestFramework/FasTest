@@ -11,7 +11,7 @@ public class AutomationBoundaryValueAnalysisJsonDTO {
     String jsonFileName;
 
     public AutomationBoundaryValueAnalysisJsonDTO() {
-        
+
     }
 
     public AutomationBoundaryValueAnalysisJsonDTO(JSONObject dataObject, JSONArray jsonMetaDataArray, String folderName,

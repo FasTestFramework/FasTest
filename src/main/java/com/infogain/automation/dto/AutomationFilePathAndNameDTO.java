@@ -3,14 +3,27 @@ package com.infogain.automation.dto;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value = "AutomationFilePathAndNameDTO",
+description = "Response body received after requesting the control of Automation to get File Path and Name.")
 public class AutomationFilePathAndNameDTO {
 
+	@ApiModelProperty(value="input Json folder path", example="D:/fasTest/input/json")
     String inputJsonFolderPath;
+	@ApiModelProperty(value="input excel folder path", example="D:/fasTest/input/Excels")
     String inputExcelFolderPath;
+	@ApiModelProperty(value="", example="{\n" + 
+			"    \"Barcode/file1.xlsx\": [\n" + 
+			"      \"sheet1\"\n" + 
+			"    ]\n" + 
+			"  }")
     Map<String, List<String>> testInputFiles;
 
 
-    public AutomationFilePathAndNameDTO() {}
+    public AutomationFilePathAndNameDTO() {
+    }
 
 
     public AutomationFilePathAndNameDTO(String inputJSonFolderPath, String inputExcelFolderPath,

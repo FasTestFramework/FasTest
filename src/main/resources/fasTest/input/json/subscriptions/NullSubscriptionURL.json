@@ -1,0 +1,6 @@
+{
+  "subscriptionRequest": {
+    "subscriptionType": "PERIPHERALS_HEALTH",
+    "subscriptionURL": ""
+  }
+}

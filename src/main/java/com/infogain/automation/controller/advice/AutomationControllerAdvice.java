@@ -143,7 +143,8 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
                         getRequestOriginAddress(request.getRemoteAddr()),
                         ExceptionUtils.getStackTrace(randomGenerationAutomationException));
         final AutomationResponse automationResponse = AutomationResponse.error(
-                        convertErrorCodesDtoListToCXSErrorList(randomGenerationAutomationException.getErrorCodes()));
+                        new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE,
+                                        randomGenerationAutomationException.getMessage()).convertToAutomationError());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
     }
 

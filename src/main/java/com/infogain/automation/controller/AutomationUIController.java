@@ -25,6 +25,10 @@ import com.infogain.automation.service.AutomationInputExcelService;
 import com.infogain.automation.service.AutomationStartupService;
 import com.infogain.automation.service.AutomationUiRequestService;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @CrossOrigin(origins = "*")
 @RestController
 public class AutomationUIController {
@@ -48,6 +52,10 @@ public class AutomationUIController {
 
     @PostMapping(value = "/runtest", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/runtest", notes = "This API will do start up tasks",
+    protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 200, message = "API run successfully"),
+    				@ApiResponse(code = 500, message = "Internal Server Error")})
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void dostartuptasks(@RequestBody AutomationRunTestCasesDTO automationRunTestCasesDTO) {
         automationStartupService.runTestCases(automationRunTestCasesDTO);
@@ -55,12 +63,23 @@ public class AutomationUIController {
 
     @PostMapping(value = "/createExcel", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/createExcel", notes = "This API is used to create Excels",
+    protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 204, message = "Excels created successfully"),
+    				@ApiResponse(code = 500, message = "Internal Server Error"),
+    				@ApiResponse(code = 400, message = "Exception Occured While Writing Excel")})
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void generateExcel(@Valid @RequestBody AutomationExcelRequestDTO automationExcelRequestDTO) {
         automationInputExcelService.insertDataToExcel(automationExcelRequestDTO);
     }
 
     @PostMapping(value = "/getResponse", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/getResponse", notes = "This API is used to get result for any UI request",
+    protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 200, message = "Response fetched successfully",
+    				response = AutomationUiResponseDTO.class, responseContainer = "",
+    				reference = "AutomationUiResponseDTO"),
+    				@ApiResponse(code = 500, message = "Internal Server Error")})
     public ResponseEntity<AutomationUiResponseDTO> uiRequest(
                     @RequestBody AutomationUiRequestDTO automationUiRequestDTO) {
         return logger.traceExit(
@@ -68,6 +87,12 @@ public class AutomationUIController {
     }
 
     @GetMapping(value = "/fetchFilePathAndNames", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/fetchFilePathAndNames", notes = "This API is used to get File Path and Names",
+    protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 200, message = "File Path and Names fetched successfully",
+    				response = AutomationFilePathAndNameDTO.class, responseContainer = "",
+    				reference = "AutomationFilePathAndNameDTO"),
+    				@ApiResponse(code = 500, message = "Internal Server Error")})
     public ResponseEntity<AutomationFilePathAndNameDTO> getFilePathAndNames() {
         return logger.traceExit(ResponseEntity.ok(automationFileDetailsService.dataname()));
     }

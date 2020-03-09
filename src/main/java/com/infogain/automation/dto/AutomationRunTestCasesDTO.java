@@ -3,9 +3,21 @@ package com.infogain.automation.dto;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value="AutomationRunTestCasesDTO", description = "Request body required to request the controller of Automation to run test cases.")
 public class AutomationRunTestCasesDTO {
+	@ApiModelProperty(value = "flag value whether to send mail", required = false,
+            example = "false")
     boolean sendMail;
+	@ApiModelProperty(value = "flag value whether to save to database", required = false,
+            example = "false")
     boolean saveToDatabase;
+	@ApiModelProperty(value = "map of input files to test", required = true,
+            example = "{\n" + 
+            		"\"Peripheral Server Test.xlsx\":[\"PeripheralDeviceHealthTest\",\"ReceiptPrinterJSONTest\"]\n" + 
+            		"    }")
     Map<String, List<String>> testInputFiles;
 
     /**
