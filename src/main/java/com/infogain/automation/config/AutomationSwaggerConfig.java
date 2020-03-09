@@ -22,7 +22,7 @@ public class AutomationSwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2).useDefaultResponseMessages(false).groupName("FasTest")
                         .apiInfo(apiInfo()).select()
                         .apis(RequestHandlerSelectors.basePackage("com.infogain.automation.controller"))
-                        .paths(regex("/.*")).build();
+                        .paths(regex("/.+")).build();
     }
     
     public ApiInfo apiInfo() {
