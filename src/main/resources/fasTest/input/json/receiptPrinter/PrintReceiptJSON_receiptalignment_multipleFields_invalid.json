@@ -1,0 +1,31 @@
+{
+  "claimId": "{}",
+  "receiptElements": [
+    {
+      "barcode": {
+        "alignment": "ferwq",
+        "data": "012345678",
+        "height": 100,
+        "symbology": "CODE39",
+        "textPosition": "eraver",
+        "width": 100
+      }
+    },
+    {
+      "image": {
+        "alignment": "dwva",
+        "url": "efbsre"
+      }
+    },
+    {
+      "receiptText": {
+        "alignment": "trgtrsbh",
+        "text": "This is a text line to be printed on receipt"
+      }
+    },{
+      "cut": {
+        "cutReceipt": true
+      }
+    }
+  ]
+}
