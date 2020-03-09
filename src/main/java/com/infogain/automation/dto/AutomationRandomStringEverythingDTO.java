@@ -1,12 +1,24 @@
 package com.infogain.automation.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import com.infogain.automation.validator.AutomationRandomStringWithEverythingGeneratorDTOValidator;
 
 @AutomationRandomStringWithEverythingGeneratorDTOValidator
+@ApiModel(value = "AutomationRandomStringEverythingDTO",
+description = "Request body required to set properties and request the controller of Automation to generate random string")
 public class AutomationRandomStringEverythingDTO {
-    private Integer length;
-    private String exclusions;
-    private String inclusions;
+
+
+    @ApiModelProperty(value = "length of random generated String", required = false, example = "25")
+     private Integer length;
+     @ApiModelProperty(value = "String which contains numbers that must be excluded from the random generation string",
+                     required = false, readOnly = true, example = "5,!,A,f,7")
+     private String exclusions;
+     @ApiModelProperty(value = "String that contains numbers, from which random string of numbers is generated",
+                     required = false, example = "@,n,M,8,s")
+     private String inclusions;
 
     public AutomationRandomStringEverythingDTO() {
     }

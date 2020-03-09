@@ -1,12 +1,22 @@
 package com.infogain.automation.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import com.infogain.automation.validator.AutomationRandomSpecialCharGeneratorDTOValidator;
 
 @AutomationRandomSpecialCharGeneratorDTOValidator
+@ApiModel(value = "AutomationRandomSpecialCharGeneratorDTO",
+                description = "Request body required to set properties and request the controller of Automation to generate random string of special characters.")
 public class AutomationRandomSpecialCharGeneratorDTO {
 
+    @ApiModelProperty(value = "length of random generated String", required = false, example = "25")
     Integer length;
+    @ApiModelProperty(value = "String which contains special characters that must be excluded from the random generation string",
+                    required = false, readOnly = true, example = "!,%,?")
     String exclusions;
+    @ApiModelProperty(value = "String that contains special characters, from which random string is generated",
+                    required = false, example = "@,*,#")
     String inclusions;
 
     /**

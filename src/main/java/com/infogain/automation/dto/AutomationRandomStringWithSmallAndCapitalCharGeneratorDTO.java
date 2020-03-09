@@ -1,12 +1,22 @@
 package com.infogain.automation.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import com.infogain.automation.validator.AutomationRandomStringSmallCapitalMixGeneratorDTOValidator;
 
 @AutomationRandomStringSmallCapitalMixGeneratorDTOValidator
+@ApiModel(value = "AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO",
+description = "Request body required to set properties and request the controller of Automation to generate random string of small and capital letters.")
 public class AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO {
 
+    @ApiModelProperty(value = "length of random generated String", required = false, example = "25")
     private Integer length;
+    @ApiModelProperty(value = "String which contains numbers that must be excluded from the random generation string",
+                    required = false, readOnly = true, example = "a,A,i")
     private String exclusions;
+    @ApiModelProperty(value = "String that contains numbers, from which random string of numbers is generated",
+                    required = false, example = "y,U,s")
     private String inclusions;
 
     public AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO(Integer length, String exclusions,

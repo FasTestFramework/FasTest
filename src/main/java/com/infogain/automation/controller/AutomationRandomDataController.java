@@ -3,6 +3,7 @@ package com.infogain.automation.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -10,7 +11,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import com.infogain.automation.dto.AutomationGenerateRandomSentenceDTO;
 import com.infogain.automation.dto.AutomationRandomDoubleGenerateDTO;
@@ -23,9 +29,8 @@ import com.infogain.automation.dto.AutomationRandomStringEverythingDTO;
 import com.infogain.automation.dto.AutomationRandomStringGeneratorDTO;
 import com.infogain.automation.dto.AutomationRandomStringSmallLetterGeneratorDTO;
 import com.infogain.automation.dto.AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO;
-import com.infogain.automation.dto.AutomationResponseStringDTO;
+import com.infogain.automation.dto.AutomationResponseRandomDataDTO;
 import com.infogain.automation.service.RandomService;
-import com.infogain.automation.utilities.AutomationUtility;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -33,111 +38,172 @@ import com.infogain.automation.utilities.AutomationUtility;
 public class AutomationRandomDataController {
 
     private final RandomService randomService;
-    private final AutomationUtility automationUtility;
 
     @Autowired
-    public AutomationRandomDataController(final RandomService randomService,
-                    final AutomationUtility automationUtility) {
+    public AutomationRandomDataController(final RandomService randomService) {
         this.randomService = randomService;
-        this.automationUtility = automationUtility;
     }
 
-    @Validated
     @PostMapping(path = "/specialCharacterString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomSpecialChar(
+    @ApiOperation(value = "/specialCharacterString",
+                    notes = "This API is used to generate random string of special characters only ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomSpecialChar(
                     @RequestBody @Valid AutomationRandomSpecialCharGeneratorDTO automationRandomSpecialCharGeneratorDTO) {
-        return automationUtility.generateResponse(
-                        randomService.generateRandomSpecialChar(automationRandomSpecialCharGeneratorDTO));
+        return generateResponse(randomService.generateRandomSpecialChar(automationRandomSpecialCharGeneratorDTO));
     }
 
-    @Validated
     @PostMapping(path = "/integerValueAsString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomInt(
+    @ApiOperation(value = "/integerValueAsString",
+                    notes = "This API is used to generate random integer value as string  ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomInt(
                     @RequestBody @Valid AutomationRandomIntegerGeneratorDTO automationRandomIntegerGeneratorDTO) {
-        return automationUtility.generateResponse(
+        return generateResponse(
                         String.valueOf(randomService.generateRandomInteger(automationRandomIntegerGeneratorDTO)));
     }
 
-    @Validated
     @PostMapping(path = "/capitalLettersString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomStringCapitalLetters(
+    @ApiOperation(value = "/capitalLettersString",
+                    notes = "This API is used to generate random string of capital letters only ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomStringCapitalLetters(
                     @RequestBody @Valid AutomationRandomStringCapitalLetterGeneratorDTO automationRandomStringCapitalLetterGeneratorDTO) {
-        return automationUtility.generateResponse(randomService
+        return generateResponse(randomService
                         .generateRandomStringCapitalLetter(automationRandomStringCapitalLetterGeneratorDTO));
     }
 
-    @Validated
     @PostMapping(path = "/smallLettersString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomStringSmallLetters(
+    @ApiOperation(value = "/smallLettersString",
+                    notes = "This API is used to generate random string of small letters only  ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomStringSmallLetters(
                     @RequestBody @Valid AutomationRandomStringSmallLetterGeneratorDTO automationRandomStringSmallLetterGeneratorDTO) {
-        return automationUtility.generateResponse(
+        return generateResponse(
                         randomService.generateRandomStringSmallLetter(automationRandomStringSmallLetterGeneratorDTO));
     }
 
-    @Validated
     @PostMapping(path = "/StringofNumbers", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomString(
+    @ApiOperation(value = "/StringofNumbers",
+                    notes = "This API is used to generate random string of number letters only  ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomString(
                     @RequestBody @Valid AutomationRandomStringGeneratorDTO automationRandomStringGeneratorDTO) {
-        return automationUtility.generateResponse(
-                        randomService.generateRandomStringOfNumbers(automationRandomStringGeneratorDTO));
+        return generateResponse(randomService.generateRandomStringOfNumbers(automationRandomStringGeneratorDTO));
     }
 
-    @Validated
     @PostMapping(path = "/SmallCapitalLettersMixString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomStringWithSmallAndCapitalChar(
+    @ApiOperation(value = "/SmallCapitalLettersMixString",
+                    notes = "This API is used to generate random string of small and capital mix letters only ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomStringWithSmallAndCapitalChar(
                     @RequestBody @Valid AutomationRandomStringWithSmallAndCapitalCharGeneratorDTO automationRandomStringWithSmallAndCapitalCharGeneratorDTO) {
-        return automationUtility.generateResponse(randomService.generateRandomStringWithSmallAndCapitalChar(
+        return generateResponse(randomService.generateRandomStringWithSmallAndCapitalChar(
                         automationRandomStringWithSmallAndCapitalCharGeneratorDTO));
     }
 
-    @Validated
     @PostMapping(path = "/anyString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomStringGenerateEverything(
+    @ApiOperation(value = "/anyString",
+                    notes = "This API is used to generate any random string including numbers, special characters, small and capital letters ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomStringGenerateEverything(
                     @RequestBody @Valid AutomationRandomStringEverythingDTO automationRandomStringEverythingDTO) {
 
-        return automationUtility
-                        .generateResponse(randomService.generateRandomEveryThing(automationRandomStringEverythingDTO));
+        return generateResponse(randomService.generateRandomEveryThing(automationRandomStringEverythingDTO));
     }
 
-    @Validated
     @PostMapping(path = "/alphanumericString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomStringGenerateAplhaNumeric(
+    @ApiOperation(value = "/alphanumericString",
+                    notes = "This API is used to generate random string including numbers, small and capital letters ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomStringGenerateAplhaNumeric(
                     @RequestBody @Valid AutomationRandomGenerateAlphaNumericDTO automationRandomGenerateAlphaNumericDTO) {
-        return automationUtility.generateResponse(
-                        randomService.generateRandomAlphaNumeric(automationRandomGenerateAlphaNumericDTO));
+        return generateResponse(randomService.generateRandomAlphaNumeric(automationRandomGenerateAlphaNumericDTO));
     }
 
-    @Validated
     @PostMapping(path = "/doubleValueAsString", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomStringGenerateRandomDouble(
+    @ApiOperation(value = "/doubleValueAsString",
+                    notes = "This API is used to generate random double (decimal) value within given range as string  ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomStringGenerateRandomDouble(
                     @RequestBody @Valid AutomationRandomDoubleGenerateDTO automationRandomDoubleGenerateDTO) {
-        return automationUtility
-                        .generateResponse(randomService.generateRandomDouble(automationRandomDoubleGenerateDTO));
+        return generateResponse(randomService.generateRandomDouble(automationRandomDoubleGenerateDTO));
     }
 
-    @Validated
     @PostMapping(path = "/randomSentence", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> randomStringGenerateRandomSentence(
+    @ApiOperation(value = "/randomSentence",
+                    notes = "This API is used to generate random sentence of given or random length ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> randomStringGenerateRandomSentence(
                     @RequestBody @Valid AutomationGenerateRandomSentenceDTO automationGenerateRandomSentenceDTO) {
-        return automationUtility
-                        .generateResponse(randomService.generateRandomSentence(automationGenerateRandomSentenceDTO));
+        return generateResponse(randomService.generateRandomSentence(automationGenerateRandomSentenceDTO));
     }
 
-    @Validated
     @PostMapping(path = "/instructionsToGenerateRandomData", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AutomationResponseStringDTO> ramdomString(
+    @ApiOperation(value = "/instructionsToGenerateRandomData",
+                    notes = "This API is used to generate random integer value as string  ",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "String Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error"),
+                    @ApiResponse(code = 400, message = "Bad Request")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> ramdomString(
                     @RequestBody @Valid AutomationRandomGeneratorDTO automationRandomGeneratorDTO) {
-        return automationUtility.generateResponse(randomService.generateRandomString(automationRandomGeneratorDTO));
+        return generateResponse(randomService.generateRandomString(automationRandomGeneratorDTO));
+    }
+
+    private ResponseEntity<AutomationResponseRandomDataDTO> generateResponse(String responseString) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AutomationResponseRandomDataDTO(responseString));
     }
 }

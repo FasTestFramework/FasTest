@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.infogain.automation.dto.AutomationResponseStringDTO;
+import com.infogain.automation.dto.AutomationResponseRandomDataDTO;
 import com.infogain.automation.exception.AutomationException;
 
 /**
@@ -80,7 +80,4 @@ public class AutomationUtility {
         return "(" + value + ",)*" + value;
     }
 
-    public ResponseEntity<AutomationResponseStringDTO> generateResponse(String responseString) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AutomationResponseStringDTO(responseString));
-    }
 }
