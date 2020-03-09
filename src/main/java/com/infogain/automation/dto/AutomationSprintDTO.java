@@ -2,6 +2,9 @@ package com.infogain.automation.dto;
 
 import java.time.LocalDate;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
  * 
@@ -14,12 +17,18 @@ import java.time.LocalDate;
  * @version 1.0.0
  * @since Dec 12, 2019
  */
+@ApiModel(value = "AutomationSprintDTO", description = "This is a response body for Sprint DTO which contains all variables for getting and setting Data to Database")
 public class AutomationSprintDTO {
 
+	@ApiModelProperty(value="Name of PI", example = "20.3")
     private String pi;
+	@ApiModelProperty(value="Name of sprint", example = "3")
     private String sprint;
+	@ApiModelProperty(value="Name of project", example = "peripheralserver")
     private String projectName;
+	@ApiModelProperty(value="Start Date", example = "2019-11-20")
     private LocalDate startDate;
+	@ApiModelProperty(value="End Date", example = "2019-09-24")
     private LocalDate endDate;
 
     public AutomationSprintDTO(String pi, String sprint, String projectName, LocalDate startDate, LocalDate endDate) {
