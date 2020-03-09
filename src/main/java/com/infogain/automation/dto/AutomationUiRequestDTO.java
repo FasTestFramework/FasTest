@@ -2,11 +2,19 @@ package com.infogain.automation.dto;
 
 import org.springframework.http.HttpMethod;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value="AutomationUiRequestDTO", description = "Request body required to request the controller of Automation")
 public class AutomationUiRequestDTO {
 
+	@ApiModelProperty(value="URL TO hit", required=true, example="/peripherals/fedexoffice/v1/claims")
     String requestURL;
+	@ApiModelProperty(value="Type of request", required=true, example="POST")
     HttpMethod requestType;
+	@ApiModelProperty(value="header", required=false, example="\"[{\"Content-Type\" : \"application/json\"},{\"Accept\" : \"application/json\"}]\"")
     String header;
+	@ApiModelProperty(value="body", required=false, example="\"{\"claimRequest\":{ \"claimType\":\"PERIPHERAL_SERVER\"\r\n}}\"")
     String body;
 
     /**

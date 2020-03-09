@@ -1,18 +1,41 @@
 package com.infogain.automation.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value="AutomationExcelInputDTO", description = "Request body required to set properties and request the controller of Automation to generate Excels.")
 public class AutomationExcelInputDTO {
 
+	@ApiModelProperty(value = "This reflects the value of test case description", required = false,example="Print Receipt with Barcode Symbology ITF and height 1")
     String testCaseDescription;
-    boolean skipTest;
+	@ApiModelProperty(value = "whether to skip the test or not", required = false,example="true")
+	boolean skipTest;
+	@ApiModelProperty(value = "required parameters", required = false,example="123e4567-e89b-12d3-a456-556642440000")
     String params;
+	@ApiModelProperty(value = "Header Json in String", required = false,example="headers/headers.json")
     String headerJson;
+	@ApiModelProperty(value = "Input Json in String", required = false,example="receiptPrinter/PrintReceiptJSON_BarcodeSymbology_ITF_Height_1.json")
     String inputJson;
+	@ApiModelProperty(value = "Expected Output", required = false,example="\"{\n" + 
+			"  \"errors\": [\n" + 
+			"    {\n" + 
+			"      \"code\": \"PERIPHERALSERVER.CLAIMID.INVALIDDATAEXCEPTION\",\n" + 
+			"      \"message\": \"'claimId' field has invalid data({0}). Please try again.\"\n" + 
+			"    }\n" + 
+			"  ]\n" + 
+			"}\"")
     String expectedOutput;
+	@ApiModelProperty(value = "Expected HTTP Status", required = false,example="405")
     Integer expectedHttpStatus;
+	@ApiModelProperty(value = "URL to hit", required = false,example="http://localhost:8085/peripherals/fedexoffice/v1/claims/")
     String requestUrl;
+	@ApiModelProperty(value = "Type of request", required = false,example="DELETE")
     String requestType;
+	@ApiModelProperty(value = "Name of input excel file", required = true,example="file1.xlsx")
     String inputExcelFileName;
+	@ApiModelProperty(value = "Sheet name of input excel file", required = true,example="sheet1")
     String inputExcelSheetName;
+	@ApiModelProperty(value = "Folder name for input excel files", required = false,example="Barcode")
     String inputExcelFolderName;
 
 
