@@ -69,13 +69,19 @@ public enum AutomationErrorCodes implements ErrorCodes {
 
     AUTOMATION_BVA_INVALID_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
                     "'{0}' field has invalid data: '{1}'. {2} Please try again."),
-
+    
     AUTOMATION_BVA_MISSING_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
                     "'{0}' field is required. Please try again."),
 
     AUTOMATION_BVA_INVALID_MIN_MAX_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
-                    "'min' field in 'metadata' has invalid data({0}) as it cannot be greater than given 'max'({1}). Please try again.");
-
+                    "'min' field in 'metadata' has invalid data({0}) as it cannot be greater than given 'max'({1}). Please try again."),
+    
+    AUTOMATION_PERF_TEST_INVALID_DATA_EXCEPTION("AUTOMATION.PERFORMANCETESTING.INVALIDDATAEXCEPTION",
+            "'{0}' field has invalid data: '{1}'. {2} Please try again."),
+    
+    AUTOMATION_PERF_TEST_MISSING_DATA_EXCEPTION("AUTOMATION.PERFORMANCETESTING.MISSINGDATAEXCEPTION",
+            "'{0}' field has invalid data: '{1}'. {2} Please try again.");
+    
     private String message;
     private String code;
 

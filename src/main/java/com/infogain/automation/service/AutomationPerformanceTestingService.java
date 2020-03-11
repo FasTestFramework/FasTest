@@ -181,18 +181,20 @@ public class AutomationPerformanceTestingService {
                             automationPerformanceTestingResultsTestResults.getHttpSample();
             if(null == httpSamples) {
             	myWriter.close();
-            	throw new AutomationException("Unable to execute Performane testing.");
+            	throw new AutomationException("Unable to execute Performance testing.");
             }
             myWriter.write("timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect\n");
             for (int i = 0; i < httpSamples.length; i++) {
-                myWriter.write(httpSamples[i].getTimeStamp().replace(",", " ") + "," + httpSamples[i].getElapsed() + ","
-                                + httpSamples[i].getLabel() + "," + httpSamples[i].getResponseCode() + ","
-                                + httpSamples[i].getResponseMessage().replace(",", " ") + "," + httpSamples[i].getThreadName() + ","
-                                + httpSamples[i].getDataType() + "," + httpSamples[i].getSuccess() + "," + " " + ","
-                                + httpSamples[i].getBytes() + "," + httpSamples[i].getSentBytes() + ","
-                                + httpSamples[i].getGrpThreads() + "," + httpSamples[i].getAllThreads() + ","
-                                + httpSamples[i].getRequestUrl() + "," + httpSamples[i].getLatency() + ","
-                                + httpSamples[i].getIdleTime() + "," + httpSamples[i].getConnect() + "\n");
+            	//replacing "," with " " from each value on every iteration as otherwise it will consider it as a new value
+            	//by using comma as delimiter, resulting in more number of values than number of columns
+                myWriter.write(httpSamples[i].getTimeStamp().replace(",", " ") + "," + httpSamples[i].getElapsed().replace(",", " ") + ","
+                                + httpSamples[i].getLabel().replace(",", " ") + "," + httpSamples[i].getResponseCode().replace(",", " ") + ","
+                                + httpSamples[i].getResponseMessage().replace(",", " ") + "," + httpSamples[i].getThreadName().replace(",", " ") + ","
+                                + httpSamples[i].getDataType().replace(",", " ") + "," + httpSamples[i].getSuccess().replace(",", " ") + "," + " " + ","
+                                + httpSamples[i].getBytes().replace(",", " ") + "," + httpSamples[i].getSentBytes().replace(",", " ") + ","
+                                + httpSamples[i].getGrpThreads().replace(",", " ") + "," + httpSamples[i].getAllThreads().replace(",", " ") + ","
+                                + httpSamples[i].getRequestUrl().replace(",", " ") + "," + httpSamples[i].getLatency().replace(",", " ") + ","
+                                + httpSamples[i].getIdleTime().replace(",", " ") + "," + httpSamples[i].getConnect().replace(",", " ") + "\n");
             }
             myWriter.close();
 

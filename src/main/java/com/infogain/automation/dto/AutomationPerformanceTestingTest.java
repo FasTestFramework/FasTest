@@ -1,5 +1,8 @@
 package com.infogain.automation.dto;
 
+import com.infogain.automation.validator.AutomationPerformanceTestingDTOValidator;
+
+@AutomationPerformanceTestingDTOValidator
 public class AutomationPerformanceTestingTest {
     AutomationPerformanceTestingCsvConfigDto csvConfig;
     AutomationPerformanceTestingHttpHandlerDto httpHandler;

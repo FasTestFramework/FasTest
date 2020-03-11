@@ -1,5 +1,7 @@
 package com.infogain.automation.controller;
 
+import javax.validation.Valid;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,7 @@ public class AutomationPerformanceTestingController {
 	@PostMapping(value = "/performancetest", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "/performancetest", notes = "This API is used to create and run a performance test", responseReference = "AutomationResponse<AutomationPerformanceTestingResultsTestResultsDto>", protocols = "http,https")
 	public AutomationResponse<AutomationPerformanceTestingResultsTestResultsDto> createPerformanceTest(
-			@RequestBody AutomationPerformanceTestingTest automationPerformanceTestingTest) {
+			@RequestBody @Valid AutomationPerformanceTestingTest automationPerformanceTestingTest) {
 		return logger.traceExit(
 				automationPerformanceTestingService.createAndRunPerformanceTest(automationPerformanceTestingTest));
 	}
