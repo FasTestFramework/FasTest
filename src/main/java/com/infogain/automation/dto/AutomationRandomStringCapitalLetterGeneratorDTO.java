@@ -7,7 +7,7 @@ import com.infogain.automation.validator.AutomationRandomStringCapitalLetterGene
 
 @AutomationRandomStringCapitalLetterGeneratorDTOValidator
 @ApiModel(value = "AutomationRandomStringCapitalLetterGeneratorDTO",
-description = "Request body required to set properties and request the controller of Automation to generate random string of capital letters.")
+                description = "Request body required to set properties and request the controller of Automation to generate random string of capital letters.")
 public class AutomationRandomStringCapitalLetterGeneratorDTO {
 
     @ApiModelProperty(value = "length of random generated String", required = false, example = "25")
@@ -16,14 +16,13 @@ public class AutomationRandomStringCapitalLetterGeneratorDTO {
     char startCharacter;
     @ApiModelProperty(value = "End range for random String generation", required = false, example = "T")
     char endCharacter;
-    @ApiModelProperty(value = "String which contains capital letters that must be excluded from the random generation string",
+    @ApiModelProperty(
+                    value = "String which contains capital letters that must be excluded from the random generation string",
                     required = false, readOnly = true, example = "D,I,G")
     String exclusions;
     @ApiModelProperty(value = "String that contains capital letters, from which random string is generated",
                     required = false, example = "M,P,J")
     String inclusions;
-    @ApiModelProperty(value = "Constant character of which random String is to be generated", required = false, readOnly = true, example = "T")
-    char constantCharacter;
 
     public AutomationRandomStringCapitalLetterGeneratorDTO(Integer length, char startCharacter, char endCharacter,
                     String exclusions, String inclusions, char constantCharacter) {
@@ -32,7 +31,6 @@ public class AutomationRandomStringCapitalLetterGeneratorDTO {
         this.endCharacter = endCharacter;
         this.exclusions = exclusions;
         this.inclusions = inclusions;
-        this.constantCharacter = constantCharacter;
     }
 
     public AutomationRandomStringCapitalLetterGeneratorDTO() {
@@ -109,20 +107,6 @@ public class AutomationRandomStringCapitalLetterGeneratorDTO {
     }
 
     /**
-     * @return the constantCharacter
-     */
-    public char getConstantCharacter() {
-        return constantCharacter;
-    }
-
-    /**
-     * @param constantCharacter the constantCharacter to set
-     */
-    public void setConstantCharacter(char constantCharacter) {
-        this.constantCharacter = constantCharacter;
-    }
-
-    /**
      * This method
      * 
      * @return
@@ -132,6 +116,6 @@ public class AutomationRandomStringCapitalLetterGeneratorDTO {
     public String toString() {
         return "AutomationRandomStringCapitalLetterGeneratorDTO [length=" + length + ", startCharacter="
                         + startCharacter + ", endCharacter=" + endCharacter + ", exclusions=" + exclusions
-                        + ", inclusions=" + inclusions + ", constantCharacter=" + constantCharacter + "]";
+                        + ", inclusions=" + inclusions + "]";
     }
 }

@@ -22,17 +22,15 @@ public class AutomationRandomStringSmallLetterGeneratorDTO {
     @ApiModelProperty(value = "String that contains small letters, from which random string is generated",
                     required = false, example = "a,z,x")
     String inclusions;
-    @ApiModelProperty(value = "Constant character of which random String is to be generated", required = false, readOnly = true, example = "i")
-    char constantCharacter;
+    
 
     public AutomationRandomStringSmallLetterGeneratorDTO(Integer length, char startCharacter, char endCharacter,
-                    String exclusions, String inclusions, char constantCharacter) {
+                    String exclusions, String inclusions) {
         this.length = length;
         this.startCharacter = startCharacter;
         this.endCharacter = endCharacter;
         this.exclusions = exclusions;
         this.inclusions = inclusions;
-        this.constantCharacter = constantCharacter;
     }
 
     public AutomationRandomStringSmallLetterGeneratorDTO() {
@@ -109,31 +107,19 @@ public class AutomationRandomStringSmallLetterGeneratorDTO {
     }
 
     /**
-     * @return the constantCharacter
-     */
-    public char getConstantCharacter() {
-        return constantCharacter;
-    }
-
-    /**
-     * @param constantCharacter the constantCharacter to set
-     */
-    public void setConstantCharacter(char constantCharacter) {
-        this.constantCharacter = constantCharacter;
-    }
-
-    /**
-     * This method
+     * This method 
      * 
      * @return
-     * @since Mar 6, 2020
+     * @since Mar 11, 2020
      */
     @Override
     public String toString() {
         return "AutomationRandomStringSmallLetterGeneratorDTO [length=" + length + ", startCharacter=" + startCharacter
                         + ", endCharacter=" + endCharacter + ", exclusions=" + exclusions + ", inclusions=" + inclusions
-                        + ", constantCharacter=" + constantCharacter + "]";
+                        + "]";
     }
+
+ 
 
 
 }

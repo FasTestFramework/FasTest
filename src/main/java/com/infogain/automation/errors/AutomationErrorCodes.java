@@ -55,10 +55,6 @@ public enum AutomationErrorCodes implements ErrorCodes {
     AUTOMATION_RANDOM_GENERATION_END_RANGE_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
                     "must have an end range"),
 
-    AUTOMATION_RANDOM_STRING_GENERATION_CONSTANT_CHARACTER_EXCEPTION(
-                    "AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
-                    "cannot have constant char with any other char"),
-
     AUTOMATION_RANDOM_STRING_GENERATION_INVALID_ALPHABETS_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
                     "Characters in field(s) '{0}' should be '{1}' alphabets"),
 
@@ -66,13 +62,10 @@ public enum AutomationErrorCodes implements ErrorCodes {
                     "'precision' field has invalid data : '{0}'. It cannot be negative"),
 
     AUTOMATION_RANDOM_GENERATION_INVALID_RANGE_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
-                    "lower bound : '{0}' should be less than the  upper bound '{1}' "),
+                    "lower bound : '{0}' should be less than the upper bound '{1}' "),
 
     AUTOMATION_RANDOM_GENERATION_INVALID_INTEGER_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
                     "One of numbers provided in '{0}' does not lie within permissible range of integers"),
-
-    AUTOMATION_RANDOM_GENERATION_CONSTANT_CHARACTER_STRING_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
-                    "cannot include inclusions,exclusions or range in case of constant character"),
 
     AUTOMATION_BVA_INVALID_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
                     "'{0}' field has invalid data: '{1}'. {2} Please try again."),
