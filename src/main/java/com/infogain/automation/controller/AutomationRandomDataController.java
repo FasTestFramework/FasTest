@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -203,7 +203,18 @@ public class AutomationRandomDataController {
         return generateResponse(randomService.generateRandomString(automationRandomGeneratorDTO));
     }
 
+    @GetMapping(path = "/uuid", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "/uuid", notes = "This API is used to generate random uuid",
+                    response = AutomationResponseRandomDataDTO.class, protocols = "http,https")
+    @ApiResponses({@ApiResponse(code = 201, message = "Random UUID Generated sucessfully"),
+                    @ApiResponse(code = 500, message = "Internal Server Error")})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AutomationResponseRandomDataDTO> ramdomUuid() {
+        return generateResponse(randomService.generateRandomUUID());
+    }
+
     private ResponseEntity<AutomationResponseRandomDataDTO> generateResponse(String responseString) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new AutomationResponseRandomDataDTO(responseString));
     }
+
 }

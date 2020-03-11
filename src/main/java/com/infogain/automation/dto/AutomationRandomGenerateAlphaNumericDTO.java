@@ -2,7 +2,6 @@ package com.infogain.automation.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiModelProperty.AccessMode;
 
 import com.infogain.automation.validator.AutomationRandomAplhaNumericGeneratorDTOValidator;
 
@@ -23,8 +22,7 @@ public class AutomationRandomGenerateAlphaNumericDTO {
                     required = false, example = "1,v,N")
     private String inclusions;
 
-    public AutomationRandomGenerateAlphaNumericDTO() {
-    }
+    public AutomationRandomGenerateAlphaNumericDTO() {}
 
     public AutomationRandomGenerateAlphaNumericDTO(Integer length, String exclusions, String inclusions) {
         this.length = length;

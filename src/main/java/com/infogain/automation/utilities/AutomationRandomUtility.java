@@ -483,7 +483,7 @@ public class AutomationRandomUtility {
     public String getRandomDoubleBetweenRange(double min, double max) {
         if (max < min) {
             throw new RandomGenerationAutomationException(
-                            "upper bound of the range should be greater then th elower bound");
+                            "upper bound of the range should be greater then the lower bound");
         }
         DecimalFormat decimalFormatter = new DecimalFormat("#.#");
         decimalFormatter.setMaximumIntegerDigits(330);

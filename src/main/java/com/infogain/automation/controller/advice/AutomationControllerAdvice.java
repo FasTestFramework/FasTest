@@ -23,7 +23,6 @@ import com.infogain.automation.errors.AutomationErrorCodes;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.exception.FastTestBadRequestException;
 import com.infogain.automation.exception.RandomGenerationAutomationException;
-import com.infogain.automation.exception.StringToJsonParseException;
 
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
@@ -62,12 +61,7 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
         logger.error("AutomationException has occured for request from: '{}' Exception: {}",
                         getRequestOriginAddress(request.getRemoteAddr()),
                         ExceptionUtils.getStackTrace(automationException));
-        final AutomationError automationError =
-                        new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE,
-                                        automationException.getMessage()).convertToAutomationError();
-        final AutomationResponse automationResponse = AutomationResponse.error(automationError);
-        // Returning Http status & filled AutomationResponse as per error code received from response builder
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(automationResponse);
+        return generateInternalServerErrorResponse(automationException.getMessage());
     }
 
     /**
@@ -88,6 +82,33 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
         final AutomationResponse automationResponse = AutomationResponse
                         .error(convertErrorCodesDtoListToCXSErrorList(fastTestBadRequestException.getErrorCodes()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
+    }
+
+    /**
+     * This method handling the exception of type IllegalArgumentException and returning the appropriate
+     * AutomationResponse.
+     * 
+     * @param automationException {@link IllegalArgumentException} object
+     * @param request Object of incoming {@link HttpServletRequest request}
+     * @return {@code ResponseEntity<AutomationResponse>} Response wrapped with CXS Envelope error message
+     * @since 09-Jul-2019
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<AutomationResponse> handleIllegalArgumentException(
+                    final IllegalArgumentException illegalArgumentException, HttpServletRequest request) {
+        logger.error("IllegalArgumentException has occured for request from: '{}' Exception: {}",
+                        getRequestOriginAddress(request.getRemoteAddr()),
+                        ExceptionUtils.getStackTrace(illegalArgumentException));
+        return generateInternalServerErrorResponse(illegalArgumentException.getMessage());
+    }
+
+    private ResponseEntity<AutomationResponse> generateInternalServerErrorResponse(final String message) {
+        final AutomationError automationError =
+                        new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE,
+                                        message).convertToAutomationError();
+        final AutomationResponse automationResponse = AutomationResponse.error(automationError);
+        // Returning Http status & filled AutomationResponse as per error code received from response builder
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(automationResponse);
     }
 
     /**
@@ -145,15 +166,6 @@ public class AutomationControllerAdvice implements AutomationControllerAdviceTyp
         final AutomationResponse automationResponse = AutomationResponse.error(
                         new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE,
                                         randomGenerationAutomationException.getMessage()).convertToAutomationError());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
-    }
-
-    @ExceptionHandler(StringToJsonParseException.class)
-    public ResponseEntity<AutomationResponse> stringToJsonParseException(
-                    final StringToJsonParseException stringToJsonParseException) {
-        final AutomationResponse automationResponse = AutomationResponse.error(
-                        new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_INERNAL_SERVER_ERROR_WITH_CUSTOM_MESSAGE,
-                                        stringToJsonParseException.getMessage()).convertToAutomationError());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(automationResponse);
     }
 

@@ -184,4 +184,12 @@ public class AutomationOutputModel implements Serializable {
         this.pai = pai;
     }
 
+    @Override
+    public String toString() {
+        return "AutomationOutputModel [outputExcelName=" + outputExcelName + ", outputSheetName=" + outputSheetName
+                        + ", totalExecutedTestCases=" + totalExecutedTestCases + ", totalPassTestCases="
+                        + totalPassTestCases + ", totalFailedTestCases=" + totalFailedTestCases + ", executionDate="
+                        + executionDate + ", testedBy=" + testedBy + ", pai=" + pai + "]";
+    }
+
 }

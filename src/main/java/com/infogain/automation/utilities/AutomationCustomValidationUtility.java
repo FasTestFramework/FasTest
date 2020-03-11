@@ -1,14 +1,17 @@
 package com.infogain.automation.utilities;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -28,26 +31,42 @@ public class AutomationCustomValidationUtility {
     private Object actualObj;
     private Object expectedObj;
 
-    /*
-     * public static void main(String[] args) { //to be removed Map<Object, String> inputMap = new LinkedHashMap<>();
-     * inputMap.put(null, "notNull();isNotNull();containsOnlyDigits()"); inputMap.put("myName",
-     * "contains(\"Name\",\"my22\");matches(\".*\");isEqualTo(\"aa\");startsWith(\"my\");asdgdf();hasSizeBetween(10,12);matches(234);isSubstringOf(\"hellomyName is Namit\")"
-     * ); inputMap.put(true, "isNotEqualTo(\"false\");isNotNull()"); inputMap.put(12,
-     * "isGreaterThan(13);isLessThan(13)"); inputMap.put(12.55, "isEqualTo(12.5)"); inputMap.put(new
-     * SendMailRequestDTO(), "hasFieldOrProperty(\"base64String\")"); AutomationCustomValidationUtility testObject = new
-     * AutomationCustomValidationUtility(); inputMap.forEach((k, v) -> { try { testObject.validate(k, k, v);
-     * System.out.println("Success"); } catch (CustomValidationFailure cvf) { System.out.print(cvf.getMessage()); }
-     * System.out.println("------------------------------"); });
-     * 
-     * 
-     * // // Map<String, String> inputMap = new LinkedHashMap<>(); // inputMap.put("output.claim", "1"); //
-     * inputMap.put("output.claim[x].idle", "2"); // inputMap.put("output.claim[1].saap", "3"); //
-     * inputMap.put("output.claim[1].needle[1]", "4"); // inputMap.put("output.claim[5].needle.money[x]", "5"); //
-     * inputMap.put("output.claim[x].needle[9]", "6"); // inputMap.put("output.claim[x].needle[x]", "7"); // String
-     * tocheck = "output.claim[5].needle.money[0]";
-     * 
-     * }
-     */
+    public static void main(String[] args) {
+
+        // to be removed
+        Map<Object, String> inputMap = new LinkedHashMap<>();
+        // inputMap.put(null, "notNull();isNotNull();containsOnlyDigits()");
+        inputMap.put("myName",
+                        "contains(\"Name\",\"my22\");matches(\".*\");isEqualTo(\"aa\");startsWith(\"my\");asdgdf();hasSizeBetween(10,12);matches(234);isSubstringOf(\"hellomyName is Namit\")");
+        // inputMap.put("myName", "hasSizeBetween(10,12)");
+        // inputMap.put(true, "isNotEqualTo(\"false\");isNotNull()");
+        // inputMap.put(12, "isGreaterThan(13);isLessThan(13)");
+        // inputMap.put(12.55, "isEqualTo(12.5)");
+        // inputMap.put(new SendMailRequestDTO(), "hasFieldOrProperty(\"base64String\")");
+        AutomationCustomValidationUtility testObject = new AutomationCustomValidationUtility();
+        inputMap.forEach((k, v) -> {
+            try {
+                testObject.validate(k, k, v);
+                System.out.println("Success");
+            } catch (CustomValidationFailure cvf) {
+                System.out.print(cvf.getMessage());
+            }
+            System.out.println("------------------------------");
+        });
+
+
+        //
+        // Map<String, String> inputMap = new LinkedHashMap<>();
+        // inputMap.put("output.claim", "1");
+        // inputMap.put("output.claim[x].idle", "2");
+        // inputMap.put("output.claim[1].saap", "3");
+        // inputMap.put("output.claim[1].needle[1]", "4");
+        // inputMap.put("output.claim[5].needle.money[x]", "5");
+        // inputMap.put("output.claim[x].needle[9]", "6");
+        // inputMap.put("output.claim[x].needle[x]", "7");
+        // String tocheck = "output.claim[5].needle.money[0]";
+
+    }
 
     public void validate(Object actualObj, Object expectedObj, String methodsToExecute) throws CustomValidationFailure {
         logger.info("\nValidating value: {} against custom validations: {}", String.valueOf(actualObj),
@@ -189,7 +208,7 @@ public class AutomationCustomValidationUtility {
                     Method[] methodsFetched) {
         Method methodFetched = null;
         for (int j = 0; j < methodsFetched.length; j++) {
-            if (methodsFetched[j].getName().equals(methodName)
+            if (Modifier.isPublic(methodsFetched[j].getModifiers()) && methodsFetched[j].getName().equals(methodName)
                             && isMethodFound(paramsObject, paramClasses, methodsFetched[j])) {
                 methodFetched = methodsFetched[j];
                 break;
@@ -247,54 +266,49 @@ public class AutomationCustomValidationUtility {
         for (int k = 0; k < parameters.length; k++) {
             if (parameters[k].isArray()) {
                 for (int l = k; l < paramClasses.length; l++) {
-                    if (!parameters[k].getComponentType().equals(paramClasses[l])
-                                    && !parameters[k].getComponentType().isAssignableFrom(paramClasses[l])) {
+                    if (isClassEqualsOrAssignable(parameters[k].getComponentType(), paramClasses[l])) {
                         return false;
                     }
                 }
-                convertParams(paramsObject, k);
+                convertParams(paramsObject, k, parameters[k].getComponentType());
                 return true;
-            } else if (!parameters[k].equals(paramClasses[k]) && !parameters[k].isAssignableFrom(paramClasses[k])) {
+            } else if (isClassEqualsOrAssignable(parameters[k], paramClasses[k])) {
                 return false;
             }
         }
         return true;
     }
 
-    private void convertParams(Object[] paramsObject, int k) {
-        String arrayParamClassName = paramsObject[k].getClass().getSimpleName();
+    private boolean isClassEqualsOrAssignable(Class<?> expectedClass, Class<?> actualClass) {
+        return !expectedClass.equals(actualClass) && !expectedClass.isAssignableFrom(actualClass)
+                        && !(expectedClass.isPrimitive() && getWrapperClass(expectedClass).equals(actualClass));
+    }
+
+    private static Class<?> getWrapperClass(Class<?> primitiveClass) {
+        return Array.get(Array.newInstance(primitiveClass, 1), 0).getClass();
+    }
+
+    private <T> void convertParams(Object[] paramsObject, int k, Class<T> classToConvert) {
         int z = 0;
-        Object[] arrayStringParam = new Object[paramsObject.length - k];
+        Object paramArray = Array.newInstance(classToConvert, paramsObject.length - k);
         for (int i = 0; i < paramsObject.length; i++) {
             if (i >= k) {
-                arrayStringParam[z] = paramsObject[i];
-                z++;
+                Array.set(paramArray, z++, safeCastTo(paramsObject[i], classToConvert));
                 paramsObject[i] = null;
             }
         }
-        Stream<Object> objectStream = Arrays.stream(arrayStringParam);
-        switch (arrayParamClassName) {
-            case "String":
-                paramsObject[k] = objectStream.map(obj -> (String) obj).toArray(String[]::new);
-                break;
-            case "Boolean":
-                Boolean[] booleanArray = new Boolean[arrayStringParam.length];
-                for (int i = 0; i < arrayStringParam.length; i++) {
-                    booleanArray[i] = (Boolean) arrayStringParam[i];
-                }
-                paramsObject[k] = booleanArray;
-                break;
-            case "Intege":
-                paramsObject[k] = objectStream.map(obj -> (Integer) obj).mapToInt(obj -> obj).toArray();
-                break;
-            case "Doubl":
-                paramsObject[k] = objectStream.map(obj -> (Double) obj).mapToDouble(obj -> obj).toArray();
-                break;
-            case "Object":
-            default:
-                paramsObject[k] = arrayStringParam;
-                break;
-        }
+        paramsObject[k] = paramArray;
     }
+
+    private static <T> T safeCastTo(Object obj, Class<T> to) {
+        if (obj != null) {
+            Class<?> c = obj.getClass();
+            if (to.isAssignableFrom(c)) {
+                return to.cast(obj);
+            }
+        }
+        return null;
+    }
+
 
 }

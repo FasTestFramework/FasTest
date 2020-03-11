@@ -6,15 +6,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.infogain.automation.dto.AutomationResponseRandomDataDTO;
 import com.infogain.automation.exception.AutomationException;
 
 /**
@@ -43,22 +36,10 @@ public class AutomationUtility {
         }
     }
 
-    public String beautifyJson(String text) {
-        String actualOutput = text;
-        JsonParser jsonParser = new JsonParser();
-        try {
-            JsonElement outputObject = jsonParser.parse(actualOutput);
-            if (!outputObject.isJsonNull() && !outputObject.isJsonPrimitive()) {
-                Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-                actualOutput = gson.toJson(outputObject);
-            }
-        } catch (Exception e) {
-            // no further handling needed
-        }
-        return actualOutput;
-    }
-
     public Integer extractIntegerOfString(String text) {
+        if (text == null) {
+            return null;
+        }
         Integer integer = null;
         try {
             integer = Double.valueOf(text).intValue();

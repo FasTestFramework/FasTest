@@ -1,6 +1,0 @@
-{
-  "": {
-    "subscriptionType": "PERIPHERALS_HEALTH",
-    "subscriptionURL": "http://172.18.83.113:8080/peripherals/fedexoffice/v1/health"
-  }
-}

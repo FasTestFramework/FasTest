@@ -65,4 +65,15 @@ public class AutomationProperties {
         return urlParameterKey;
     }
 
+    public void reloadProperties() {
+        Properties newProperties;
+        try (InputStream input = new FileInputStream(propertyFilePath)) {
+            newProperties = new Properties();
+            newProperties.load(input);
+            props = newProperties;
+        } catch (IOException ex) {
+            logger.debug("Exception Occured While Reading Properties File With Path {} : {} ", propertyFilePath,
+                            ExceptionUtils.getStackTrace(ex));
+        }
+    }
 }

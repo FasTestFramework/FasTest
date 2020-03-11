@@ -44,6 +44,7 @@ public class AutomationFileDetailsService {
                         automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         String inputExcelFolderPath =
                         automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
+        String outputFolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH);
         List<String> result = new ArrayList<>();
 
         try (Stream<Path> walk = Files.walk(Paths.get(inputExcelFolderPath))) {
@@ -61,10 +62,13 @@ public class AutomationFileDetailsService {
             }
             automationExcelUtility.closeExcel(workbookInput);
             if (!excelSheetNames.isEmpty()) {
-                allExcelSheetsNames.put(excelFilePath.substring(inputExcelFolderPath.length() + 1).replaceAll("\\\\", "/"), excelSheetNames);
+                allExcelSheetsNames.put(
+                                excelFilePath.substring(inputExcelFolderPath.length() + 1).replaceAll("\\\\", "/"),
+                                excelSheetNames);
             }
         }
-        return new AutomationFilePathAndNameDTO(inputJSonFolderPath, inputExcelFolderPath, allExcelSheetsNames);
+        return new AutomationFilePathAndNameDTO(inputJSonFolderPath, inputExcelFolderPath, outputFolderPath,
+                        allExcelSheetsNames);
     }
 
 }

@@ -41,7 +41,7 @@ public enum AutomationErrorCodes implements ErrorCodes {
                     "'length' field has invalid data : '{0}'. Length must be positive"),
 
     AUTOMATION_RANDOM_GENERATION_INVALID_DATA_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDDATAEXCEPTION",
-                    "'{0}' field has invalid data : {1}."),
+                    "'{0}' field has invalid data: '{1}'. Please try again."),
 
     AUTOMATION_RANDOM_GENERATION_INCLUSION_EXCLUSION_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
                     "Cannot have both 'inclusion' and 'exclusion' arrays."),
@@ -72,7 +72,16 @@ public enum AutomationErrorCodes implements ErrorCodes {
                     "One of numbers provided in '{0}' does not lie within permissible range of integers"),
 
     AUTOMATION_RANDOM_GENERATION_CONSTANT_CHARACTER_STRING_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
-                    "cannot include inclusions,exclusions or range in case of constant character");
+                    "cannot include inclusions,exclusions or range in case of constant character"),
+
+    AUTOMATION_BVA_INVALID_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
+                    "'{0}' field has invalid data: '{1}'. {2} Please try again."),
+
+    AUTOMATION_BVA_MISSING_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
+                    "'{0}' field is required. Please try again."),
+
+    AUTOMATION_BVA_INVAID_MIN_MAX_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
+                    "'min' field in 'metadata' has invalid data({0}) as it cannot be greater than given 'max'({1}). Please try again.");
 
     private String message;
     private String code;

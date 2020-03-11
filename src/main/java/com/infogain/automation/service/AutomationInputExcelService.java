@@ -81,21 +81,20 @@ public class AutomationInputExcelService {
             if (excelSheet == null) {
                 excelSheet = createNewSheet(excelSheetName, workbookInput);
             }
-            insertDataInExcelSheet(entry.getValue(), excelSheet, workbookInput);
+            insertDataInExcelSheet(entry.getValue(), excelSheet);
         }
     }
 
     private XSSFSheet createNewSheet(String inputExcelSheetName, XSSFWorkbook workbookInput) {
         XSSFSheet sheet = workbookInput.createSheet(inputExcelSheetName);
-        automationExcelUtility.generateHeaderRow(workbookInput, sheet, sheet.createRow(0));
+        automationExcelUtility.generateHeaderRow(sheet.createRow(0));
         return sheet;
     }
 
-    private void insertDataInExcelSheet(List<AutomationExcelRowModel> automationExcelRowModelList, XSSFSheet sheet,
-                    XSSFWorkbook workbookInput) {
+    private void insertDataInExcelSheet(List<AutomationExcelRowModel> automationExcelRowModelList, XSSFSheet sheet) {
         Iterator<Row> row = sheet.iterator();
         Map<FastTestExcelHeaders, Integer> headerIndexes =
-                        automationExcelUtility.generateHeaderRow(workbookInput, sheet, row.next());
+                        automationExcelUtility.generateHeaderRow(row.next());
         int lastSNoCount = sheet.getLastRowNum();
         Map<FastTestExcelHeaders, Object> cellData = new EnumMap<>(FastTestExcelHeaders.class);
         for (AutomationExcelRowModel automationExcelRowModel : automationExcelRowModelList) {
@@ -118,7 +117,7 @@ public class AutomationInputExcelService {
             cellData.put(FastTestExcelHeaders.EXECUTION_DATE_TIME, null);
             cellData.put(FastTestExcelHeaders.COMMENTS, null);
             cellData.put(FastTestExcelHeaders.RUNTIME,null);
-            automationExcelUtility.insertRowData(workbookInput, sheet, currentRow, headerIndexes, cellData);
+            automationExcelUtility.insertRowData(currentRow, headerIndexes, cellData);
         }
     }
 

@@ -25,7 +25,8 @@ import com.infogain.automation.utilities.AutomationClaimsUtility;
 import com.infogain.automation.utilities.AutomationEmailUtility;
 import com.infogain.automation.utilities.AutomationEndpointHitUtility;
 import com.infogain.automation.utilities.AutomationExcelUtility;
-import com.infogain.automation.utilities.AutomationRequestBodyAndHeadersUtility;
+import com.infogain.automation.utilities.AutomationHeadersUtility;
+import com.infogain.automation.utilities.AutomationJsonUtility;
 import com.infogain.automation.utilities.AutomationValidationUtility;
 import com.infogain.automation.utilities.BeanUtil;
 
@@ -61,7 +62,9 @@ public abstract class AutomationAbstractTests {
     private final AutomationReportService automationReportService;
     private final AutomationExcelUtility automationExcelUtility;
     private final AutomationEndpointHitUtility automationEndpointHitUtility;
-    private final AutomationRequestBodyAndHeadersUtility automationRequestBodyAndHeadersUtility;
+    private final AutomationHeadersUtility automationHeadersUtility;
+    private final AutomationJsonUtility automationJsonUtility;
+    private final AutomationValidationUtility automationValidationUtility;
 
     public AutomationAbstractTests() {
         automationProperties = BeanUtil.getBean(AutomationProperties.class);
@@ -72,7 +75,9 @@ public abstract class AutomationAbstractTests {
         baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
                         + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
         automationEndpointHitUtility = BeanUtil.getBean(AutomationEndpointHitUtility.class);
-        automationRequestBodyAndHeadersUtility = BeanUtil.getBean(AutomationRequestBodyAndHeadersUtility.class);
+        automationHeadersUtility = BeanUtil.getBean(AutomationHeadersUtility.class);
+        automationJsonUtility = BeanUtil.getBean(AutomationJsonUtility.class);
+        automationValidationUtility = BeanUtil.getBean(AutomationValidationUtility.class);
     }
 
     public void init(XSSFWorkbook workbook, String inputExcelFileName, String testSheetName) {
@@ -110,7 +115,10 @@ public abstract class AutomationAbstractTests {
                     automationClaimsUtility.updateToken(automationInputDTO);
                 }
                 getActualResponse(baseClaimUrl, automationInputDTO);
+            } catch (AutomationException e) {
+                throw e;
             } catch (Exception e) {
+
                 logger.debug("Exception Occured While hitting endpoint {} of type {} : {}",
                                 automationInputDTO.getRequestURL(), automationInputDTO.getRequestType(),
                                 ExceptionUtils.getStackTrace(e));
@@ -135,7 +143,8 @@ public abstract class AutomationAbstractTests {
      */
     public void performValidations() {
         logger.traceEntry("performValidations method of {} class", testSheetName);
-        automationInputDTOList.forEach(AutomationValidationUtility::performValidations);
+        automationInputDTOList.forEach(
+                        automationInputDTO -> automationValidationUtility.performValidations(automationInputDTO));
         logger.traceExit();
     }
 
@@ -178,14 +187,20 @@ public abstract class AutomationAbstractTests {
         logger.traceEntry("hitEndpoint method of AutomationEndpointHitUtility class");
         logger.info("Expected Response Status code - {}, response body : {}",
                         automationInputDTO.getExpectedHttpStatus(), automationInputDTO.getExpectedOutput());
-        Pair<Response, Double> responseAndRuntime =  automationEndpointHitUtility.hitEndpoint(baseUrl,
-                        automationInputDTO.getRequestURL() + automationInputDTO.getInputParam(),
-                        automationInputDTO.getHeaders(), automationInputDTO.getRequestType(),
+        String requestURL = automationInputDTO.getRequestURL();
+        HttpMethod requestType = automationInputDTO.getRequestType();
+        Pair<Response, Double> responseAndRuntime = automationEndpointHitUtility.hitEndpoint(baseUrl,
+                        requestURL + automationInputDTO.getInputParam(), automationInputDTO.getHeaders(), requestType,
                         automationInputDTO.getTestCaseInputJson());
         Response resp = responseAndRuntime.getFirst();
+        int actualStatusCode = resp.statusCode();
+        //update token response if endpoint was of token
+        automationClaimsUtility.checkIfTokenResponse(requestURL, requestType.name(), resp);
+        String actualOutput = automationJsonUtility.beautifyJson(resp.asString());
+        logger.info("Actual Response Status code - {}, response body : {}", actualStatusCode, actualOutput);
         Double testCaseRuntime = responseAndRuntime.getSecond();
-        automationInputDTO.setActualHttpStatus(resp.statusCode());
-        automationInputDTO.setActualOutput(resp.asString());
+        automationInputDTO.setActualHttpStatus(actualStatusCode);
+        automationInputDTO.setActualOutput(actualOutput);
         automationInputDTO.setExecutionDateTime(LocalDateTime.now());
         automationInputDTO.setRuntime(testCaseRuntime);
         logger.traceExit();
@@ -198,14 +213,13 @@ public abstract class AutomationAbstractTests {
             if (StringUtils.isNotBlank(inputJson)) {
                 inputJson = inputJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + inputJson
                                 : inputJson;
-                automationInputDTO.setTestCaseInputJson(
-                                automationRequestBodyAndHeadersUtility.fetchJSONObject(inputJson));
+                automationInputDTO.setTestCaseInputJson(automationJsonUtility.fetchJSONObject(inputJson));
             }
             // sets Header Object in AutomationInputDTO
             if (StringUtils.isNotBlank(headerJson)) {
                 headerJson = headerJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + headerJson
                                 : headerJson;
-                Headers fetchHeaders = automationRequestBodyAndHeadersUtility.fetchHeaders(headerJson);
+                Headers fetchHeaders = automationHeadersUtility.fetchHeaders(headerJson);
                 automationInputDTO.setHeaders(fetchHeaders);
             }
         });

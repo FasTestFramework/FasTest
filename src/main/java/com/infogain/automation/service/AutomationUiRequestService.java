@@ -19,7 +19,8 @@ import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.properties.AutomationProperties;
 import com.infogain.automation.utilities.AutomationClaimsUtility;
 import com.infogain.automation.utilities.AutomationEndpointHitUtility;
-import com.infogain.automation.utilities.AutomationRequestBodyAndHeadersUtility;
+import com.infogain.automation.utilities.AutomationHeadersUtility;
+import com.infogain.automation.utilities.AutomationJsonUtility;
 
 @Service
 public class AutomationUiRequestService {
@@ -27,19 +28,21 @@ public class AutomationUiRequestService {
 
     private final AutomationEndpointHitUtility automationEndpointHitUtility;
     private final AutomationProperties automationProperties;
-    private final AutomationRequestBodyAndHeadersUtility automationRequestBodyAndHeadersUtility;
+    private final AutomationHeadersUtility automationHeadersUtility;
     private final AutomationClaimsUtility automationClaimsUtility;
-
+    private final AutomationJsonUtility automationJsonUtility;
 
     @Autowired
     public AutomationUiRequestService(final AutomationEndpointHitUtility automationEndpointHitUtility,
                     final AutomationProperties automationProperties,
-                    final AutomationRequestBodyAndHeadersUtility automationRequestBodyAndHeadersUtility,
-                    final AutomationClaimsUtility automationClaimsUtility) {
+                    final AutomationHeadersUtility automationHeadersUtility,
+                    final AutomationClaimsUtility automationClaimsUtility,
+                    final AutomationJsonUtility automationJsonUtility) {
         this.automationEndpointHitUtility = automationEndpointHitUtility;
         this.automationProperties = automationProperties;
-        this.automationRequestBodyAndHeadersUtility = automationRequestBodyAndHeadersUtility;
+        this.automationHeadersUtility = automationHeadersUtility;
         this.automationClaimsUtility = automationClaimsUtility;
+        this.automationJsonUtility = automationJsonUtility;
     }
 
     public AutomationUiResponseDTO hitEndpointFromUI(AutomationUiRequestDTO automationUiRequestDTO) {
@@ -48,11 +51,11 @@ public class AutomationUiRequestService {
         String inputjsonFolderPath =
                         automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         String body = automationUiRequestDTO.getBody();
-        body = body.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + body : body;
         JSONObject bodyJson = null;
         if (body != null) {
             try {
-                bodyJson = automationRequestBodyAndHeadersUtility.fetchJSONObject(body);
+                body = body.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + body : body;
+                bodyJson = automationJsonUtility.fetchJSONObject(body);
                 body = bodyJson.toJSONString();
             } catch (AutomationException e) {
                 if (!(e.getCause() instanceof ParseException)) {
@@ -67,7 +70,7 @@ public class AutomationUiRequestService {
             baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
                             + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
         }
-        Headers headers = automationRequestBodyAndHeadersUtility.fetchHeaders(automationUiRequestDTO.getHeader());
+        Headers headers = automationHeadersUtility.fetchHeaders(automationUiRequestDTO.getHeader());
 
 
         AutomationInputDTO automationInputDTO = new AutomationInputDTO();

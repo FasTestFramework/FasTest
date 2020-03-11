@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -205,16 +204,16 @@ public class AutomationReportingRestController {
                         automationProperties.getProperty(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH) + "/"
                                         + sendMailRequestDTO.getReportFileName();
         File file = new File(automationReportFileName);
-        BodyBuilder bodyBuilder;
+        HttpStatus status;
         String responseBody = null;
         if (file.exists() && !file.isDirectory()) {
             mailService.attachReportAndProcessMail(automationReportFileName);
-            bodyBuilder = ResponseEntity.status(HttpStatus.NO_CONTENT);
+            status = HttpStatus.NO_CONTENT;
         } else {
-            bodyBuilder = ResponseEntity.status(HttpStatus.BAD_REQUEST);
+            status = HttpStatus.BAD_REQUEST;
             responseBody = "File does not exist at path specified.";
         }
-        return logger.traceExit(bodyBuilder.body(responseBody));
+        return logger.traceExit(ResponseEntity.status(status).body(responseBody));
     }
 
     /**

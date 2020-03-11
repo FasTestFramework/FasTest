@@ -14,108 +14,196 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infogain.automation.constants.AutomationConstants;
 import com.infogain.automation.dto.AutomationInputDTO;
 import com.infogain.automation.exception.CustomValidationFailure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Component
 public class AutomationValidationUtility {
-    private static final Logger logger = LogManager.getLogger(AutomationValidationUtility.class);
-    private static Map<String, String> customKeysValidation;
-    private static StringBuilder comments = new StringBuilder();
+    private static final String FAILURE_COMMENTS_SEPERATOR = "----------------------------------------\n";
+    private final Logger logger = LogManager.getLogger(AutomationValidationUtility.class);
+    private Map<String, String> customKeysValidation;
+    private StringBuilder comments;
+    private List<String> keysIgnored = new ArrayList<>();
 
-    private AutomationValidationUtility() {}
+    private AutomationJsonUtility automationJsonUtility;
 
-    /*
-     * public static void main(String[] args) { //to be removed String expected = "{\"output\":{\r\n" +
-     * "  \"claimId\": \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n" + "  \"receiptElements\": [\r\n" + "    {\r\n" +
-     * "      \"barcode\": {\r\n" + "        \"alignment\": \"Center\",\r\n" + "        \"data\": [1.23],\r\n" +
-     * "        \"height\": 100,\r\n" + "        \"symbology\": \"PDF41\",\r\n" +
-     * "        \"textPosition\": \"Below\",\r\n" + "        \"width\": 100\r\n" + "      },\r\n" +
-     * "      \"cut\": {\r\n" + "        \"cutReceipt\": true\r\n" + "      }\r\n" + "    },\r\n" + "    {\r\n" +
-     * "      \"image\": {\r\n" + "        \"alignment\": \"Center\",\r\n" +
-     * "        \"requestURL\": \"https://home.Infogain.com/Corporate/SiteAssets/Lists/Infogain%20News%20Articles/NewForm/InfogainCollective_120W_2017.jpg\"\r\n"
-     * + "      }\r\n" + "    },\r\n" + "    {\"barcode\": {\r\n" + "        \"alignment\": \"Center\",\r\n" +
-     * "        \"data\": [13.122,2.0,3,4],\r\n" + "        \"height\": 10000,\r\n" +
-     * "        \"symbology\": \"PDF41\",\r\n" + "        \"textPosition\": \"dfg\",\r\n" +
-     * "        \"width\": \"1000\"\r\n" + "      },\r\n" + "      \"receiptText\": {\r\n" +
-     * "        \"alignment\": \"Center\",\r\n" +
-     * "        \"text\": \"This is a text line to be printed on receipt\"\r\n" + "      }\r\n" + "    }\r\n" +
-     * "  ]}\r\n" + "}";
-     * 
-     * String actual = "{\"output\":{\r\n" + "  \"claimId\": \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n" +
-     * "  \"receiptElements\": [\r\n" + "    {\r\n" + "      \"barcode\": {\r\n" +
-     * "        \"alignment\": \"Center\",\r\n" + "        \"data\": [1.2],\r\n" + "        \"height\": 100,\r\n" +
-     * "        \"symbology\": \"PDF41\",\r\n" + "        \"textPosition\": \"Below\",\r\n" +
-     * "        \"width\": 100\r\n" + "      },\r\n" + "      \"cut\": {\r\n" + "        \"cutReceipt\": true\r\n" +
-     * "      }\r\n" + "    },\r\n" + "    {\r\n" + "      \"image\": {\r\n" + "        \"alignment\": \"Center\",\r\n"
-     * +
-     * "        \"requestURL\": \"https://home.Infogain.com/Corporate/SiteAssets/Lists/Infogain%20News%20Articles/NewForm/InfogainCollective_120W_2017.jpg\"\r\n"
-     * + "      }\r\n" + "    },\r\n" + "    {\"barcode\": {\r\n" + "        \"alignment\": \"Center\",\r\n" +
-     * "        \"data\": [13.122,2.0,1.23,4],\r\n" + "        \"height\": 10000,\r\n" +
-     * "        \"symbology\": \"PDF41\",\r\n" + "        \"textPosition\": \"dfg\",\r\n" +
-     * "        \"width\": \"1000\"\r\n" + "      },\r\n" + "      \"receiptText\": {\r\n" +
-     * "        \"alignment\": \"Center\",\r\n" +
-     * "        \"text\": \"This is a text line to be printed on receipt\"\r\n" + "      }\r\n" + "    }\r\n" +
-     * "  ]}\r\n" + "}";
-     * 
-     * // {"output":{ // "claimId": "1d3d0dbe-3b24-4dd8-87b2-44114d83619b", // "receiptElements": [ // { // "barcode": {
-     * // "alignment": "Center", // "data": [1,2,3], // "height": 100, // "symbology": "PDF41", // "textPosition":
-     * "Below", // "width": 100 // }, // "cut": { // "cutReceipt": true // } // }, // { // "image": { // "alignment":
-     * "Center", // "requestURL": //
-     * "https://home.Infogain.com/Corporate/SiteAssets/Lists/Infogain%20News%20Articles/NewForm/InfogainCollective_120W_2017.jpg"
-     * // } // }, // {"barcode": { // "alignment": "Center", // "data": [1,2,3,4], // "height": 10000, // "symbology":
-     * "PDF41", // "textPosition": "dfg", // "width": "1000" // }, // "receiptText": { // "alignment": "Center", //
-     * "text": "This is a text line to be printed on receipt" // } // } // ]} // }
-     * 
-     * Map<String, String> inputMap = new LinkedHashMap<>(); // inputMap.put("output.claimId",
-     * "notNull();isNotNull();contains(\"-\")"); inputMap.put("output.receiptElements[x].barcode.data",
-     * "contains(1.23)"); // inputMap.put("output.receiptElements[x]", "isEqual()"); //
-     * inputMap.put("output.receiptElements[0].barcode.data", "isEqual()"); // inputMap.put("output.receiptElements[x]",
-     * "ignore()"); // // inputMap.put("output.receiptElements[x].barcode", //
-     * "containsKey(\"data\");containsEntry(\"alignment\",\"Centr\")"); // inputMap.put("output",
-     * "containsKeys(\"receiptElements\",\"claimId\")");
-     * 
-     * customKeysValidation = inputMap;
-     * 
-     * boolean testCaseResult; try { JSONParser jsonParser = new JSONParser(); Object jsonObjectExpectedOutput =
-     * jsonParser.parse(expected); Object jsonObjectActualOutput = jsonParser.parse(actual); testCaseResult =
-     * compareJSONs(jsonObjectExpectedOutput, jsonObjectActualOutput); System.out.println(comments.toString()); } catch
-     * (ParseException e) { testCaseResult = false; } System.out.println("result: " + testCaseResult); }
-     */
-    public static void performValidations(AutomationInputDTO automationInputDTO) {
-        logger.traceEntry("performValidations method of AutomationValidationUtility class");
-        boolean testCaseResult =
-                        automationInputDTO.getActualHttpStatus().equals(automationInputDTO.getExpectedHttpStatus());
-        // If actual and Expected HTTP status are equal then only Output is validated
-        if (testCaseResult) {
-            if (StringUtils.isNotBlank(automationInputDTO.getExpectedOutput())
-                            && StringUtils.isNotBlank(automationInputDTO.getActualOutput())) {
-                try {
-                    customKeysValidation = automationInputDTO.getKeyValidation();
-                    JSONParser jsonParser = new JSONParser();
-                    Object jsonObjectExpectedOutput = jsonParser.parse(automationInputDTO.getExpectedOutput());
-                    Object jsonObjectActualOutput = jsonParser.parse(automationInputDTO.getActualOutput());
-                    testCaseResult = compareJSONs(jsonObjectExpectedOutput, jsonObjectActualOutput);
-                    System.out.println(comments.toString());
-                } catch (ParseException e) {
-                    testCaseResult = false;
-                }
-            } else if (!automationInputDTO.getExpectedOutput().equals(automationInputDTO.getActualOutput())) {
-                testCaseResult = false;
-            }
-        }
-        automationInputDTO.setTestCaseResult(testCaseResult ? AutomationConstants.TEST_CASE_RESULT_PASS
-                        : AutomationConstants.TEST_CASE_RESULT_FAIL);
-        logger.traceExit();
-
+    @Autowired
+    public AutomationValidationUtility(AutomationJsonUtility automationJsonUtility) {
+        this.automationJsonUtility = automationJsonUtility;
     }
 
-    private static boolean compareJSONs(Object jsonObjectExpectedOutput, Object jsonObjectActualOutput) {
+    public static void main(String[] args) {
+        // //to be removed
+        String expected = "{\r\n" + "  \"output\" : {\r\n"
+                        + "    \"claimId\" : \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n"
+                        + "    \"receiptElements\" : [ " + "{\r\n" + "      \"cut\" : {\r\n"
+                        + "        \"cutReceipt\" : true\r\n" + "      },\r\n" + "      \"barcode\" : {\r\n"
+                        + "        \"textPosition\" : \"Below\",\r\n" + "        \"data\" : [ 1, 2, 3 ],\r\n"
+                        + "        \"symbology\" : \"PDF41\",\r\n" + "        \"width\" : 100,\r\n"
+                        + "        \"alignment\" : \"Center\",\r\n" + "        \"height\" : 100\r\n" + "      }\r\n"
+                        + "    }, " + "{\r\n" + "      \"image\" : {\r\n" + "        \"alignment\" : \"Center\",\r\n"
+                        + "        \"url\" : \"https://home.fedex.com/Corporate/SiteAssets/Lists/FedEx%20News%20Articles/NewForm/FedExCollective_120W_2017.jpg\"\r\n"
+                        + "      }\r\n" + "    }, {\r\n" + "      \"receiptText\" : {\r\n"
+                        + "        \"text\" : \"This is a text line to be printed on receipt\",\r\n"
+                        + "        \"alignment\" : \"Center\"\r\n" + "      },\r\n" + "      \"barcode\" : {\r\n"
+                        + "        \"textPosition\" : \"dfg\",\r\n" + "        \"data\" : [ 1, 2, 3, 4 ],\r\n"
+                        + "        \"symbology\" : \"PDF41\",\r\n" + "        \"width\" : \"1000\",\r\n"
+                        + "        \"alignment\" : \"Center\",\r\n" + "        \"height\" : 10000\r\n" + "      }\r\n"
+                        + "    } ]\r\n" + "  }\r\n" + "}";
 
-        return objectValidate("", jsonObjectExpectedOutput, jsonObjectActualOutput, new StringBuilder());
+        String actual = "{\r\n" + "  \"output\" : {\r\n"
+                        + "    \"claimId\" : \"1d3d0dbe-3b24-4dd8-87b2-44114d83619b\",\r\n"
+                        + "    \"receiptElements\" : [ " + "{\r\n" + "      \"cut\" : {\r\n"
+                        + "        \"cutReceipt\" : true\r\n" + "      },\r\n" + "      \"barcode\" : {\r\n"
+                        + "        \"textPosition\" : \"Below\",\r\n" + "        \"data\" : [ 1, 2, 3 ],\r\n"
+                        + "        \"symbology\" : \"PDF41\",\r\n" + "        \"width\" : 100,\r\n"
+                        + "        \"alignment\" : \"Center\",\r\n" + "        \"height\" : 100\r\n" + "      }\r\n"
+                        + "    }, " + "{\r\n" + "      \"image\" : {\r\n" + "        \"alignment\" : \"Center\",\r\n"
+                        + "        \"url\" : \"https://home.fedex.com/Corporate/SiteAssets/Lists/FedEx%20News%20Articles/NewForm/FedExCollective_120W_2017.jpg\"\r\n"
+                        + "      }\r\n" + "    }, {\r\n" + "      \"receiptText\" : {\r\n"
+                        + "        \"text\" : \"This is a text line to be printed on receipt\",\r\n"
+                        + "        \"alignment\" : \"Center\"\r\n" + "      },\r\n" + "      \"barcode\" : {\r\n"
+                        + "        \"textPosition\" : \"dfg\",\r\n" + "        \"data\" : [ 1, 3,2, 4 ],\r\n"
+                        + "        \"symbology\" : \"PDF41\",\r\n" + "        \"width\" : \"1000\",\r\n"
+                        + "        \"alignment\" : \"Center\",\r\n" + "        \"height\" : 10000\r\n" + "      }\r\n"
+                        + "    } ]\r\n" + "  }\r\n" + "}";
+
+
+        // {"output":{
+        // "claimId": "1d3d0dbe-3b24-4dd8-87b2-44114d83619b",
+        // "receiptElements": [
+        // {
+        // "barcode": {
+        // "alignment": "Center",
+        // "data": [1,2,3],
+        // "height": 100,
+        // "symbology": "PDF41",
+        // "textPosition": "Below",
+        // "width": 100
+        // },
+        // "cut": {
+        // "cutReceipt": true
+        // }
+        // },
+        // {
+        // "image": {
+        // "alignment": "Center",
+        // "url":
+        // "https://home.fedex.com/Corporate/SiteAssets/Lists/FedEx%20News%20Articles/NewForm/FedExCollective_120W_2017.jpg"
+        // }
+        // },
+        // {"barcode": {
+        // "alignment": "Center",
+        // "data": [1,2,3,4],
+        // "height": 10000,
+        // "symbology": "PDF41",
+        // "textPosition": "dfg",
+        // "width": "1000"
+        // },
+        // "receiptText": {
+        // "alignment": "Center",
+        // "text": "This is a text line to be printed on receipt"
+        // }
+        // }
+        // ]}
+        // }
+
+        Map<String, String> inputMap = new LinkedHashMap<>();
+        // inputMap.put("output.claimId", "notNull();isNotNull();contains(\"-\")");
+        // inputMap.put("output.receiptElements", "containsArrayEntries()");
+        // inputMap.put("output.receiptElements[x].barcode.data", "contains(1,3)");
+        // inputMap.put("output.receiptElements[x]", "isEqual()");
+        // inputMap.put("output.receiptElements[0].barcode.data", "isEqual()");
+        // inputMap.put("output.receiptElements[x]", "ignore()");
+        //
+        // inputMap.put("output.receiptElements[x].barcode",
+        // "containsKey(\"daa\");containsEntry(\"alignment\",\"Centr\")");
+        // inputMap.put("output", "containsKeys(\"receiptElements\",\"claimId\")");
+        // inputMap.put("output.receiptElements", "ignore()");
+        // inputMap.put("output.receiptElements[2].barcode", "sdfhghdfg()");
+
+        // customKeysValidation = inputMap;
+        AutomationValidationUtility automationValidationUtility =
+                        new AutomationValidationUtility(new AutomationJsonUtility(new AutomationUtility()));
+        automationValidationUtility.customKeysValidation = inputMap;
+        try {
+            JSONParser jsonParser = new JSONParser();
+            Object jsonObjectExpectedOutput = jsonParser.parse(expected);
+            Object jsonObjectActualOutput = jsonParser.parse(actual);
+            automationValidationUtility.compareJSONs(jsonObjectExpectedOutput, jsonObjectActualOutput);
+            System.out.println("Expected:\n" + new ObjectMapper().writerWithDefaultPrettyPrinter()
+                            .writeValueAsString(jsonObjectExpectedOutput));
+            System.out.println("Actual:\n" + new ObjectMapper().writerWithDefaultPrettyPrinter()
+                            .writeValueAsString(jsonObjectActualOutput));
+            System.out.println(automationValidationUtility.comments.toString());
+        } catch (ParseException | JsonProcessingException e) {
+        }
+        System.out.println("result: " + (automationValidationUtility.comments.length() == 0));
+    }
+
+    public void performValidations(AutomationInputDTO automationInputDTO) {
+        logger.traceEntry("performValidations method of AutomationValidationUtility class");
+        comments = new StringBuilder();
+        Integer actualHttpStatus = automationInputDTO.getActualHttpStatus();
+        Integer expectedHttpStatus = automationInputDTO.getExpectedHttpStatus();
+        boolean statusResult = actualHttpStatus.equals(expectedHttpStatus);
+        String outputFailureComments = "";
+        String expectedOutput = automationInputDTO.getExpectedOutput();
+        String actualOutput = automationInputDTO.getActualOutput();
+        if (StringUtils.isNotEmpty(expectedOutput) && StringUtils.isNotEmpty(actualOutput)) {
+            customKeysValidation = automationInputDTO.getKeyValidation();
+            try {
+                Object jsonObjectExpectedOutput = automationJsonUtility.fetchObjectFromString(expectedOutput);
+                Object jsonObjectActualOutput = automationJsonUtility.fetchObjectFromString(actualOutput);
+                compareJSONs(jsonObjectExpectedOutput, jsonObjectActualOutput);
+                outputFailureComments = comments.toString();
+            } catch (IllegalArgumentException e) {
+                if (!expectedOutput.equals(actualOutput)) {
+                    String equalsFailureMessage = equalValidations(expectedOutput, actualOutput);
+                    if (!equalsFailureMessage.isEmpty()) {
+                        outputFailureComments = "Response body validation failure:\n" + equalsFailureMessage
+                                        + "\n\nNote: Expected or Actual response body is not in json format.";
+                    }
+                }
+            }
+        } else if (!expectedOutput.equals(actualOutput)) {
+            if (StringUtils.isEmpty(expectedOutput)) {
+                outputFailureComments = "Expected response body to be blank but was not.";
+            } else {
+                outputFailureComments = "Expected response body to be:\n<" + expectedOutput + ">\nbut was blank.";
+            }
+        }
+        StringBuilder failureComments = new StringBuilder();
+        if (!statusResult) {
+            failureComments.append("Expected Status Code:\n<" + actualHttpStatus + ">\nto be:\n<" + expectedHttpStatus
+                            + ">\nbut was not.\n");
+        }
+        if (!outputFailureComments.isEmpty()) {
+            if (failureComments.length() != 0) {
+                failureComments.append(FAILURE_COMMENTS_SEPERATOR);
+            }
+            failureComments.append(outputFailureComments);
+        }
+
+        if (failureComments.length() == 0) {
+            automationInputDTO.setTestCaseResult(AutomationConstants.TEST_CASE_RESULT_PASS);
+        } else {
+            automationInputDTO.setFailureComments(failureComments.toString());
+            automationInputDTO.setTestCaseResult(AutomationConstants.TEST_CASE_RESULT_FAIL);
+        }
+        logger.traceExit();
+    }
+
+    public void compareJSONs(Object jsonObjectExpectedOutput, Object jsonObjectActualOutput) {
+        objectValidate("", jsonObjectExpectedOutput, jsonObjectActualOutput, new StringBuilder());
     }
 
     /**
@@ -128,55 +216,136 @@ public class AutomationValidationUtility {
      * @param key in JSON
      * @param objectExpected - Expected Object
      * @param objectActual - Actual Object
-     * @return toReturn
      * @since Dec 11, 2019
      */
-    private static boolean objectValidate(Object key, Object objectExpected, Object objectActual,
-                    StringBuilder currentKeyPath) {
+    private void objectValidate(Object key, Object objectExpected, Object objectActual, StringBuilder currentKeyPath) {
         logger.traceEntry("objectValidate method of AutomationValidationUtility class");
-        boolean toReturn = true;
         String keyPath = currentKeyPath.toString();
         String customValidations = getCustomValidationsByKey(keyPath);
-
-        if (customValidations != null) {
-            try {
-                new AutomationCustomValidationUtility().validate(objectActual, objectExpected, customValidations);
-            } catch (CustomValidationFailure e) {
-                if (comments.length() != 0) {
-                    comments.append("----------------------------------------\n");
-                }
-                comments.append(keyPath).append(":\n").append(e.getMessage());
-                toReturn = false;
-            }
+        boolean customValidationsFound = customValidations != null;
+        if (customValidationsFound) {
+            doCustomValidations(objectExpected, objectActual, keyPath, customValidations);
         }
         if (objectExpected instanceof JSONObject) {
-            toReturn = jsonObjectValidate((JSONObject) objectExpected, (JSONObject) objectActual, currentKeyPath);
+            jsonObjectValidate(objectExpected, objectActual, currentKeyPath, customValidationsFound);
         } else if (objectExpected instanceof JSONArray) {
-            toReturn = jsonArrayValidate(key, (JSONArray) objectExpected, (JSONArray) objectActual, currentKeyPath);
-        } else if (customValidations != null) {
-            try {
-                assertThat(objectActual).isEqualTo(objectExpected);
-            } catch (AssertionError e) {
-                if (comments.length() != 0) {
-                    comments.append("----------------------------------------\n");
-                }
-                comments.append(keyPath).append(":\n").append(e.getMessage());
-                toReturn = false;
+            jsonArrayValidate(key, objectExpected, objectActual, currentKeyPath, customValidationsFound);
+        } else if (customValidations == null) {
+            String failureMessage = equalValidations(objectExpected, objectActual);
+            if (!failureMessage.isEmpty()) {
+                addComment(keyPath, failureMessage);
             }
         }
+        logger.traceExit();
+    }
 
-        // else if (customValidations != null) {
-        // try {
-        // new AutomationCustomValidationUtility().validate(objectActual, customValidations);
-        // } catch (CustomValidationFailure e) {
-        // logger.info(e);
-        // toReturn = false;
-        // }
-        // } else if (!(objectActual.getClass().equals(objectExpected.getClass())
-        // && objectActual.toString().equals(objectExpected.toString()))) {
-        // toReturn = false;
-        // }
-        return logger.traceExit(toReturn);
+    private void doCustomValidations(Object objectExpected, Object objectActual, String keyPath,
+                    String customValidations) {
+        try {
+            new AutomationCustomValidationUtility().validate(objectActual, objectExpected, customValidations);
+        } catch (CustomValidationFailure e) {
+            addComment(keyPath, e);
+        }
+        if (customValidations.contains("ignore()")) {
+            keysIgnored.add(keyPath);
+        }
+    }
+
+    private void jsonObjectValidate(Object objectExpected, Object objectActual, StringBuilder currentKeyPath,
+                    boolean customValidationsFound) {
+        if (objectActual instanceof JSONObject) {
+            JSONObject jsonObjectExpected = (JSONObject) objectExpected;
+            JSONObject jsonObjectActual = (JSONObject) objectActual;
+            Set<Object> expectedKeySet = jsonObjectExpected.keySet();
+            if (customValidationsFound || expectedKeySet.containsAll(jsonObjectActual.keySet())) {
+                jsonObjectValidate(jsonObjectExpected, jsonObjectActual, currentKeyPath);
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Expecting keys:\n<");
+                sb.append(expectedKeySet.toString());
+                sb.append(">\n but was:\n<");
+                sb.append(jsonObjectActual.keySet().toString());
+                sb.append(">");
+                addComment(currentKeyPath.toString(), sb.toString());
+            }
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Expecting:\n<");
+            addQuotesIfString(objectActual, sb);
+            sb.append(">\nto be object:\n<");
+            sb.append(objectExpected);
+            sb.append(">\nbut was not.");
+            addComment(currentKeyPath.toString(), sb.toString());
+        }
+    }
+
+    private void addQuotesIfString(Object objectActual, StringBuilder sb) {
+        if (objectActual instanceof String) {
+            sb.append("\"");
+            sb.append(objectActual);
+            sb.append("\"");
+        } else {
+            sb.append(objectActual);
+        }
+    }
+
+    private void jsonArrayValidate(Object key, Object objectExpected, Object objectActual, StringBuilder currentKeyPath,
+                    boolean customValidationsFound) {
+        if (objectActual instanceof JSONArray) {
+            JSONArray jsonArrayExpected = (JSONArray) objectExpected;
+            JSONArray jsonArrayActual = (JSONArray) objectActual;
+            if (customValidationsFound || jsonArrayExpected.size() == jsonArrayActual.size()) {
+                jsonArrayValidate(key, jsonArrayExpected, jsonArrayActual, currentKeyPath);
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Expecting array size:\n<");
+                sb.append(jsonArrayExpected.size());
+                sb.append(">\nbut was :\n<");
+                sb.append(jsonArrayActual.size());
+                sb.append(">");
+                addComment(currentKeyPath.toString(), sb.toString());
+            }
+
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Expecting:\n<");
+            addQuotesIfString(objectActual, sb);
+            sb.append(">\nto be an array:\n<");
+            sb.append(objectExpected);
+            sb.append(">\nbut was not.");
+            addComment(currentKeyPath.toString(), sb.toString());
+        }
+    }
+
+    private String equalValidations(Object objectExpected, Object objectActual) {
+        String message = "";
+        try {
+            assertThat(objectActual).isEqualTo(objectExpected);
+        } catch (AssertionError e) {
+            message = e.getMessage();
+        }
+        return message;
+    }
+
+    private void addComment(String keyPath, CustomValidationFailure e) {
+        addComment(keyPath, e.getMessage(), true);
+    }
+
+    private void addComment(String keyPath, String message) {
+        addComment(keyPath, message, false);
+    }
+
+    private void addComment(String keyPath, String message, boolean addComment) {
+        if (addComment || !ignoreTheKey(keyPath)) {
+            if (comments.length() != 0) {
+                comments.append(FAILURE_COMMENTS_SEPERATOR);
+            }
+            comments.append(keyPath).append(":\n").append(message).append("\n");
+        }
+    }
+
+    private boolean ignoreTheKey(String currentKey) {
+        return keysIgnored.stream().anyMatch(currentKey::startsWith);
     }
 
     /**
@@ -187,23 +356,25 @@ public class AutomationValidationUtility {
      * @return toReturn
      */
     @SuppressWarnings("unchecked")
-    private static boolean jsonObjectValidate(JSONObject jsonObjectExpected, JSONObject jsonObjectActual,
+    private void jsonObjectValidate(JSONObject jsonObjectExpected, JSONObject jsonObjectActual,
                     StringBuilder currentKeyPath) {
         logger.traceEntry("jsonObjectValidate method of AutomationValidationUtility class");
-
-        boolean toReturn = true;
         for (Object entry : jsonObjectExpected.keySet()) {
             StringBuilder localPath = addKey(currentKeyPath, entry.toString());
             if (jsonObjectActual.containsKey(entry)) {
-                toReturn = objectValidate(entry, jsonObjectExpected.get(entry), jsonObjectActual.get(entry), localPath);
+                objectValidate(entry, jsonObjectExpected.get(entry), jsonObjectActual.get(entry), localPath);
             } else {
-                toReturn = false;
-            }
-            if (!toReturn) {
-                break;
+                StringBuilder sb = new StringBuilder();
+                sb.append("Expecting:\n<");
+                sb.append(jsonObjectActual);
+                sb.append(">\nto contain key:\n<");
+                sb.append(entry);
+                sb.append(">");
+                addComment(localPath.toString(), sb.toString());
             }
         }
-        return logger.traceExit(toReturn);
+
+        logger.traceExit();
     }
 
     /**
@@ -215,26 +386,17 @@ public class AutomationValidationUtility {
      * @param jsonArrayActual- Actual JSON Array
      * @return toReturn
      */
-    private static boolean jsonArrayValidate(Object key, JSONArray jsonArrayExpected, JSONArray jsonArrayActual,
+    private void jsonArrayValidate(Object key, JSONArray jsonArrayExpected, JSONArray jsonArrayActual,
                     StringBuilder currentKeyPath) {
         logger.traceEntry("jsonArrayValidate method of AutomationValidationUtility class");
-
-        boolean toReturn = true;
-        if (jsonArrayExpected.size() == jsonArrayActual.size()) {
-            for (int i = 0; i < jsonArrayExpected.size(); i++) {
-                StringBuilder localPath = new StringBuilder(currentKeyPath).append("[").append(i).append("]");
-                if (!objectValidate(key, jsonArrayExpected.get(i), jsonArrayActual.get(i), localPath)) {
-                    toReturn = false;
-                    break;
-                }
-            }
-        } else {
-            toReturn = false;
+        for (int i = 0; i < jsonArrayExpected.size(); i++) {
+            StringBuilder localPath = new StringBuilder(currentKeyPath).append("[").append(i).append("]");
+            objectValidate(key, jsonArrayExpected.get(i), jsonArrayActual.get(i), localPath);
         }
-        return logger.traceExit(toReturn);
+        logger.traceExit();
     }
 
-    private static String getCustomValidationsByKey(String currentKeyPath) {
+    private String getCustomValidationsByKey(String currentKeyPath) {
         Set<String> allKeyPaths = extractArrayGenericKeyPaths(currentKeyPath);
         for (String keyPath : allKeyPaths) {
             if (customKeysValidation.containsKey(keyPath)) {
@@ -244,7 +406,7 @@ public class AutomationValidationUtility {
         return null;
     }
 
-    private static Set<String> extractArrayGenericKeyPaths(String currentKeyPath) {
+    private Set<String> extractArrayGenericKeyPaths(String currentKeyPath) {
         Set<String> arrayGenericKeyPaths = new CopyOnWriteArraySet<>();
         arrayGenericKeyPaths.add(currentKeyPath);
         List<String> checked = new ArrayList<>();
@@ -259,7 +421,7 @@ public class AutomationValidationUtility {
         return arrayGenericKeyPaths;
     }
 
-    private static void addArrayGenericKeyPaths(String path, Set<String> arrayGenericKeyPaths) {
+    private void addArrayGenericKeyPaths(String path, Set<String> arrayGenericKeyPaths) {
         Map<Integer, Integer> indexes = new LinkedHashMap<>();
         int index = 0;
         int diff = 0;
@@ -276,16 +438,13 @@ public class AutomationValidationUtility {
                 }
             }
         }
-        indexes.forEach((k, v) -> {
-            arrayGenericKeyPaths.add(new StringBuilder(path).replace(k + 1, v, "x").toString());
-        });
+        indexes.forEach((k, v) -> arrayGenericKeyPaths.add(new StringBuilder(path).replace(k + 1, v, "x").toString()));
     }
 
-    private static StringBuilder addKey(StringBuilder currentKeyPath, String key) {
+    private StringBuilder addKey(StringBuilder currentKeyPath, String key) {
         return StringUtils.isNotEmpty(currentKeyPath.toString())
                         ? new StringBuilder(currentKeyPath).append(".").append(key)
                         : new StringBuilder(key);
     }
-
 
 }

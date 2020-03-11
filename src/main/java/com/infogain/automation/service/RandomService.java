@@ -2,6 +2,7 @@ package com.infogain.automation.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -346,5 +347,15 @@ public class RandomService {
             }
         }
         return charArray;
+    }
+    
+    /**
+     * This method generates the random UUID in string format
+     * 
+     * @return the UUID generated in string format
+     * @since 07-Mar-2020
+     */
+    public String generateRandomUUID() {
+        return UUID.randomUUID().toString();
     }
 }
