@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBIntrospector;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.jmeter.assertions.DurationAssertion;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.config.CSVDataSet;
@@ -46,6 +47,8 @@ import org.apache.jmeter.threads.SetupThreadGroup;
 import org.apache.jmeter.threads.gui.ThreadGroupGui;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -63,6 +66,7 @@ import com.infogain.automation.dto.AutomationPerformanceTestingTest;
 import com.infogain.automation.dto.AutomationPerformanceTestingTestPlanDto;
 import com.infogain.automation.dto.AutomationPerformanceTestingThreadGroupDto;
 import com.infogain.automation.dto.AutomationResponse;
+import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.properties.AutomationProperties;
 
 
@@ -79,6 +83,9 @@ import com.infogain.automation.properties.AutomationProperties;
  */
 @Service
 public class AutomationPerformanceTestingService {
+	
+	private static final Logger logger = LogManager.getLogger(AutomationPerformanceTestingService.class);
+	
     CSVDataSet csvDataSet;
     HTTPSamplerProxy httpSamplerProxy;
     LoopController loopController;
@@ -115,18 +122,18 @@ public class AutomationPerformanceTestingService {
                             (AutomationPerformanceTestingResultsTestResults) JAXBIntrospector.getValue(jaxbMarshaller
                                             .unmarshal(new FileInputStream(new File(automationProperties.getProperty("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_").concat(dateTimesuffix).concat(".xml")))));
         } catch (FileNotFoundException | JAXBException e) {
-            e.printStackTrace();
+            logger.debug("Exception Occured While Unmarshalling of XML file during Performance Testing : {} ", ExceptionUtils.getStackTrace(e));
         }
         AutomationPerformanceTestingResultsTestResultsDto output =
                         new AutomationPerformanceTestingResultsTestResultsDto();
-        if (automationPerformanceTestingTest.getDeatiledResponse().booleanValue()) {
-            output.setDetailedResults(automationPerformanceTestingResultsTestResults);
-        }
         output.setSummary(summariser.results);
         if (automationPerformanceTestingResultsTestResults != null) {
             generateHtmlReport(testPlan, automationPerformanceTestingResultsTestResults, output);
+            output.setCsvReportPath(automationProperties.getProperty("fastest.jmetercsvreportsfilepath").concat("/csvResultreport_").concat(dateTimesuffix).concat(".csv"));
+            output.setJmxReportPath(automationProperties.getProperty("fastest.jmeterjmxfilepath").concat("/jmxreport_".concat(dateTimesuffix).concat(".jmx")));
+            output.setXmlReportPath(automationProperties.getProperty("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_".concat(dateTimesuffix).concat(".xml")));
         }
-        return AutomationResponse.success(output);
+        return logger.traceExit(AutomationResponse.success(output));
 
 
     }
@@ -154,17 +161,33 @@ public class AutomationPerformanceTestingService {
                     AutomationPerformanceTestingResultsTestResultsDto output) {
 
         try {
+        	File sourceReportHtmlDirectory = new File(
+                    automationProperties.getProperty("fastest.jmeterhome").concat("/bin/report-output/"));
+        	   Properties reportProps = new Properties();
+               reportProps.load(new FileInputStream(
+                               automationProperties.getProperty("fastest.jmeterreportpropertiespath")));
 
-
+               File sourceReportJsonDirectory = new File(
+                               reportProps.getProperty("jmeter.reportgenerator.exporter.json.property.output_dir"));
+               
+               if (sourceReportHtmlDirectory.isDirectory() && sourceReportJsonDirectory.isDirectory()) {
+                  
+                   FileUtils.cleanDirectory(sourceReportHtmlDirectory);
+                   FileUtils.cleanDirectory(sourceReportJsonDirectory);
+               }
             File csvFile = new File(automationProperties.getProperty("fastest.jmetercsvreportsfilepath").concat("/csvResultreport_").concat(dateTimesuffix).concat(".csv"));
             FileWriter myWriter = new FileWriter(csvFile);
             AutomationPerformanceTestingResultsHttpSample[] httpSamples =
                             automationPerformanceTestingResultsTestResults.getHttpSample();
+            if(null == httpSamples) {
+            	myWriter.close();
+            	throw new AutomationException("Unable to execute Performane testing.");
+            }
             myWriter.write("timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect\n");
             for (int i = 0; i < httpSamples.length; i++) {
-                myWriter.write(httpSamples[i].getTimeStamp() + "," + httpSamples[i].getElapsed() + ","
+                myWriter.write(httpSamples[i].getTimeStamp().replace(",", " ") + "," + httpSamples[i].getElapsed() + ","
                                 + httpSamples[i].getLabel() + "," + httpSamples[i].getResponseCode() + ","
-                                + httpSamples[i].getResponseMessage() + "," + httpSamples[i].getThreadName() + ","
+                                + httpSamples[i].getResponseMessage().replace(",", " ") + "," + httpSamples[i].getThreadName() + ","
                                 + httpSamples[i].getDataType() + "," + httpSamples[i].getSuccess() + "," + " " + ","
                                 + httpSamples[i].getBytes() + "," + httpSamples[i].getSentBytes() + ","
                                 + httpSamples[i].getGrpThreads() + "," + httpSamples[i].getAllThreads() + ","
@@ -178,8 +201,7 @@ public class AutomationPerformanceTestingService {
                             automationProperties.getProperty("fastest.jmeterreportpropertiespath"));
             rg.generate();
             
-            File sourceReportHtmlDirectory = new File(
-                            automationProperties.getProperty("fastest.jmeterhome").concat("/bin/report-output/"));
+            
             File destinationReportHtmlDirectory = new File(automationProperties.getProperty("fastest.jmeterhtmlreportfilepath")
                     .concat("/htmlreport_".concat(dateTimesuffix)));
             java.nio.file.Files.createDirectories(Paths.get(destinationReportHtmlDirectory.getAbsolutePath()));
@@ -191,12 +213,7 @@ public class AutomationPerformanceTestingService {
             }
 
 
-            Properties reportProps = new Properties();
-            reportProps.load(new FileInputStream(
-                            automationProperties.getProperty("fastest.jmeterreportpropertiespath")));
-
-            File sourceReportJsonDirectory = new File(
-                            reportProps.getProperty("jmeter.reportgenerator.exporter.json.property.output_dir"));
+         
             File destinationReportJsonDirectory = new File(automationProperties.getProperty("fastest.jmeterjsonreportsfilepath")
                     .concat("/jsonreport_".concat(dateTimesuffix)));
             java.nio.file.Files.createDirectories(Paths.get(destinationReportJsonDirectory.getAbsolutePath()));
@@ -216,7 +233,7 @@ public class AutomationPerformanceTestingService {
             // Read JSON file
             output.setResultStats((JSONObject) obj);
         } catch (ConfigurationException | GenerationException | IOException | ParseException e) {
-            e.printStackTrace();
+            logger.debug("Exception Occured on generating HtmlReport during Performance Testing : {} ", ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -232,7 +249,7 @@ public class AutomationPerformanceTestingService {
         try {
             SaveService.saveTree(testHashTree, new FileOutputStream(automationProperties.getProperty("fastest.jmeterjmxfilepath").concat("/jmxreport_".concat(dateTimesuffix).concat(".jmx"))));
         } catch (IOException e) {
-            e.printStackTrace();
+        	logger.debug("Exception Occured on creating Test HashTree during Performance Testing : {} ", ExceptionUtils.getStackTrace(e));
         }
         // Added summarizer for logging meta info
         summariser = new Summariser("summaryOfResults");

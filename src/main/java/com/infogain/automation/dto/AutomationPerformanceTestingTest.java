@@ -1,14 +1,10 @@
 package com.infogain.automation.dto;
 
-import io.swagger.annotations.ApiModelProperty;
-
 public class AutomationPerformanceTestingTest {
     AutomationPerformanceTestingCsvConfigDto csvConfig;
     AutomationPerformanceTestingHttpHandlerDto httpHandler;
     AutomationPerformanceTestingTestPlanDto testPlan;
     AutomationPerformanceTestingThreadGroupDto threadGroup;
-    @ApiModelProperty(value = "whether detailed response is needed", required = true, example = "false",position = 5)
-    private Boolean deatiledResponse;
     private AutomationPerformanceTestingAssertions assertions;
 
     public AutomationPerformanceTestingCsvConfigDto getCsvConfig() {
@@ -43,14 +39,6 @@ public class AutomationPerformanceTestingTest {
         this.threadGroup = threadGroup;
     }
 
-    public Boolean getDeatiledResponse() {
-        return deatiledResponse;
-    }
-
-    public void setDeatiledResponse(Boolean deatiledResponse) {
-        this.deatiledResponse = deatiledResponse;
-    }
-
     public AutomationPerformanceTestingAssertions getAssertions() {
         return assertions;
     }
@@ -74,9 +62,6 @@ public class AutomationPerformanceTestingTest {
         }
         if (threadGroup != null) {
             builder.append("threadGroup=").append(threadGroup).append(", ");
-        }
-        if (deatiledResponse != null) {
-            builder.append("deatiledResponse=").append(deatiledResponse).append(", ");
         }
         if (assertions != null) {
             builder.append("assertions=").append(assertions);

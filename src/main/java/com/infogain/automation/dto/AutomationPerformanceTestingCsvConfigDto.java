@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "csvConfig",
 description = "Request body for configuring input csv  config")
 public class AutomationPerformanceTestingCsvConfigDto {
-    @ApiModelProperty(value = "name of the input file. Relative file names are resolved based on the path of the active test plan. Absolute filenames are also supported", required = true, example = "D:\\workspaces\\peripheralWorkspace\\JmeterExampleProject\\src\\it\\resources\\claims3.csv")
+    @ApiModelProperty(value = "name of the input file. Relative file names are resolved based on the path of the active test plan. Absolute filenames are also supported", required = true, example = "D:\\fasTest\\input\\Excels\\performancetesting\\claims3.csv")
     String inputCsvFilename;
     @ApiModelProperty(value = "delimiter that will be used to split the parsed values from the input file", required = true, example = ",")
     String delimiter;
