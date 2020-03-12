@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import com.infogain.automation.constants.AutomationConstants;
 import com.infogain.automation.constants.FastTestExcelHeaders;
 import com.infogain.automation.dto.AutomationExcelRequestDTO;
+import com.infogain.automation.dto.AutomationInputDTO;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.mapper.AutomationExcelRequestDTOtoAutomationExcelRequestModelList;
 import com.infogain.automation.model.AutomationExcelRequestModel;
@@ -87,15 +90,19 @@ public class AutomationInputExcelService {
 
     private XSSFSheet createNewSheet(String inputExcelSheetName, XSSFWorkbook workbookInput) {
         XSSFSheet sheet = workbookInput.createSheet(inputExcelSheetName);
-        automationExcelUtility.generateHeaderRow(sheet.createRow(0));
+        automationExcelUtility.reArrangeHeaders(sheet.createRow(0));
         return sheet;
     }
 
     private void insertDataInExcelSheet(List<AutomationExcelRowModel> automationExcelRowModelList, XSSFSheet sheet) {
         Iterator<Row> row = sheet.iterator();
+        Row firstRow = row.next();
         Map<FastTestExcelHeaders, Integer> headerIndexes =
-                        automationExcelUtility.generateHeaderRow(row.next());
+                        automationExcelUtility.reArrangeHeaders(firstRow);
         int lastSNoCount = sheet.getLastRowNum();
+        while(automationExcelUtility.removeRowIfEmpty(sheet, lastSNoCount)) {
+            lastSNoCount--;
+        }
         Map<FastTestExcelHeaders, Object> cellData = new EnumMap<>(FastTestExcelHeaders.class);
         for (AutomationExcelRowModel automationExcelRowModel : automationExcelRowModelList) {
             Row currentRow = sheet.createRow(++lastSNoCount);
@@ -109,16 +116,17 @@ public class AutomationInputExcelService {
             cellData.put(FastTestExcelHeaders.INPUT_JSON, automationExcelRowModel.getInputJson());
             cellData.put(FastTestExcelHeaders.EXPECTED_OUTPUT, automationExcelRowModel.getExpectedOutput());
             cellData.put(FastTestExcelHeaders.EXPECTED_HTTP_STATUS, automationExcelRowModel.getExpectedHttpStatus());
-            cellData.put(FastTestExcelHeaders.KEYS_VALIDATION, null);
-            cellData.put(FastTestExcelHeaders.ACTUAL_OUTPUT, null);
-            cellData.put(FastTestExcelHeaders.ACTUAL_HTTP_STATUS, null);
-            cellData.put(FastTestExcelHeaders.TEST_CASE_RESULT, null);
-            cellData.put(FastTestExcelHeaders.FAILURES, null);
-            cellData.put(FastTestExcelHeaders.EXECUTION_DATE_TIME, null);
-            cellData.put(FastTestExcelHeaders.COMMENTS, null);
-            cellData.put(FastTestExcelHeaders.RUNTIME,null);
             automationExcelUtility.insertRowData(currentRow, headerIndexes, cellData);
         }
+        List<FastTestExcelHeaders> columnsToDelete = new ArrayList<>();
+        columnsToDelete.add(FastTestExcelHeaders.ACTUAL_OUTPUT);
+        columnsToDelete.add(FastTestExcelHeaders.ACTUAL_HTTP_STATUS);
+        columnsToDelete.add(FastTestExcelHeaders.TEST_CASE_RESULT);
+        columnsToDelete.add(FastTestExcelHeaders.FAILURES);
+        columnsToDelete.add(FastTestExcelHeaders.RUNTIME);
+        columnsToDelete.add(FastTestExcelHeaders.EXECUTION_DATE_TIME);
+        columnsToDelete.add(FastTestExcelHeaders.COMMENTS);
+        automationExcelUtility.deleteColumnsInSheet(firstRow, columnsToDelete);
     }
 
     private String getUrlParamter(AutomationExcelRowModel automationExcelRowModel) {

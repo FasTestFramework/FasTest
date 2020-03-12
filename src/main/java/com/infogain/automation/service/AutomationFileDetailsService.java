@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,20 +45,31 @@ public class AutomationFileDetailsService {
         String inputExcelFolderPath =
                         automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
         String outputFolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH);
-        List<String> result = new ArrayList<>();
+        List<String> allExcelFilePaths = new ArrayList<>();
 
         try (Stream<Path> walk = Files.walk(Paths.get(inputExcelFolderPath))) {
-            result = walk.filter(path -> Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".xlsx"))
-                            .map(Path::toString).collect(Collectors.toList());
+            allExcelFilePaths = walk.filter(path -> {
+                try {
+                    return Files.isRegularFile(path) && !Files.isHidden(path)
+                                    && path.toString().toLowerCase().endsWith(".xlsx");
+                } catch (IOException e) {
+                    return false;
+                }
+            }).map(Path::toString).collect(Collectors.toList());
         } catch (IOException e) {
             throw new AutomationException("Exception Occured While Fetching excelfile names", e);
         }
-        Map<String, List<String>> allExcelSheetsNames = new HashMap<>();
-        for (String excelFilePath : result) {
+        Map<String, List<String>> allExcelSheetsNames = new LinkedHashMap<>();
+        for (String excelFilePath : allExcelFilePaths) {
             ArrayList<String> excelSheetNames = new ArrayList<>();
-            XSSFWorkbook workbookInput = automationExcelUtility.readExcelFile(excelFilePath);
-            for (int i = 0; i < workbookInput.getNumberOfSheets(); i++) {
-                excelSheetNames.add(workbookInput.getSheetName(i));
+            XSSFWorkbook workbookInput = null;
+            try {
+                workbookInput = automationExcelUtility.readExcelFile(excelFilePath);
+                for (int i = 0; i < workbookInput.getNumberOfSheets(); i++) {
+                    excelSheetNames.add(workbookInput.getSheetName(i));
+                }
+            } catch (AutomationException e) {
+                // no handling needed
             }
             automationExcelUtility.closeExcel(workbookInput);
             if (!excelSheetNames.isEmpty()) {

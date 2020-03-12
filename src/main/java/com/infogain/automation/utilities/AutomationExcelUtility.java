@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -60,15 +59,14 @@ import com.infogain.automation.properties.AutomationProperties;
 @Component
 public class AutomationExcelUtility {
 
-    private static final String FASTEST_TEMPORARY_SHEET_NAME1 = "FastestemporarySheetName1";
-    private static final String FASTEST_TEMPORARY_SHEET_NAME2 = "FastestemporarySheetName2";
+    private static final String FASTEST_TEMPORARY_SHEET_NAME = "FastestemporarySheetName";
 
     private static final int HEADER_ROW_HEIGHT = 950;
     private static final Logger logger = LogManager.getLogger(AutomationExcelUtility.class);
     protected AutomationProperties automationProperties;
     private final AutomationUtility automationUtility;
     private final AutomationJsonUtility automationJsonUtility;
-
+    private final List<FastTestExcelHeaders> headersList = Arrays.asList(FastTestExcelHeaders.values());
 
     @Autowired
     public AutomationExcelUtility(final AutomationProperties automationProperties,
@@ -166,30 +164,6 @@ public class AutomationExcelUtility {
         return jsonFileList;
     }
 
-    public Map<FastTestExcelHeaders, Integer> generateHeaderRow(Row headerRow) {
-        Map<FastTestExcelHeaders, Integer> headerIndexes = getHeaderIndexes(headerRow);
-        int lastCellNum = headerRow.getLastCellNum();
-        int i = lastCellNum >= 0 ? lastCellNum - 1 : lastCellNum;
-        FastTestExcelHeaders[] headersValues = FastTestExcelHeaders.values();
-        for (FastTestExcelHeaders header : headersValues) {
-            Cell cell;
-            Integer index = headerIndexes.get(header);
-            if (index != null) {
-                cell = getCell(headerRow, index);
-            } else {
-                headerIndexes.put(header, ++i);
-                cell = createCell(headerRow, i);
-                cell.setCellValue(header.getName());
-            }
-            setStyle(cell, getCellStyleForBGColorWithBold(headerRow.getSheet().getWorkbook(),
-                            IndexedColors.LIGHT_CORNFLOWER_BLUE), BorderStyle.THICK);
-            headerRow.getSheet().setColumnWidth(i, header.getWidth());
-        }
-        headerRow.setHeight((short) HEADER_ROW_HEIGHT);
-
-        return headerIndexes;
-    }
-
     /**
      * This method writes Data to Excel Output File
      * 
@@ -230,10 +204,12 @@ public class AutomationExcelUtility {
 
 
     public void closeExcel(XSSFWorkbook workbookInput) {
-        try {
-            workbookInput.close();
-        } catch (IOException e) {
-            logger.error("Exception Occured While Closing Excel", e);
+        if (workbookInput != null) {
+            try {
+                workbookInput.close();
+            } catch (IOException e) {
+                logger.error("Exception Occured While Closing Excel", e);
+            }
         }
     }
 
@@ -329,7 +305,7 @@ public class AutomationExcelUtility {
             ArrayList<Integer> rowToBeRemovedIndex = new ArrayList<>();
             Iterator<Row> row = sheet.iterator();
             Row firstRow = row.next();
-            Map<FastTestExcelHeaders, Integer> headerIndexes = generateHeaderRow(firstRow);
+            Map<FastTestExcelHeaders, Integer> headerIndexes = reArrangeHeaders(firstRow);
             int j = 0;
             Map<FastTestExcelHeaders, Object> cellData = new EnumMap<>(FastTestExcelHeaders.class);
             List<FastTestExcelHeaders> columnsToDelete = new ArrayList<>();
@@ -337,6 +313,7 @@ public class AutomationExcelUtility {
             columnsToDelete.add(FastTestExcelHeaders.KEYS_VALIDATION);
             columnsToDelete.add(FastTestExcelHeaders.PARAMS);
             columnsToDelete.add(FastTestExcelHeaders.COMMENTS);
+            columnsToDelete.add(FastTestExcelHeaders.INPUT_JSON);
 
             while (row.hasNext() && automationInputDTOList.size() > j) {
                 AutomationInputDTO automationInputDTO = automationInputDTOList.get(j);
@@ -379,14 +356,14 @@ public class AutomationExcelUtility {
     }
 
 
-    private void deleteColumnsInSheet(Row firstRow, List<FastTestExcelHeaders> columnsToDelete) {
+    public void deleteColumnsInSheet(Row firstRow, List<FastTestExcelHeaders> columnsToDelete) {
         Sheet sheet = firstRow.getSheet();
         List<FastTestExcelHeaders> columnsList = Arrays.asList(FastTestExcelHeaders.values());
         for (ListIterator<FastTestExcelHeaders> iterator = columnsList.listIterator(columnsList.size()); iterator
                         .hasPrevious();) {
             FastTestExcelHeaders header = iterator.previous();
             if (columnsToDelete.contains(header)) {
-                removeColumn(sheet, getHeaderIndex(firstRow, header));
+                removeAndShiftColumn(sheet, getHeaderIndex(firstRow, header));
             }
         }
         setColumnWidthInSheet(sheet, getHeaderIndexes(firstRow));
@@ -443,15 +420,15 @@ public class AutomationExcelUtility {
 
 
 
-    private String extractValueFromCell(Cell serialNumberCell) {
+    private String extractValueFromCell(Cell cell) {
         String serialNumber;
-        if (serialNumberCell == null) {
+        if (cell == null) {
             serialNumber = "";
-        } else if (serialNumberCell.getCellType().equals(CellType.NUMERIC)) {
-            double numericCellValue = serialNumberCell.getNumericCellValue();
+        } else if (cell.getCellType().equals(CellType.NUMERIC)) {
+            double numericCellValue = cell.getNumericCellValue();
             serialNumber = String.valueOf(numericCellValue % 1 == 0 ? (int) numericCellValue : numericCellValue);
         } else {
-            serialNumber = serialNumberCell.toString();
+            serialNumber = cell.toString();
         }
         return serialNumber;
     }
@@ -516,6 +493,10 @@ public class AutomationExcelUtility {
         logger.traceExit();
     }
 
+    private Cell setStyle(Cell cell) {
+        return setStyle(cell, cell.getRow().getSheet().getWorkbook().createCellStyle(), BorderStyle.THIN);
+    }
+
     private Cell setStyle(Cell cell, CellStyle style) {
         return setStyle(cell, style, BorderStyle.THIN);
     }
@@ -558,6 +539,15 @@ public class AutomationExcelUtility {
         return true;
     }
 
+    public boolean removeRowIfEmpty(XSSFSheet sheet, int rowIndex) {
+        if (checkIfRowIsEmpty(sheet.getRow(rowIndex))) {
+            removeRow(sheet, rowIndex);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void removeRow(XSSFSheet sheet, int rowIndex) {
         int lastRowNum = sheet.getLastRowNum();
         if (rowIndex >= 0 && rowIndex < lastRowNum) {
@@ -571,7 +561,7 @@ public class AutomationExcelUtility {
         }
     }
 
-    public void removeColumn(Sheet sheet, int columnToDelete) {
+    public void removeAndShiftColumn(Sheet sheet, int columnToDelete) {
         int maxColumn = 0;
         for (Iterator<Row> rowIterator = sheet.iterator(); rowIterator.hasNext();) {
             Row row = rowIterator.next();
@@ -634,75 +624,143 @@ public class AutomationExcelUtility {
         }
     }
 
-    public void reArrange(Sheet mainSheet, Map<FastTestExcelHeaders, Integer> headerIndexes) {
+    public Map<FastTestExcelHeaders, Integer> reArrangeHeaders(Row headerRow) {
+        Map<FastTestExcelHeaders, Integer> headerIndexes = getHeaderIndexes(headerRow);
+        if (!headerIndexes.isEmpty() && headerIndexes.size() != headersList.size()) {
+            reArrange(headerRow.getSheet(), headerIndexes);
+        }
+        generateHeaders(headerRow);
+        return headerIndexes;
+    }
 
-        // get column headers
-        Set<FastTestExcelHeaders> colNumbs = headerIndexes.keySet();
-
+    private void reArrange(Sheet mainSheet, Map<FastTestExcelHeaders, Integer> headerIndexes) {
         // Create New Workbook instance
         Workbook workbook = mainSheet.getWorkbook();
-        Sheet outSheet = workbook.createSheet(FASTEST_TEMPORARY_SHEET_NAME1);
-        Row hrow = outSheet.createRow(0);
-        generateHeaderRow(hrow);
-
-        // This parameter is for appending sheet rows to mergedSheet in the end
-        for (int j = mainSheet.getFirstRowNum() + 1; j <= mainSheet.getLastRowNum(); j++) {
-            Row row = mainSheet.getRow(j);
-
-            // Create row in main sheet
-            Row mrow = outSheet.createRow(j);
-            int num = -1;
-            for (FastTestExcelHeaders k : colNumbs) {
-                Integer cellNum = headerIndexes.get(k);
-                num++;
-                if (cellNum != null) {
-                    Cell cell = row.getCell(cellNum.intValue());
-
-                    // if cell is null then continue with next cell
-                    if (cell == null) {
-                        continue;
-                    }
-                    // Create column in main sheet
-                    Cell mcell = mrow.createCell(num);
-                    cloneCell(mcell, cell);
+        // create temp sheet
+        Sheet tempSheet = workbook.createSheet(FASTEST_TEMPORARY_SHEET_NAME);
+        Row firstRowTempSheet = tempSheet.createRow(0);
+        Row firstRow = mainSheet.getRow(0);
+        int headersSize = headersList.size();
+        int insertionColumnIndex = firstRow.getLastCellNum() >= headersSize ? firstRow.getLastCellNum() : headersSize;
+        int initialMaxColumnIndex = insertionColumnIndex;
+        for (int i = 0; i < headersSize; i++) {
+            FastTestExcelHeaders header = headersList.get(i);
+            String headerValue = extractValueFromCell(firstRow.getCell(i));
+            FastTestExcelHeaders mainHeader = FastTestExcelHeaders.getEnumValueByText(headerValue);
+            if (mainHeader == null) {
+                copyColumnAndDelete(mainSheet, i, tempSheet, insertionColumnIndex);
+                insertionColumnIndex = firstRowTempSheet.getLastCellNum() >= initialMaxColumnIndex
+                                ? firstRowTempSheet.getLastCellNum()
+                                : initialMaxColumnIndex;
+                insertColumn(headerIndexes, tempSheet, header, mainSheet, i);
+            } else if (!header.getName().equals(headerValue)) {
+                int correctIndexOfHeader = headersList.indexOf(mainHeader);
+                copyColumnAndDelete(mainSheet, i, tempSheet, correctIndexOfHeader);
+                insertColumn(headerIndexes, tempSheet, header, mainSheet, i);
+                if (correctIndexOfHeader != headerIndexes.get(mainHeader)) {
+                    headerIndexes.remove(mainHeader);
                 }
             }
         }
-        removeSheetContents(mainSheet);
-        String sheetName = mainSheet.getSheetName();
-        workbook.setSheetName(workbook.getSheetIndex(mainSheet), FASTEST_TEMPORARY_SHEET_NAME2);
-        workbook.setSheetName(workbook.getSheetIndex(outSheet), sheetName);
+        for (int j = initialMaxColumnIndex; j < insertionColumnIndex; j++) {
+            copyColumnAndDelete(tempSheet, j, mainSheet, j);
+        }
+        removeSheet(workbook, tempSheet);
     }
 
-    public void removeSheetContents(Sheet sheet) {
-        Iterator<Row> rowIte = sheet.iterator();
-        while (rowIte.hasNext()) {
-            rowIte.next();
-            rowIte.remove();
+    public void generateHeaders(Row headerRow) {
+        Sheet sheet = headerRow.getSheet();
+        for (int i = 0; i < headersList.size(); i++) {
+            Cell cell;
+            cell = createCell(headerRow, i);
+            cell.setCellValue(headersList.get(i).getName());
+            setStyle(cell, getCellStyleForBGColorWithBold(sheet.getWorkbook(), IndexedColors.LIGHT_CORNFLOWER_BLUE),
+                            BorderStyle.THICK);
+            sheet.setColumnWidth(i, headersList.get(i).getWidth());
+        }
+        headerRow.setHeight((short) HEADER_ROW_HEIGHT);
+    }
+
+    private void insertColumn(Map<FastTestExcelHeaders, Integer> headerIndexes, Sheet tempSheet,
+                    FastTestExcelHeaders headerToInsert, Sheet mainSheet, int headerIndexInMainSheet) {
+        Integer headerIndex = headerIndexes.get(headerToInsert);
+        if (headerIndex != null) {
+            copyColumn(mainSheet, headerIndex, mainSheet, headerIndexInMainSheet);
+        } else {
+            Cell cell = tempSheet.getRow(0).getCell(headerIndexInMainSheet);
+            if (cell != null && headerToInsert.getName().equals(cell.toString())) {
+                copyColumnAndDelete(tempSheet, headerIndexInMainSheet, mainSheet, headerIndexInMainSheet);
+            } else {
+                insertEmptyColumnWithHeader(headerToInsert.getName(), mainSheet, headerIndexInMainSheet);
+            }
+        }
+        headerIndexes.put(headerToInsert, headerIndexInMainSheet);
+    }
+
+    private void insertEmptyColumnWithHeader(String headerName, Sheet sheet, int columnIndex) {
+        createCell(sheet.getRow(0), columnIndex).setCellValue(headerName);
+        for (int j = sheet.getFirstRowNum() + 1; j <= sheet.getLastRowNum(); j++) {
+            Row row = sheet.getRow(j);
+            if (row == null) {
+                continue;
+            }
+            setStyle(createCell(row, columnIndex));
         }
     }
 
-//    public Map<FastTestExcelHeaders, Integer> generateHeaderRow(Row headerRow) {
-//        Map<FastTestExcelHeaders, Integer> headerIndexes = getHeaderIndexes(headerRow);
-//        FastTestExcelHeaders[] headersValues = FastTestExcelHeaders.values();
-//
-//        if (!headerIndexes.isEmpty() && headerIndexes.size() != headersValues.length) {
-//            reArrange(headerRow.getSheet(), headerIndexes);
-//        } else {
-//            for (int i = 0; i < headersValues.length; i++) {
-//                Cell cell;
-//                if (!headerIndexes.isEmpty()) {
-//                    cell = getCell(headerRow, i);
-//                } else {
-//                    cell = createCell(headerRow, i);
-//                    cell.setCellValue(headersValues[i].getName());
-//                }
-//                setStyle(cell, getCellStyleForBGColorWithBold(headerRow.getSheet().getWorkbook(),
-//                                IndexedColors.LIGHT_CORNFLOWER_BLUE), BorderStyle.THICK);
-//                headerRow.getSheet().setColumnWidth(i, headersValues[i].getWidth());
-//            }
-//        }
-//        headerRow.setHeight((short) HEADER_ROW_HEIGHT);
-//        return headerIndexes;
-//    }
+    private void copyColumn(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn, boolean delete) {
+        boolean rowCreated = false;
+        boolean isEmptyColumn = true;
+        for (int j = fromSheet.getFirstRowNum(); j <= fromSheet.getLastRowNum(); j++) {
+            Row row = fromSheet.getRow(j);
+            if (row == null) {
+                continue;
+            }
+            Row mrow = toSheet.getRow(j);
+            if (mrow == null) {
+                mrow = toSheet.createRow(j);
+            }
+            Cell cell = row.getCell(fromColumn);
+            // if cell is null then continue with next cell
+            if (cell != null) {
+                if (StringUtils.isNotBlank(cell.toString())) {
+                    isEmptyColumn = false;
+                }
+                rowCreated = true;
+                // Create column in main sheet
+                Cell tempCell = mrow.createCell(toColumn);
+                cloneCell(tempCell, cell);
+                if (delete) {
+                    cell.setBlank();
+                    setStyle(cell);
+                }
+            }
+        }
+        if (rowCreated && isEmptyColumn) {
+            removeColumn(toSheet, toColumn);
+        }
+    }
+
+    private void removeColumn(Sheet sheet, int column) {
+        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            Cell cell = getCell(row, column);
+            if (cell != null) {
+                row.removeCell(cell);
+            }
+        }
+    }
+
+    private void copyColumnAndDelete(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn) {
+        copyColumn(fromSheet, fromColumn, toSheet, toColumn, true);
+    }
+
+    private void copyColumn(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn) {
+        copyColumn(fromSheet, fromColumn, toSheet, toColumn, false);
+    }
+
+    public void removeSheet(Workbook workbook, Sheet outSheet) {
+        workbook.removeSheetAt(workbook.getSheetIndex(outSheet));
+    }
+
 }
