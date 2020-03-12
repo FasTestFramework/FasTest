@@ -2,18 +2,12 @@ package com.infogain.automation.dto;
 import org.apache.jmeter.reporters.AutomationPerformanceTestingSummarizedResults;
 import org.json.simple.JSONObject;
 public class AutomationPerformanceTestingResultsTestResultsDto extends AutomationOutput {
-    AutomationPerformanceTestingResultsTestResults detailedResults;
     AutomationPerformanceTestingSummarizedResults summary;
     JSONObject resultStats;
     String htmlReportPath;
-
-    public AutomationPerformanceTestingResultsTestResults getDetailedResults() {
-        return detailedResults;
-    }
-
-    public void setDetailedResults(AutomationPerformanceTestingResultsTestResults detailedResults) {
-        this.detailedResults = detailedResults;
-    }
+    String csvReportPath;
+    String xmlReportPath;
+    String jmxReportPath;
 
     public AutomationPerformanceTestingSummarizedResults getSummary() {
         return summary;
@@ -39,13 +33,34 @@ public class AutomationPerformanceTestingResultsTestResultsDto extends Automatio
         this.htmlReportPath = htmlReportPath;
     }
 
-    @Override
+    public String getCsvReportPath() {
+		return csvReportPath;
+	}
+
+	public void setCsvReportPath(String csvReportPath) {
+		this.csvReportPath = csvReportPath;
+	}
+
+	public String getXmlReportPath() {
+		return xmlReportPath;
+	}
+
+	public void setXmlReportPath(String xmlReportPath) {
+		this.xmlReportPath = xmlReportPath;
+	}
+
+	public String getJmxReportPath() {
+		return jmxReportPath;
+	}
+
+	public void setJmxReportPath(String jmxReportPath) {
+		this.jmxReportPath = jmxReportPath;
+	}
+
+	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("AutomationPerformanceTestingResultsTestResultsDto [");
-        if (detailedResults != null) {
-            builder.append("detailedResults=").append(detailedResults).append(", ");
-        }
         if (summary != null) {
             builder.append("summary=").append(summary).append(", ");
         }
@@ -55,10 +70,17 @@ public class AutomationPerformanceTestingResultsTestResultsDto extends Automatio
         if (htmlReportPath != null) {
             builder.append("htmlReportPath=").append(htmlReportPath);
         }
+        if (csvReportPath != null) {
+            builder.append("csvReportPath=").append(csvReportPath);
+        }
+        if (xmlReportPath != null) {
+            builder.append("xmlReportPath=").append(xmlReportPath);
+        }
+        if (jmxReportPath != null) {
+            builder.append("jmxReportPath=").append(jmxReportPath);
+        }
         builder.append("]");
         return builder.toString();
     }
-
-   
 
 }

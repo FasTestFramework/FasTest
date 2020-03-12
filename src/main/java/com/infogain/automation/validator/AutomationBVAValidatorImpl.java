@@ -55,7 +55,7 @@ public class AutomationBVAValidatorImpl
                     Double max = metaData.getMax();
                     if (min != null && max != null && max < min) {
                         errorCodes.add(new ErrorCodesDTO(
-                                        AutomationErrorCodes.AUTOMATION_BVA_INVAID_MIN_MAX_DATA_EXCEPTION, min, max));
+                                        AutomationErrorCodes.AUTOMATION_BVA_INVALID_MIN_MAX_DATA_EXCEPTION, min, max));
                     }
                     Integer length = metaData.getLength();
                     if (length != null && length < 1) {

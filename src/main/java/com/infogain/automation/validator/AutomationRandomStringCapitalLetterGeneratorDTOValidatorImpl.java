@@ -21,7 +21,6 @@ import com.infogain.automation.utilities.AutomationUtility;
 public class AutomationRandomStringCapitalLetterGeneratorDTOValidatorImpl implements
                 ConstraintValidator<AutomationRandomStringCapitalLetterGeneratorDTOValidator, AutomationRandomStringCapitalLetterGeneratorDTO> {
 
-
     private static final Logger logger =
                     LogManager.getLogger(AutomationRandomStringCapitalLetterGeneratorDTOValidatorImpl.class);
 
@@ -39,7 +38,6 @@ public class AutomationRandomStringCapitalLetterGeneratorDTOValidatorImpl implem
         Integer length = value.getLength();
         char startCharacter = value.getStartCharacter();
         char endCharacter = value.getEndCharacter();
-        char constCharacter = value.getConstantCharacter();
         String inclusions = value.getInclusions();
         String exclusions = value.getExclusions();
         boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
@@ -48,31 +46,41 @@ public class AutomationRandomStringCapitalLetterGeneratorDTOValidatorImpl implem
             errorCodeList.add(new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_RANDOM_GENERATION_LENGTH_EXCEPTION,
                             value.getLength()));
         }
-        if (constCharacter != EMPTY && (startCharacter != EMPTY || endCharacter != EMPTY || inclusions != null
-                        || exclusions != null)) {
-            errorCodeList.add(new ErrorCodesDTO(
-                            AutomationErrorCodes.AUTOMATION_RANDOM_GENERATION_CONSTANT_CHARACTER_STRING_EXCEPTION));
-            if (!Character.isAlphabetic(constCharacter) || Character.isLowerCase(constCharacter)) {
-                errorCodeList.add(new ErrorCodesDTO(
-                                AutomationErrorCodes.AUTOMATION_RANDOM_STRING_GENERATION_INVALID_ALPHABETS_EXCEPTION,
-                                "constCharacter", "UPPER CASE"));
-            }
-        }
         if (inclusionsFlag && exclusionsFlag) {
             errorCodeList.add(new ErrorCodesDTO(
                             AutomationErrorCodes.AUTOMATION_RANDOM_GENERATION_INCLUSION_EXCLUSION_EXCEPTION));
         }
-        if (Character.isLowerCase(startCharacter) || !Character.isAlphabetic(startCharacter)
-                        || !Character.isAlphabetic(endCharacter) || Character.isLowerCase(endCharacter)) {
-            errorCodeList.add(new ErrorCodesDTO(
-                            AutomationErrorCodes.AUTOMATION_RANDOM_STRING_GENERATION_INVALID_ALPHABETS_EXCEPTION,
-                            "startCharcter, endCharcater", "UPPER CASE"));
-        } else if (startCharacter > endCharacter) {
+        int rangeCheckRequired = 0;
+        if (startCharacter != EMPTY) {
+            if (endCharacter == EMPTY) {
+                errorCodeList.add(new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_RANDOM_GENERATION_RANGE_EXCEPTION));
+            }
+            if (!Character.isUpperCase(startCharacter)) {
+                errorCodeList.add(new ErrorCodesDTO(
+                                AutomationErrorCodes.AUTOMATION_RANDOM_STRING_GENERATION_INVALID_ALPHABETS_EXCEPTION,
+                                "startCharcter", "UPPER CASE"));
+            } else {
+                rangeCheckRequired++;
+            }
+        }
+        if (endCharacter != EMPTY) {
+            if (startCharacter == EMPTY) {
+                errorCodeList.add(new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_RANDOM_GENERATION_RANGE_EXCEPTION));
+            }
+            if (!Character.isUpperCase(endCharacter)) {
+                errorCodeList.add(new ErrorCodesDTO(
+                                AutomationErrorCodes.AUTOMATION_RANDOM_STRING_GENERATION_INVALID_ALPHABETS_EXCEPTION,
+                                "endCharacter", "UPPER CASE"));
+            } else {
+                rangeCheckRequired++;
+            }
+        }
+        if (rangeCheckRequired == 2 && startCharacter >= endCharacter) {
             errorCodeList.add(
                             new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_RANDOM_GENERATION_INVALID_RANGE_EXCEPTION,
                                             startCharacter, endCharacter));
-
         }
+
         if (inclusionsFlag || exclusionsFlag) {
             String inclusionsOrExclusions = inclusionsFlag ? inclusions : exclusions;
             String capsRegex = automationUtility.fetchCommaSeperatedValueRegex(AutomationConstants.CAPS_REGEX);
@@ -82,9 +90,7 @@ public class AutomationRandomStringCapitalLetterGeneratorDTOValidatorImpl implem
                                 inclusionsFlag ? "inclusions" : "exclusions", inclusionsOrExclusions));
             }
         }
-        if (startCharacter != EMPTY && endCharacter == EMPTY || endCharacter != EMPTY && startCharacter == EMPTY) {
-            errorCodeList.add(new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_RANDOM_GENERATION_RANGE_EXCEPTION));
-        }
+
         if (!errorCodeList.isEmpty()) {
             throw new FastTestBadRequestException(errorCodeList);
         }

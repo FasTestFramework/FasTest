@@ -55,10 +55,6 @@ public enum AutomationErrorCodes implements ErrorCodes {
     AUTOMATION_RANDOM_GENERATION_END_RANGE_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
                     "must have an end range"),
 
-    AUTOMATION_RANDOM_STRING_GENERATION_CONSTANT_CHARACTER_EXCEPTION(
-                    "AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
-                    "cannot have constant char with any other char"),
-
     AUTOMATION_RANDOM_STRING_GENERATION_INVALID_ALPHABETS_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
                     "Characters in field(s) '{0}' should be '{1}' alphabets"),
 
@@ -66,13 +62,10 @@ public enum AutomationErrorCodes implements ErrorCodes {
                     "'precision' field has invalid data : '{0}'. It cannot be negative"),
 
     AUTOMATION_RANDOM_GENERATION_INVALID_RANGE_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
-                    "lower bound : '{0}' should be less than the  upper bound '{1}' "),
+                    "lower bound : '{0}' should be less than the upper bound '{1}' "),
 
     AUTOMATION_RANDOM_GENERATION_INVALID_INTEGER_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDRANGEEXCEPTION",
                     "One of numbers provided in '{0}' does not lie within permissible range of integers"),
-
-    AUTOMATION_RANDOM_GENERATION_CONSTANT_CHARACTER_STRING_EXCEPTION("AUTOMATION.RANDOMGENERATION.INVALIDCHAREXCEPTION",
-                    "cannot include inclusions,exclusions or range in case of constant character"),
 
     AUTOMATION_BVA_INVALID_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
                     "'{0}' field has invalid data: '{1}'. {2} Please try again."),
@@ -80,14 +73,20 @@ public enum AutomationErrorCodes implements ErrorCodes {
     AUTOMATION_BVA_MISSING_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.MISSINGEXCEPTION",
                     "'{0}' field is required. Please try again."),
 
-    AUTOMATION_BVA_INVAID_MIN_MAX_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
+    AUTOMATION_BVA_INVALID_MIN_MAX_DATA_EXCEPTION("AUTOMATION.BOUNDARYVALUEANALYSIS.INVALIDDATAEXCEPTION",
                     "'min' field in 'metadata' has invalid data({0}) as it cannot be greater than given 'max'({1}). Please try again."),
 
     AUTOMATION_SEND_MAIL_INVALID_BASE64_DATA_EXCEPTION("AUTOMATION.SENDMAIL.INVALIDDATAEXCEPTION",
                     "'base64String' field has invalid data({0}). {1} Please try again."),
     AUTOMATION_SEND_MAIL_MISSING_BASE64_DATA_EXCEPTION("AUTOMATION.SENDMAIL.MISSINGEXCEPTION",
-                    "'base64String' field is required. Please try again.");
-
+                    "'base64String' field is required. Please try again."),
+    
+    AUTOMATION_PERF_TEST_INVALID_DATA_EXCEPTION("AUTOMATION.PERFORMANCETESTING.INVALIDDATAEXCEPTION",
+            "'{0}' field has invalid data: '{1}'. {2} Please try again."),
+    
+    AUTOMATION_PERF_TEST_MISSING_DATA_EXCEPTION("AUTOMATION.PERFORMANCETESTING.MISSINGDATAEXCEPTION",
+            "'{0}' field has invalid data: '{1}'. {2} Please try again.");
+    
     private String message;
     private String code;
 
