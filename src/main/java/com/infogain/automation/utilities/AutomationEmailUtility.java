@@ -54,12 +54,12 @@ public class AutomationEmailUtility {
 
     @Autowired
     public AutomationEmailUtility(final AutomationProperties automationProperties) {
-        this.emailFrom = (String) automationProperties.getProperty(EMAIL_FROM);
-        this.emailPort = Integer.parseInt((String) automationProperties.getProperty(PORT));
-        this.emailHost = (String) automationProperties.getProperty(EMAIL_HOST);
-        this.emailTo = (String) automationProperties.getProperty(EMAIL_TO);
-        this.emailSubject = (String) automationProperties.getProperty(EMAIL_SUBJECT);
-        this.messageBody = (String) automationProperties.getProperty(MESSAGE_BODY);
+        this.emailFrom = automationProperties.getProperty(EMAIL_FROM);
+        this.emailPort = Integer.parseInt(automationProperties.getProperty(PORT));
+        this.emailHost = automationProperties.getProperty(EMAIL_HOST);
+        this.emailTo = automationProperties.getProperty(EMAIL_TO);
+        this.emailSubject = automationProperties.getProperty(EMAIL_SUBJECT);
+        this.messageBody = automationProperties.getProperty(MESSAGE_BODY);
     }
 
     /**
@@ -140,6 +140,7 @@ public class AutomationEmailUtility {
 
         // Setting up a mail session
         Session session = Session.getInstance(emailProps, new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication("frameworkfastest@gmail.com", "Titans@123");
             }

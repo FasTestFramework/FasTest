@@ -42,6 +42,8 @@ public final class AutomationConstants {
     public static final String FASTEST_GENERATE_TOKEN_URL = "fastest.tokenGenerateUrl";
     public static final String FASTEST_GENERATE_TOKEN_BODY_TO_USE = "fastest.tokenGenerateBody";
     public static final String FASTEST_GENERATE_TOKEN_HEADER_TO_USE = "fastest.tokenGenerateHeaders";
+    public static final String FASTEST_GENERATE_TOKEN_RESPONSE_KEYS_TO_VALIDATE = "fastest.tokenResponseKeysToValidate";
+    public static final String FASTEST_GENERATE_TOKEN_RESPONSE_SUCCESS_STATUS_CODE = "fastest.tokenResponseSuccessStatusCode";
 
     public static final String FASTEST_RELEASE_TOKEN = "fastest.tokenRelease";
     public static final String FASTEST_TOKEN_RELEASE_URL = "fastest.tokenReleaseUrl";

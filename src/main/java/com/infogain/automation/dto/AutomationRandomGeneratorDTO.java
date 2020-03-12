@@ -16,15 +16,15 @@ import com.infogain.automation.validator.AutomationRandomGeneratorDTOValidator;
                 description = "Request body required to set properties and request the controller of Automation to generate random string from regex.")
 public class AutomationRandomGeneratorDTO {
 
-    @ApiModelProperty(value = "instructions to generate random data", required = true, example = "W(claimId: ){1}C(){5}")
+    @ApiModelProperty(value = "instructions to generate random data", required = true,
+                    example = "W(claimId: ){1}C(){5}")
     @JsonProperty
     private String instructionsToGenerateRandomData;
-    
+
     @ApiModelProperty(hidden = true)
     private List<AutomationRegexData> automationRegexDatalist;
 
-    public AutomationRandomGeneratorDTO() {
-    }
+    public AutomationRandomGeneratorDTO() {}
 
     public AutomationRandomGeneratorDTO(String instructionsToGenerateRandomData) {
         this.instructionsToGenerateRandomData = instructionsToGenerateRandomData;

@@ -5,18 +5,18 @@ public enum FastTestExcelHeaders {
     TEST_CASE_DESCRIPTION("Test case Description", 5100),
     SKIP_TEST("Skip Test", 1400),
     URL_PARAMETER("URL Parameter", 3600),
-    PARAMS("Params", 5100),
+    PARAMS("Params", 4100),
     HEADERS("Header Json", 5400),
     INPUT_JSON("Input json", 6800),
-    KEYS_VALIDATION("Key Validation", 5000),
+    KEYS_VALIDATION("Key Validation", 6000),
     EXPECTED_OUTPUT("Expected Output", 10000),
     EXPECTED_HTTP_STATUS("Expected http status", 2500),
     ACTUAL_OUTPUT("Actual Output", 10000),
     ACTUAL_HTTP_STATUS("Actual http status", 2500),
     TEST_CASE_RESULT("Test case Result", 3600),
-    FAILURES("Failures/Errors", 6000),
-    EXECUTION_DATE_TIME("Execution date time", 4900),
+    FAILURES("Failures/Errors", 8000),
     RUNTIME("API Response Time", 5000),
+    EXECUTION_DATE_TIME("Execution date time", 4900),
     COMMENTS("Comments", 5000);
     
     private String name;

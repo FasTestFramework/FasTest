@@ -2,6 +2,7 @@ package com.infogain.automation.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,16 +95,13 @@ public class RandomService {
         Integer length = automationRandomStringCapitalLetterGeneratorDTO.getLength();
         char startCharacter = automationRandomStringCapitalLetterGeneratorDTO.getStartCharacter();
         char endCharacter = automationRandomStringCapitalLetterGeneratorDTO.getEndCharacter();
-        char constCharacter = automationRandomStringCapitalLetterGeneratorDTO.getConstantCharacter();
         String exclusions = automationRandomStringCapitalLetterGeneratorDTO.getExclusions();
         String inclusions = automationRandomStringCapitalLetterGeneratorDTO.getInclusions();
         boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
         boolean exclusionsFlag = exclusions != null && !exclusions.isEmpty();
         char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
         if (length != null) {
-            if (constCharacter != EMPTY) {
-                return automationRandomUtility.generateRandomStringCapitalLetters(length, constCharacter);
-            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+            if (startCharacter != EMPTY && endCharacter != EMPTY) {
                 if (exclusionsOrExclusions == null) {
                     return automationRandomUtility.generateRandomStringCapitalLettersRange(length, startCharacter,
                                     endCharacter);
@@ -123,9 +121,7 @@ public class RandomService {
             }
             return automationRandomUtility.generateRandomStringCapitalLetters(length);
         } else {
-            if (constCharacter != EMPTY) {
-                return automationRandomUtility.generateRandomStringCapitalLetters(constCharacter);
-            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+            if (startCharacter != EMPTY && endCharacter != EMPTY) {
                 if (exclusionsOrExclusions == null) {
                     return automationRandomUtility.generateRandomStringCapitalLettersRange(startCharacter,
                                     endCharacter);
@@ -152,16 +148,13 @@ public class RandomService {
         Integer length = automationRandomStringSmallLetterGeneratorDTO.getLength();
         char startCharacter = automationRandomStringSmallLetterGeneratorDTO.getStartCharacter();
         char endCharacter = automationRandomStringSmallLetterGeneratorDTO.getEndCharacter();
-        char constCharacter = automationRandomStringSmallLetterGeneratorDTO.getConstantCharacter();
         String exclusions = automationRandomStringSmallLetterGeneratorDTO.getExclusions();
         String inclusions = automationRandomStringSmallLetterGeneratorDTO.getInclusions();
         boolean inclusionsFlag = inclusions != null && !inclusions.isEmpty();
         boolean exclusionsFlag = exclusions != null && !exclusions.isEmpty();
         char[] exclusionsOrExclusions = convertStringToCharArray(inclusionsFlag ? inclusions : exclusions);
         if (length != null) {
-            if (constCharacter != EMPTY) {
-                return automationRandomUtility.generateRandomStringSmallLetters(length, constCharacter);
-            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+             if (startCharacter != EMPTY && endCharacter != EMPTY) {
                 if (exclusionsOrExclusions == null) {
                     return automationRandomUtility.generateRandomStringSmallLettersRange(length, startCharacter,
                                     endCharacter);
@@ -181,9 +174,7 @@ public class RandomService {
             }
             return automationRandomUtility.generateRandomStringSmallLetters(length);
         } else {
-            if (constCharacter != EMPTY) {
-                return automationRandomUtility.generateRandomStringSmallLetters(constCharacter);
-            } else if (startCharacter != EMPTY && endCharacter != EMPTY) {
+             if (startCharacter != EMPTY && endCharacter != EMPTY) {
                 if (exclusionsOrExclusions == null) {
                     return automationRandomUtility.generateRandomStringSmallLettersRange(startCharacter, endCharacter);
                 } else if (inclusionsFlag) {
@@ -346,5 +337,15 @@ public class RandomService {
             }
         }
         return charArray;
+    }
+
+    /**
+     * This method generates the random UUID in string format
+     * 
+     * @return the UUID generated in string format
+     * @since 07-Mar-2020
+     */
+    public String generateRandomUUID() {
+        return UUID.randomUUID().toString();
     }
 }

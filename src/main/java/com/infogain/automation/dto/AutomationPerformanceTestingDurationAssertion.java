@@ -7,7 +7,7 @@ description = "Request body for creating a jmeter duration assertion")
 public class AutomationPerformanceTestingDurationAssertion {
     @ApiModelProperty(value = "Name for the durationAssertion.Any string can be given", required = true, example = "AutomationDurationAssertion")
     String name;
-    @ApiModelProperty(value = "allowed duration for a http requestn", required = true, example = "3000")
+    @ApiModelProperty(value = "allowed duration for a http request", required = true, example = "3000")
     Long allowedDuration;
     public String getName() {
         return name;

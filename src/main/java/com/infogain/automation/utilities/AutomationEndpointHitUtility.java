@@ -31,17 +31,18 @@ public class AutomationEndpointHitUtility {
                     String requestBody) {
         RestAssured.baseURI = baseUrl;
         logger.traceEntry("hitEndpoint method of AutomationEndpointHitUtility class");
-        logger.info("Test Case For Request - {}, automationInputDTO.getRequestType() - {}", url, methodType.name());
+        logger.info("Request URL: {}, Type: {}", url, methodType.name());
         RequestSpecification requestSpecification = given().headers(headers);
         if (requestBody != null) {
-            logger.info("Payload - {}", requestBody);
+            logger.info("Request body: {}", requestBody);
             requestSpecification = requestSpecification.body(requestBody);
         }
         Long startTime = System.currentTimeMillis();
         Response response = requestSpecification.when().request(methodType.name(), url).then().extract().response();
         Long endTime = System.currentTimeMillis();
-        return logger.traceExit(Pair.of(response, (double)(endTime- startTime)/1000));
-       
+        logger.info("Response status code: {}", response.statusCode());
+        logger.info("Response body: {}", response.asString());
+        return logger.traceExit(Pair.of(response, (double) (endTime - startTime) / 1000));
     }
 
     /**

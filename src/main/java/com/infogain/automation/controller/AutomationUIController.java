@@ -52,9 +52,9 @@ public class AutomationUIController {
 
     @PostMapping(value = "/runtest", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "/runtest", notes = "This API will do start up tasks",
+    @ApiOperation(value = "/runtest", notes = "This API will start testing.",
     protocols = "http,https")
-    @ApiResponses({@ApiResponse(code = 200, message = "API run successfully"),
+    @ApiResponses({@ApiResponse(code = 204, message = "API run successfully"),
     				@ApiResponse(code = 500, message = "Internal Server Error")})
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void dostartuptasks(@RequestBody AutomationRunTestCasesDTO automationRunTestCasesDTO) {
@@ -63,7 +63,7 @@ public class AutomationUIController {
 
     @PostMapping(value = "/createExcel", consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "/createExcel", notes = "This API is used to create Excels",
+    @ApiOperation(value = "/createExcel", notes = "This API is used to create Input Excels",
     protocols = "http,https")
     @ApiResponses({@ApiResponse(code = 204, message = "Excels created successfully"),
     				@ApiResponse(code = 500, message = "Internal Server Error"),

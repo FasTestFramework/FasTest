@@ -31,7 +31,7 @@ public class AutomationInputDTO {
     Integer expectedHttpStatus;
     JSONObject testCaseInputJson;
     String actualOutput;
-    String failureReason;
+    String failureComments;
     Integer actualHttpStatus;
     String testCaseResult;
     LocalDateTime executionDateTime;
@@ -145,19 +145,18 @@ public class AutomationInputDTO {
 
 
     /**
-     * @return the failureReason
+     * @return the failureComments
      */
-    public String getFailureReason() {
-        return failureReason;
+    public String getFailureComments() {
+        return failureComments;
     }
 
     /**
-     * @param failureReason the failureReason to set
+     * @param failureComments the failureComments to set
      */
-    public void setFailureReason(String failureReason) {
-        this.failureReason = failureReason;
+    public void setFailureComments(String failureComments) {
+        this.failureComments = failureComments;
     }
-
 
     /**
      * @return the runtime
@@ -206,7 +205,7 @@ public class AutomationInputDTO {
                         + ", headerJson=" + headerJson + ", inputJson=" + inputJson + ", inputParam=" + inputParam
                         + ", expectedOutput=" + expectedOutput + ", expectedHttpStatus=" + expectedHttpStatus
                         + ", testCaseInputJson=" + testCaseInputJson + ", actualOutput=" + actualOutput
-                        + ", failureReason=" + failureReason + ", actualHttpStatus=" + actualHttpStatus
+                        + ", failureComments=" + failureComments + ", actualHttpStatus=" + actualHttpStatus
                         + ", testCaseResult=" + testCaseResult + ", executionDateTime=" + executionDateTime
                         + ", headers=" + headers + ", requestURL=" + requestURL + ", requestType=" + requestType
                         + ", keyValidation=" + keyValidation + ", runtime=" + runtime + "]";
@@ -221,7 +220,7 @@ public class AutomationInputDTO {
     @Override
     public int hashCode() {
         return Objects.hash(actualHttpStatus, actualOutput, executionDateTime, expectedHttpStatus, expectedOutput,
-                        failureReason, headerJson, headers, inputJson, inputParam, keyValidation, requestType,
+                        failureComments, headerJson, headers, inputJson, inputParam, keyValidation, requestType,
                         requestURL, runtime, serialNo, testCaseDescription, testCaseInputJson, testCaseResult);
     }
 
@@ -249,7 +248,7 @@ public class AutomationInputDTO {
                         && Objects.equals(executionDateTime, other.executionDateTime)
                         && Objects.equals(expectedHttpStatus, other.expectedHttpStatus)
                         && Objects.equals(expectedOutput, other.expectedOutput)
-                        && Objects.equals(failureReason, other.failureReason)
+                        && Objects.equals(failureComments, other.failureComments)
                         && Objects.equals(headerJson, other.headerJson) && Objects.equals(headers, other.headers)
                         && Objects.equals(inputJson, other.inputJson) && Objects.equals(inputParam, other.inputParam)
                         && Objects.equals(keyValidation, other.keyValidation)

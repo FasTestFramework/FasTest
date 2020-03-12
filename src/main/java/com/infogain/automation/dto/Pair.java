@@ -38,4 +38,9 @@ public final class Pair<S, T> {
     public T getSecond() {
         return second;
     }
+
+    @Override
+    public String toString() {
+        return "Pair [first=" + first + ", second=" + second + "]";
+    }
 }

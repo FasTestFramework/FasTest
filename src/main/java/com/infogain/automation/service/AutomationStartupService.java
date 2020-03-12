@@ -101,13 +101,8 @@ public class AutomationStartupService {
                     automationExcelUtility.closeExcel(workbook);
                     throw e;
                 } catch (Exception e) {
-                    if (e.getCause() instanceof AutomationException) {
-                        automationExcelUtility.closeExcel(workbook);
-                        throw (AutomationException) e.getCause();
-                    } else {
-                        logger.debug("Exception Occured While testing sheet {} : {} ", excelSheetName,
-                                        ExceptionUtils.getStackTrace(e));
-                    }
+                    logger.debug("Exception Occured While testing sheet {} : {} ", excelSheetName,
+                                    ExceptionUtils.getStackTrace(e));
                 }
             }
             String outputExcelFileName = generateOutputExcelFileName(excelFileName);
@@ -128,7 +123,7 @@ public class AutomationStartupService {
     }
 
     private String generateOutputExcelFileName(String excelFileName) {
-        String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH-mm-ss a"));
+        String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss_a"));
         int extensionIndex = excelFileName.indexOf(".") - 1;
         // Setting Excel Sheet Name
         return automationProperties.getProperty(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH) + "/"

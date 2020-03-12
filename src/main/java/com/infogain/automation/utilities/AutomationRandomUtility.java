@@ -55,7 +55,7 @@ public class AutomationRandomUtility {
      */
 
     public String generateRandomSpecialCharacter() {
-        return generateRandomSpecialCharacter(random.nextInt(40));
+        return generateRandomSpecialCharacter(random.nextInt(40)+1);
     }
 
     public String generateRandomSpecialCharacter(int count) {
@@ -63,7 +63,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomSpecialCharactersWithExclusions(char[] exclusions) {
-        return generateRandomSpecialCharactersWithExclusions(random.nextInt(40), exclusions);
+        return generateRandomSpecialCharactersWithExclusions(random.nextInt(40)+1, exclusions);
     }
 
     public String generateRandomSpecialCharactersWithExclusions(int length, char[] exclusions) {
@@ -114,7 +114,7 @@ public class AutomationRandomUtility {
 
 
     public String generateRandomStringSmallLetters() {
-        return generateRandomStringSmallLetters(random.nextInt(40));
+        return generateRandomStringSmallLetters(random.nextInt(40)+1);
     }
 
     public String generateRandomStringSmallLetters(int length) {
@@ -131,7 +131,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringSmallLettersRange(Character startCharacter, Character endCharacter) {
-        return generateRandomStringSmallLettersRange(random.nextInt(40), startCharacter, endCharacter);
+        return generateRandomStringSmallLettersRange(random.nextInt(40)+1, startCharacter, endCharacter);
     }
 
     public String generateRandomStringSmallLettersRange(int length, Character startCharacter, Character endCharacter) {
@@ -145,7 +145,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringSmallLettersWithExclusion(char[] exclusions) {
-        return generateRandomStringSmallLettersWithExclusion(random.nextInt(40), exclusions);
+        return generateRandomStringSmallLettersWithExclusion(random.nextInt(40)+1, exclusions);
     }
 
     public String generateRandomStringSmallLettersWithExclusion(int length, char[] exclusions) {
@@ -160,7 +160,7 @@ public class AutomationRandomUtility {
 
     public String generateRandomStringAllLettersRangeWithInclusion(Character startCharacter, Character endCharacter,
                     char[] inclusions) {
-        return generateRandomStringAllLettersRangeWithInclusion(random.nextInt(40), startCharacter, endCharacter,
+        return generateRandomStringAllLettersRangeWithInclusion(random.nextInt(40)+1, startCharacter, endCharacter,
                         inclusions);
     }
 
@@ -190,7 +190,7 @@ public class AutomationRandomUtility {
 
     public String generateRandomStringSmallLettersRangeWithExclusion(Character startCharacter, Character endCharacter,
                     char[] exclusions) {
-        return generateRandomStringSmallLettersRangeWithExclusion(random.nextInt(40), startCharacter, endCharacter,
+        return generateRandomStringSmallLettersRangeWithExclusion(random.nextInt(40)+1, startCharacter, endCharacter,
                         exclusions);
     }
 
@@ -234,7 +234,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringCapitalLetters(Character character) {
-        return generateRandomStringCapitalLetters(random.nextInt(40), character);
+        return generateRandomStringCapitalLetters(random.nextInt(40)+1, character);
     }
 
     public String generateRandomStringCapitalLetters(int length, Character character) {
@@ -248,7 +248,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringCapitalLettersRange(Character startCharacter, Character endCharacter) {
-        return generateRandomStringCapitalLettersRange(random.nextInt(40), startCharacter, endCharacter);
+        return generateRandomStringCapitalLettersRange(random.nextInt(40)+1, startCharacter, endCharacter);
     }
 
     public String generateRandomStringLettersRange(int length, Character startCharacter, Character endCharacter) {
@@ -262,7 +262,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringCapitalLettersWithExclusion(char[] exclusions) {
-        return generateRandomStringCapitalLettersWithExclusion(random.nextInt(40), exclusions);
+        return generateRandomStringCapitalLettersWithExclusion(random.nextInt(40)+1, exclusions);
     }
 
     public String generateRandomStringCapitalSmallMixWithExclusions(int length, char[] exclusions) {
@@ -296,7 +296,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomNumericStringWithExclusions(char[] exclusions) {
-        return generateRandomNumericStringWithExclusions(random.nextInt(40), exclusions);
+        return generateRandomNumericStringWithExclusions(random.nextInt(40)+1, exclusions);
     }
 
     public String generateRandomNumericStringWithExclusions(int length, char[] exclusions) {
@@ -311,7 +311,7 @@ public class AutomationRandomUtility {
 
     public String generateRandomStringCapitalLettersRangeWithExclusion(Character startCharacter, Character endCharacter,
                     char[] exclusions) {
-        return generateRandomStringCapitalLettersRangeWithExclusion(random.nextInt(40), startCharacter, endCharacter,
+        return generateRandomStringCapitalLettersRangeWithExclusion(random.nextInt(40)+1, startCharacter, endCharacter,
                         exclusions);
     }
 
@@ -341,7 +341,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringOutOfGivenCharacters(char... characterSet) {
-        return generateRandomStringOutOfGivenCharacters(random.nextInt(40), characterSet);
+        return generateRandomStringOutOfGivenCharacters(random.nextInt(40)+1, characterSet);
     }
 
     public String generateRandomStringOutOfGivenCharacters(int length, char... characterSet) {
@@ -349,7 +349,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringOutOfGivenCharactersFromString(String characterSet) {
-        return generateRandomStringOutOfGivenCharactersFromString(random.nextInt(40), characterSet);
+        return generateRandomStringOutOfGivenCharactersFromString(random.nextInt(40)+1, characterSet);
     }
 
     public String generateRandomStringOutOfGivenCharactersFromString(int length, String characterSet) {
@@ -357,7 +357,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringOfNumbers() {
-        return generateRandomStringOfNumbers(random.nextInt(40));
+        return generateRandomStringOfNumbers(random.nextInt(40)+1);
     }
 
     public String generateRandomStringOfNumbers(int length) {
@@ -365,7 +365,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringCapitalSmallMix() {
-        return generateRandomStringCapitalSmallMix(random.nextInt(40));
+        return generateRandomStringCapitalSmallMix(random.nextInt(40)+1);
     }
 
     public String generateRandomStringCapitalSmallMix(int length) {
@@ -373,7 +373,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringCapitalSmallMix(char[] exclusions) {
-        return generateRandomStringCapitalSmallMix(random.nextInt(40), exclusions);
+        return generateRandomStringCapitalSmallMix(random.nextInt(40)+1, exclusions);
     }
 
     public String generateRandomStringCapitalSmallMix(int length, char[] exclusions) {
@@ -443,7 +443,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomSentence() {
-        return generateRandomSentence(random.nextInt(40));
+        return generateRandomSentence(random.nextInt(40)+1);
     }
     // public double getRandomDoubleBetweenRangeWith(double min, double max, RoundingMode roundingMode, int scale) {
     // // RandomStringUtils.
@@ -483,7 +483,7 @@ public class AutomationRandomUtility {
     public String getRandomDoubleBetweenRange(double min, double max) {
         if (max < min) {
             throw new RandomGenerationAutomationException(
-                            "upper bound of the range should be greater then th elower bound");
+                            "upper bound of the range should be greater then the lower bound");
         }
         DecimalFormat decimalFormatter = new DecimalFormat("#.#");
         decimalFormatter.setMaximumIntegerDigits(330);
@@ -492,7 +492,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringAlphaNumeric() {
-        return generateRandomStringAlphaNumeric(random.nextInt(40));
+        return generateRandomStringAlphaNumeric(random.nextInt(40)+1);
     }
 
     public String generateRandomStringAlphaNumeric(int length) {
@@ -500,7 +500,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringAlphaNumericWithExclusions(char[] exclusions) {
-        return generateRandomStringAlphaNumericWithExclusions(random.nextInt(40), exclusions);
+        return generateRandomStringAlphaNumericWithExclusions(random.nextInt(40)+1, exclusions);
     }
 
     public String generateRandomStringAlphaNumericWithExclusions(int length, char[] exclusions) {
@@ -536,7 +536,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringEverything() {
-        return generateRandomStringEverything(random.nextInt(40));
+        return generateRandomStringEverything(random.nextInt(40)+1);
     }
 
     public String generateRandomStringEverything(int length) {
@@ -545,7 +545,7 @@ public class AutomationRandomUtility {
     }
 
     public String generateRandomStringEverythingWithExclusions(char[] exclusions) {
-        return generateRandomStringEverythingWithExclusions(random.nextInt(40), exclusions);
+        return generateRandomStringEverythingWithExclusions(random.nextInt(40)+1, exclusions);
     }
 
     public String generateRandomStringEverythingWithExclusions(int length, char[] exclusions) {
