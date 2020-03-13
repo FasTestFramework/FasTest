@@ -21,6 +21,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ooxml.POIXMLException;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -79,6 +80,7 @@ public class AutomationExcelUtility {
 
     public XSSFWorkbook readExcelFile(String filePath) {
         XSSFWorkbook workbookInput;
+        ZipSecureFile.setMinInflateRatio(0);
         try (FileInputStream fis = new FileInputStream(filePath)) {
             workbookInput = new XSSFWorkbook(fis);
         } catch (POIXMLException | IOException e) {
@@ -728,6 +730,12 @@ public class AutomationExcelUtility {
                 }
                 rowCreated = true;
                 // Create column in main sheet
+                if(toColumn>7)
+                {
+                	System.out.println("stop");
+                }
+                System.out.println(toColumn);
+                System.out.println(cell);
                 Cell tempCell = mrow.createCell(toColumn);
                 cloneCell(tempCell, cell);
                 if (delete) {

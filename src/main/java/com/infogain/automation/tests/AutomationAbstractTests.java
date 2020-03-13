@@ -51,7 +51,7 @@ public abstract class AutomationAbstractTests {
     private static final Logger logger = LogManager.getLogger(AutomationAbstractTests.class);
     protected List<AutomationInputDTO> automationInputDTOList;
     protected String testSheetName;
-    protected String baseClaimUrl;
+	protected String baseClaimUrl; 
 
     private AutomationProperties automationProperties;
     private String inputExcelFileName;
@@ -72,8 +72,6 @@ public abstract class AutomationAbstractTests {
         automationClaimsUtility = BeanUtil.getBean(AutomationClaimsUtility.class);
         automationReportService = BeanUtil.getBean(AutomationReportService.class);
         automationExcelUtility = BeanUtil.getBean(AutomationExcelUtility.class);
-        baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
-                        + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
         automationEndpointHitUtility = BeanUtil.getBean(AutomationEndpointHitUtility.class);
         automationHeadersUtility = BeanUtil.getBean(AutomationHeadersUtility.class);
         automationJsonUtility = BeanUtil.getBean(AutomationJsonUtility.class);
@@ -97,6 +95,8 @@ public abstract class AutomationAbstractTests {
      */
     public void test() {
         logger.traceEntry("test method of {} class", testSheetName);
+        baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
+                + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
         String generateToken = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN);
 
         String generateTokenAt = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);

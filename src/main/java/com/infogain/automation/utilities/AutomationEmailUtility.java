@@ -33,189 +33,195 @@ import com.infogain.automation.properties.AutomationProperties;
 
 @Component
 public class AutomationEmailUtility {
-    private static final Logger logger = LogManager.getLogger(AutomationEmailUtility.class);
-    public static final String EMAIL_FROM = "emailFrom";
-    public static final String PORT = "emailport";
-    public static final String EMAIL_HOST = "emailHost";
-    public static final String EMAIL_TO = "emailTo";
-    public static final String EMAIL_SUBJECT = "emailSubject";
-    public static final String MESSAGE_BODY = "messageBody";
-    private String emailFrom;
-    private int emailPort;
-    private String emailHost;
-    private String emailTo;
-    private List<String> attachmentPaths;
-    private String emailSubject;
-    private String messageBody;
-    private int totalExecutedTestCases;
-    private int lastExecutedTestCount;
-    private int totalPassTestCases;
-    private int totalFailedTestCases;
+	private static final Logger logger = LogManager.getLogger(AutomationEmailUtility.class);
+	public static final String EMAIL_FROM = "emailFrom";
+	public static final String PORT = "emailport";
+	public static final String EMAIL_HOST = "emailHost";
+	public static final String EMAIL_TO = "emailTo";
+	public static final String EMAIL_SUBJECT = "emailSubject";
+	public static final String MESSAGE_BODY = "messageBody";
 
-    @Autowired
-    public AutomationEmailUtility(final AutomationProperties automationProperties) {
-        this.emailFrom = automationProperties.getProperty(EMAIL_FROM);
-        this.emailPort = Integer.parseInt(automationProperties.getProperty(PORT));
-        this.emailHost = automationProperties.getProperty(EMAIL_HOST);
-        this.emailTo = automationProperties.getProperty(EMAIL_TO);
-        this.emailSubject = automationProperties.getProperty(EMAIL_SUBJECT);
-        this.messageBody = automationProperties.getProperty(MESSAGE_BODY);
-    }
+	private String emailFrom;
+	private int emailPort;
+	private String emailHost;
+	private String emailTo;
 
-    /**
-     * @param attachmentPaths the attachmentPaths to set
-     */
-    public void addAttachments(List<String> attachmentPathstoadd) {
-        if (attachmentPaths == null) {
-            attachmentPaths = new ArrayList<>();
-        }
-        this.attachmentPaths.addAll(attachmentPathstoadd);
-    }
+	private List<String> attachmentPaths;
 
-    /**
-     * This method adds the attachment
-     * 
-     * @param attachment - file which needs to be attached
-     * @since Dec 11, 2019
-     */
-    public void addAttachment(String attachment) {
-        if (attachmentPaths == null) {
-            attachmentPaths = new ArrayList<>();
-        }
-        this.attachmentPaths.add(attachment);
-    }
+	private String emailSubject;
+	private String messageBody;
 
-    public int getTotalExecutedTestCases() {
-        return totalExecutedTestCases;
-    }
+	private int totalExecutedTestCases;
+	private int lastExecutedTestCount;
+	private int totalPassTestCases;
+	private int totalFailedTestCases;
+	private final AutomationProperties automationProperties;
 
-    public void setTotalExecutedTestCases(int totalExecutedTestCases) {
-        this.totalExecutedTestCases = totalExecutedTestCases;
-    }
+	@Autowired
+	public AutomationEmailUtility(final AutomationProperties automationProperties) {
+		this.automationProperties = automationProperties;
+	}
 
-    public int getLastExecutedTestCount() {
-        return lastExecutedTestCount;
-    }
+	/**
+	 * @param attachmentPaths the attachmentPaths to set
+	 */
+	public void addAttachments(List<String> attachmentPathstoadd) {
+		if (attachmentPaths == null) {
+			attachmentPaths = new ArrayList<>();
+		}
+		this.attachmentPaths.addAll(attachmentPathstoadd);
+	}
 
-    public void setLastExecutedTestCount(int lastExecutedTestCount) {
-        this.lastExecutedTestCount = lastExecutedTestCount;
-    }
+	/**
+	 * This method adds the attachment
+	 * 
+	 * @param attachment - file which needs to be attached
+	 * @since Dec 11, 2019
+	 */
+	public void addAttachment(String attachment) {
+		if (attachmentPaths == null) {
+			attachmentPaths = new ArrayList<>();
+		}
+		this.attachmentPaths.add(attachment);
+	}
 
-    public int getTotalPassTestCases() {
-        return totalPassTestCases;
-    }
+	public int getTotalExecutedTestCases() {
+		return totalExecutedTestCases;
+	}
 
-    public void setTotalPassTestCases(int totalPassTestCases) {
-        this.totalPassTestCases = totalPassTestCases;
-    }
+	public void setTotalExecutedTestCases(int totalExecutedTestCases) {
+		this.totalExecutedTestCases = totalExecutedTestCases;
+	}
 
-    public int getTotalFailedTestCases() {
-        return totalFailedTestCases;
-    }
+	public int getLastExecutedTestCount() {
+		return lastExecutedTestCount;
+	}
 
-    public void setTotalFailedTestCases(int totalFailedTestCases) {
-        this.totalFailedTestCases = totalFailedTestCases;
-    }
+	public void setLastExecutedTestCount(int lastExecutedTestCount) {
+		this.lastExecutedTestCount = lastExecutedTestCount;
+	}
 
-    /**
-     * This method sets the session and its properties to send a mail
-     * 
-     * @since Dec 11, 2019
-     */
-    public void sendMail() {
-        logger.traceEntry("sendMail method of AutomationEmailUtility class");
-        // Making Properties object which will further pass as argument to Session
-        // object
-        double passPercentage;
-        double failPercentage;
-        int newTestCases = 0;
-        Properties emailProps = new Properties();
-        emailProps.put("mail.smtp.host", this.emailHost);
-        emailProps.put("mail.smtp.port", Integer.valueOf(this.emailPort));
+	public int getTotalPassTestCases() {
+		return totalPassTestCases;
+	}
 
-        emailProps.put("mail.smtp.auth", true);
-        emailProps.put("mail.smtp.starttls.enable", true);
+	public void setTotalPassTestCases(int totalPassTestCases) {
+		this.totalPassTestCases = totalPassTestCases;
+	}
 
-        /* emailProps.put("mail.debug", "true"); */
+	public int getTotalFailedTestCases() {
+		return totalFailedTestCases;
+	}
 
-        // Setting up a mail session
-        Session session = Session.getInstance(emailProps, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("frameworkfastest@gmail.com", "Titans@123");
-            }
-        });
+	public void setTotalFailedTestCases(int totalFailedTestCases) {
+		this.totalFailedTestCases = totalFailedTestCases;
+	}
 
-        try {
-            InternetAddress[] receiversAddress = InternetAddress.parse(this.emailTo, true);
+	/**
+	 * This method sets the session and its properties to send a mail
+	 * 
+	 * @since Dec 11, 2019
+	 */
+	public void sendMail() {
+		logger.traceEntry("sendMail method of AutomationEmailUtility class");
+		emailFrom = automationProperties.getProperty(EMAIL_FROM);
+		emailPort = Integer.parseInt(automationProperties.getProperty(PORT));
+		emailHost = automationProperties.getProperty(EMAIL_HOST);
+		emailTo = automationProperties.getProperty(EMAIL_TO);
+		emailSubject = automationProperties.getProperty(EMAIL_SUBJECT);
+		messageBody = automationProperties.getProperty(MESSAGE_BODY);
+		// Making Properties object which will further pass as argument to Session
+		// object
+		double passPercentage;
+		double failPercentage;
+		int newTestCases = 0;
+		Properties emailProps = new Properties();
+		emailProps.put("mail.smtp.host", this.emailHost);
+		emailProps.put("mail.smtp.port", Integer.valueOf(this.emailPort));
 
-            InetAddress addr = InetAddress.getLocalHost();
-            String machineName = addr.getHostName();
+		emailProps.put("mail.smtp.auth", true);
+		emailProps.put("mail.smtp.starttls.enable", true);
 
-            // Setting up message properties
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(this.emailFrom));
-            message.setRecipients(Message.RecipientType.TO, receiversAddress);
-            Multipart multipart = new MimeMultipart();
-            for (String fName : attachmentPaths) {
-                File file = new File(fName);
-                if (file.exists()) {
-                    addAttachmentInMultipart(multipart, fName);
-                }
-            }
-            BodyPart htmlBodyPart = new MimeBodyPart();
-            String msgBody = this.messageBody.replace("totalExecutedCount", String.valueOf(totalExecutedTestCases));
-            msgBody = msgBody.replace("TotalPassedCount", String.valueOf(totalPassTestCases));
-            msgBody = msgBody.replace("TotalFailedCount", String.valueOf(totalFailedTestCases));
-            passPercentage = ((double) totalPassTestCases / (double) totalExecutedTestCases) * 100;
-            failPercentage = ((double) totalFailedTestCases * 100) / (double) totalExecutedTestCases;
-            msgBody = msgBody.replace("passPercentage", String.format("%.2f", passPercentage) + "%");
-            msgBody = msgBody.replace("failPercentage", String.format("%.2f", failPercentage) + "%");
-            newTestCases = totalExecutedTestCases - lastExecutedTestCount;
-            msgBody = msgBody.replace("testCasesAdded", String.valueOf(Math.abs(newTestCases)));
-            if (newTestCases < 0) {
-                msgBody = msgBody.replace("Test Cases Added", "Test Cases Deleted");
-            }
-            htmlBodyPart.setContent(msgBody, "text/html");
-            multipart.addBodyPart(htmlBodyPart);
-            message.setContent(multipart);
-            message.setSubject(this.emailSubject + machineName);
-            logger.debug("Sending email notification");
-            Transport.send(message);
-            attachmentPaths = null;
-            logger.info("Mail sent successfully");
-        } catch (MessagingException | UnknownHostException e) {
-            logger.debug("Exception Occured While sending mail {} ", ExceptionUtils.getStackTrace(e));
-        } finally {
-            resetMailData();
-        }
-        logger.traceExit();
-    }
+		/* emailProps.put("mail.debug", "true"); */
 
-    private void resetMailData() {
-        totalExecutedTestCases = 0;
-        lastExecutedTestCount = 0;
-        totalPassTestCases = 0;
-        totalFailedTestCases = 0;
+		// Setting up a mail session
+		Session session = Session.getInstance(emailProps, new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication("frameworkfastest@gmail.com", "Titans@123");
+			}
+		});
 
-    }
+		try {
+			InternetAddress[] receiversAddress = InternetAddress.parse(this.emailTo, true);
 
-    /**
-     * This method is used to attach an Attachment to the mail
-     * 
-     * @param multipart of {@link Multipart} that contains multiple Body Parts
-     * @param fileName - Name of Attached File
-     * @throws MessagingException message
-     * @since Dec 11, 2019
-     */
-    private void addAttachmentInMultipart(Multipart multipart, String fileName) throws MessagingException {
-        logger.traceEntry("addAttachment method of AutomationEmailUtility class");
-        DataSource source = new FileDataSource(fileName);
-        BodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setDataHandler(new DataHandler(source));
-        messageBodyPart.setFileName(fileName.substring(fileName.lastIndexOf('/')));
-        logger.info("Adding attachment with path {} in email", fileName);
-        multipart.addBodyPart(messageBodyPart);
-        logger.trace("Exit addAttachment()");
-    }
+			InetAddress addr = InetAddress.getLocalHost();
+			String machineName = addr.getHostName();
+
+			// Setting up message properties
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(this.emailFrom));
+			message.setRecipients(Message.RecipientType.TO, receiversAddress);
+			Multipart multipart = new MimeMultipart();
+			for (String fName : attachmentPaths) {
+				File file = new File(fName);
+				if (file.exists()) {
+					addAttachmentInMultipart(multipart, fName);
+				}
+			}
+			BodyPart htmlBodyPart = new MimeBodyPart();
+			String msgBody = this.messageBody.replace("totalExecutedCount", String.valueOf(totalExecutedTestCases));
+			msgBody = msgBody.replace("TotalPassedCount", String.valueOf(totalPassTestCases));
+			msgBody = msgBody.replace("TotalFailedCount", String.valueOf(totalFailedTestCases));
+			passPercentage = ((double) totalPassTestCases / (double) totalExecutedTestCases) * 100;
+			failPercentage = ((double) totalFailedTestCases * 100) / (double) totalExecutedTestCases;
+			msgBody = msgBody.replace("passPercentage", String.format("%.2f", passPercentage) + "%");
+			msgBody = msgBody.replace("failPercentage", String.format("%.2f", failPercentage) + "%");
+			newTestCases = totalExecutedTestCases - lastExecutedTestCount;
+			msgBody = msgBody.replace("testCasesAdded", String.valueOf(Math.abs(newTestCases)));
+			if (newTestCases < 0) {
+				msgBody = msgBody.replace("Test Cases Added", "Test Cases Deleted");
+			}
+			htmlBodyPart.setContent(msgBody, "text/html");
+			multipart.addBodyPart(htmlBodyPart);
+			message.setContent(multipart);
+			message.setSubject(this.emailSubject + machineName);
+			logger.debug("Sending email notification");
+			Transport.send(message);
+			attachmentPaths = null;
+			logger.info("Mail sent successfully");
+		} catch (MessagingException | UnknownHostException e) {
+			logger.debug("Exception Occured While sending mail {} ", ExceptionUtils.getStackTrace(e));
+		} finally {
+			resetMailData();
+		}
+		logger.traceExit();
+	}
+
+	private void resetMailData() {
+		totalExecutedTestCases = 0;
+		lastExecutedTestCount = 0;
+		totalPassTestCases = 0;
+		totalFailedTestCases = 0;
+
+	}
+
+	/**
+	 * This method is used to attach an Attachment to the mail
+	 * 
+	 * @param multipart of {@link Multipart} that contains multiple Body Parts
+	 * @param fileName  - Name of Attached File
+	 * @throws MessagingException message
+	 * @since Dec 11, 2019
+	 */
+	private void addAttachmentInMultipart(Multipart multipart, String fileName) throws MessagingException {
+		logger.traceEntry("addAttachment method of AutomationEmailUtility class");
+		DataSource source = new FileDataSource(fileName);
+		BodyPart messageBodyPart = new MimeBodyPart();
+		messageBodyPart.setDataHandler(new DataHandler(source));
+		messageBodyPart.setFileName(fileName.substring(fileName.lastIndexOf('/')));
+		logger.info("Adding attachment with path {} in email", fileName);
+		multipart.addBodyPart(messageBodyPart);
+		logger.trace("Exit addAttachment()");
+	}
 }

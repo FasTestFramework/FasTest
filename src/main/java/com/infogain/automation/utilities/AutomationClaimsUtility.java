@@ -47,8 +47,10 @@ public class AutomationClaimsUtility {
     private final AutomationHeadersUtility automationHeadersUtility;
 
     private Response tokenResponse;
-    private String inputJSONfolderPath;
-    private String baseClaimUrl;
+	
+	  private String inputJSONfolderPath; 
+	  private String baseClaimUrl;
+	 
     private final AutomationEndpointHitUtility automationEndpointHitUtility;
     private final AutomationProperties automationProperties;
     private final AutomationUtility automationUtility;
@@ -64,9 +66,7 @@ public class AutomationClaimsUtility {
         this.automationUtility = automationUtility;
         this.automationHeadersUtility = automationHeadersUtility;
         this.automationJsonUtility = automationJsonUtility;
-        baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
-                        + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
-        inputJSONfolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
+       
     }
 
     /**
@@ -159,7 +159,8 @@ public class AutomationClaimsUtility {
     }
 
     private Pair<String, HttpMethod> fetchUrlAndType(String url) {
-        if (!url.contains("/")) {
+       
+    	if (!url.contains("/")) {
             url = automationProperties.getProperty(url);
         }
         String[] urlWithType = url.split("\\|");
@@ -168,7 +169,8 @@ public class AutomationClaimsUtility {
     }
 
     private String pathCheck(String jsonFilePath) {
-        String filePath;
+ inputJSONfolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
+    	String filePath;
         if (StringUtils.isNotEmpty(jsonFilePath)) {
             filePath = inputJSONfolderPath + "/" + jsonFilePath;
         } else {
@@ -299,6 +301,8 @@ public class AutomationClaimsUtility {
      */
     private void hitReleaseAutomationServer() {
         logger.traceEntry("hitReleaseAutomationServer method of AutomationClaimsUtility class");
+        baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
+                + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
         String tokenReleaseUrl = automationProperties.getProperty(AutomationConstants.FASTEST_TOKEN_RELEASE_URL);
         Pair<String, HttpMethod> urlAndType = fetchUrlAndType(tokenReleaseUrl);
         tokenReleaseUrl = urlAndType.getFirst();
@@ -351,6 +355,9 @@ public class AutomationClaimsUtility {
      */
     private Response getTokenFromServer() {
         logger.traceEntry("getClaimIdFromServer method of AutomationClaimsUtility class");
+        baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
+                + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
+inputJSONfolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         String claimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_URL);
         String headerPath = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_HEADER_TO_USE);
         String tokenGenerateHeaderPath = pathCheck(headerPath);
