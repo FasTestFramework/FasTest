@@ -41,10 +41,10 @@ public class AutomationFileDetailsService {
 
     public AutomationFilePathAndNameDTO dataname() {
         String inputJSonFolderPath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         String inputExcelFolderPath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
-        String outputFolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH);
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
+        String outputFolderPath = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH);
         List<String> allExcelFilePaths = new ArrayList<>();
 
         try (Stream<Path> walk = Files.walk(Paths.get(inputExcelFolderPath))) {

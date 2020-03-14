@@ -79,7 +79,7 @@ public class AutomationBoundaryValueAnalysisService {
                     AutomationBoundaryValueAnalysisDTO automationBoundaryValueAnalysisDTO) {
         AutomationBoundaryValueAnalysisModel automationBoundaryValueAnalysisModel =
                         AutomationBoundaryValueAnalysisDTOtoModel.convert(automationBoundaryValueAnalysisDTO);
-        directory = automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH) + "/"
+        directory = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH) + "/"
                         + automationBoundaryValueAnalysisModel.getFolderName() + "/";
         jsonFileName = automationBoundaryValueAnalysisModel.getFileName();
         if (jsonFileName.matches("^.*\\.(json|JSON)$")) {

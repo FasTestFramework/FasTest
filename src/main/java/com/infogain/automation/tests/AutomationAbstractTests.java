@@ -84,7 +84,7 @@ public abstract class AutomationAbstractTests {
         // Reading Data from Excel Utility Method and setting it to Automation Input DTO
         automationInputDTOList = automationExcelUtility.readInputExcelFile(workbook, inputExcelFileName, testSheetName);
         String inputjsonFolderPath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         setRequestBodyAndHeaders(inputjsonFolderPath);
     }
 
@@ -97,9 +97,9 @@ public abstract class AutomationAbstractTests {
         logger.traceEntry("test method of {} class", testSheetName);
         baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
                 + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
-        String generateToken = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN);
+        String generateToken = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN);
 
-        String generateTokenAt = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);
+        String generateTokenAt = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);
         if (generateTokenAt.equalsIgnoreCase("beforeSheet") && generateToken.equalsIgnoreCase("true")) {
             automationClaimsUtility.releaseAutomationServer();
             automationInputDTOList

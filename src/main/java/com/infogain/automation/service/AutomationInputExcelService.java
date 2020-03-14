@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Iterator;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import com.infogain.automation.constants.AutomationConstants;
 import com.infogain.automation.constants.FastTestExcelHeaders;
 import com.infogain.automation.dto.AutomationExcelRequestDTO;
-import com.infogain.automation.dto.AutomationInputDTO;
 import com.infogain.automation.exception.AutomationException;
 import com.infogain.automation.mapper.AutomationExcelRequestDTOtoAutomationExcelRequestModelList;
 import com.infogain.automation.model.AutomationExcelRequestModel;
@@ -55,7 +53,7 @@ public class AutomationInputExcelService {
             String inputExcelName = automationExcelRequestModel.getInputExcelFileName();
             Map<String, List<AutomationExcelRowModel>> inputExcelSheetsMap = automationExcelRequestModel.getSheets();
             String inputExcelFolderPath =
-                            automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
+                            automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
             if (StringUtils.isNotEmpty(inputExcelFolderName)) {
                 inputExcelFolderPath = inputExcelFolderPath + "/" + inputExcelFolderName;
             }

@@ -141,7 +141,7 @@ public class AutomationExcelUtility {
                         String inputParam = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.PARAMS);
                         if (!endpoint.contains("|")) {
                             endpoint = automationProperties
-                                            .getProperty(AutomationConstants.FASTEST_URL_PREFIX + endpoint);
+                                            .getPropertyAsString(AutomationConstants.FASTEST_URL_PREFIX + endpoint);
                         }
                         String[] printJsonReceiptUrlArray = endpoint.split("\\|");
                         // Splitting the Request URl and Request Type which are defined in properties file
