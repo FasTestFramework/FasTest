@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -137,15 +139,15 @@ public class AutomationEmailUtility {
         double passPercentage;
         double failPercentage;
         int newTestCases = 0;
-        
-		Configuration config = new PropertiesConfiguration();
-		config.addProperty("mail.smtp.host", this.emailHost);
-		config.addProperty("mail.smtp.port", Integer.valueOf(this.emailPort));
-		config.addProperty("mail.smtp.auth", true);
-		config.addProperty("mail.smtp.starttls.enable", true);
+
+        Properties config = new Properties();
+		config.put("mail.smtp.host", this.emailHost);
+		config.put("mail.smtp.port", Integer.valueOf(this.emailPort));
+		config.put("mail.smtp.auth", true);
+		config.put("mail.smtp.starttls.enable", true);
         
         // Setting up a mail session
-        Session session = Session.getInstance(ConfigurationConverter.getProperties(config), new Authenticator() {
+        Session session = Session.getInstance(config, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication("frameworkfastest@gmail.com", "Titans@123");
