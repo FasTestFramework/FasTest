@@ -7,25 +7,36 @@ import io.swagger.annotations.ApiModelProperty;
                 description = "Response body containing boolean value received after testing custom validations.")
 public class AutomationTestCustomValidationsResponseDTO {
 
-    @ApiModelProperty(value = "Custom validations test result", example = "true")
-    private boolean output;
+    @ApiModelProperty(value = "Custom validations test result status", example = "true")
+    private boolean validationStatus;
+    @ApiModelProperty(value = "Custom validations test result comments", example = "")
+    private String validationComments;
+
+    public AutomationTestCustomValidationsResponseDTO(boolean validationStatus, String validationComments) {
+        this.validationStatus = validationStatus;
+        this.validationComments = validationComments;
+    }
+
+    public boolean isValidationStatus() {
+        return validationStatus;
+    }
+
+    public void setValidationStatus(boolean validationStatus) {
+        this.validationStatus = validationStatus;
+    }
+
+    public String getValidationComments() {
+        return validationComments;
+    }
+
+    public void setValidationComments(String validationComments) {
+        this.validationComments = validationComments;
+    }
 
     @Override
     public String toString() {
-        return "AutomationTestCustomValidationsResponseDTO [output=" + output + "]";
+        return "AutomationTestCustomValidationsResponseDTO [validationStatus=" + validationStatus
+                        + ", validationComments=" + validationComments + "]";
     }
-
-    public boolean isOutput() {
-        return output;
-    }
-
-    public void setOutput(boolean output) {
-        this.output = output;
-    }
-
-    public AutomationTestCustomValidationsResponseDTO(boolean output) {
-        this.output = output;
-    }
-
 
 }

@@ -31,9 +31,9 @@ public class AutomationTestCustomValidationsDTO {
     @ApiModelProperty(
                     value = "map of custom validations where key is the key path, and value is the validations where validations are need to be applied",
                     required = true,
-                    example = "{\r\n" + "  \"output.claimId\": [\r\n" + "    \"isNotNull()\",\r\n"
+                    example = "{\r\n" + "  \"claimId\": [\r\n" + "    \"isNotNull()\",\r\n"
                                     + "    \"contains(\\\"-\\\")\"\r\n" + "  ],\r\n"
-                                    + "  \"output.receiptElements\": [\r\n" + "    \"isArray()\"\r\n" + "  ],\r\n"
+                                    + "  \"receiptElements\": [\r\n" + "    \"isArray()\"\r\n" + "  ],\r\n"
                                     + "  \"receiptElements[0].image.alignment\": [\r\n" + "    \"notNull()\",\r\n"
                                     + "    \"isEqualTo(\\\"Left\\\")\"\r\n" + "  ]\r\n" + "}")
     private Map<String, List<String>> customValidations;

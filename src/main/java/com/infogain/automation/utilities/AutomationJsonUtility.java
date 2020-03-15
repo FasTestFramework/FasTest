@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -218,7 +220,7 @@ public class AutomationJsonUtility {
     // }
 
     public void setValueandGetJSONStringForLeafNodes(JSONAware obj, String keyPath, Map<Object, String> newValueList,
-                    Map<String, String> fileNameWihData) {
+                    Map<String, String> fileNameWithData) {
         checkValidJsonPath(keyPath);
         List<String> keyPaths = splitKeyPath(keyPath);
         String lastKey;
@@ -243,7 +245,7 @@ public class AutomationJsonUtility {
         }
         for (Entry<Object, String> newValue : newValueList.entrySet()) {
             setValueFromSingleKey(parentObj, lastKey, newValue.getKey());
-            fileNameWihData.put(newValue.getValue(), beautifyJson(obj.toJSONString()));
+            fileNameWithData.put(newValue.getValue(), beautifyJson(obj.toJSONString()));
         }
         setValueFromSingleKey(parentObj, lastKey, oldValue);
     }
@@ -379,6 +381,49 @@ public class AutomationJsonUtility {
             logger.error("Can't convert String to required Type", e);
         }
         return readValue;
+    }
+
+    public Set<String> fetchAllKeyPaths(Object jsonData, boolean addGenericArrayPaths) {
+        Set<String> allKeyPaths = new LinkedHashSet<>();
+        addKeysFromObject(allKeyPaths, jsonData, "", addGenericArrayPaths);
+        return allKeyPaths;
+    }
+
+    private void addKeysFromObject(Set<String> allKeyPaths, Object jsonData, String currentKeyPath,
+                    boolean addGenericArrayPaths) {
+        if (jsonData instanceof JSONObject) {
+            addKeysFromJSONObject(allKeyPaths, (JSONObject) jsonData, currentKeyPath, addGenericArrayPaths);
+        } else if (jsonData instanceof JSONArray) {
+            addKeysFromJSONArray(allKeyPaths, (JSONArray) jsonData, currentKeyPath, addGenericArrayPaths);
+        }
+    }
+
+    private void addKeysFromJSONObject(Set<String> allKeyPaths, JSONObject jsonData, String currentKeyPath,
+                    boolean addGenericArrayPaths) {
+        String currentKeyPathObject;
+        for (Object entry : jsonData.keySet()) {
+            currentKeyPathObject =
+                            currentKeyPath.isEmpty() ? entry.toString() : currentKeyPath + "." + entry.toString();
+            allKeyPaths.add(currentKeyPathObject);
+            addKeysFromObject(allKeyPaths, jsonData.get(entry), currentKeyPathObject, addGenericArrayPaths);
+        }
+    }
+
+    private void addKeysFromJSONArray(Set<String> allKeyPaths, JSONArray jsonData, String currentKeyPath,
+                    boolean addGenericArrayPaths) {
+        String currentKeyPathArray;
+        if (addGenericArrayPaths) {
+            currentKeyPathArray = currentKeyPath + "[x]";
+            allKeyPaths.add(currentKeyPathArray);
+            if (!jsonData.isEmpty()) {
+                addKeysFromObject(allKeyPaths, jsonData.get(0), currentKeyPathArray, addGenericArrayPaths);
+            }
+        }
+        for (int i = 0; i < jsonData.size(); i++) {
+            currentKeyPathArray = currentKeyPath + "[" + i + "]";
+            allKeyPaths.add(currentKeyPathArray);
+            addKeysFromObject(allKeyPaths, jsonData.get(i), currentKeyPathArray, addGenericArrayPaths);
+        }
     }
 
 }
