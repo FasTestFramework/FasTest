@@ -279,16 +279,6 @@ System.out.println(new JSONObject().toJSONString(inputMap));
         }
     }
 
-    private void addQuotesIfString(Object objectActual, StringBuilder sb) {
-        if (objectActual instanceof String) {
-            sb.append("\"");
-            sb.append(objectActual);
-            sb.append("\"");
-        } else {
-            sb.append(objectActual);
-        }
-    }
-
     private void jsonArrayValidate(Object key, Object objectExpected, Object objectActual, StringBuilder currentKeyPath,
                     boolean customValidationsFound) {
         if (objectActual instanceof JSONArray) {
@@ -314,6 +304,16 @@ System.out.println(new JSONObject().toJSONString(inputMap));
             sb.append(objectExpected);
             sb.append(">\nbut was not.");
             addComment(currentKeyPath.toString(), sb.toString());
+        }
+    }
+
+    private void addQuotesIfString(Object objectActual, StringBuilder sb) {
+        if (objectActual instanceof String) {
+            sb.append("\"");
+            sb.append(objectActual);
+            sb.append("\"");
+        } else {
+            sb.append(objectActual);
         }
     }
 

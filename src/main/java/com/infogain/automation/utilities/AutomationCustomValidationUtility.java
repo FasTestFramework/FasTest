@@ -121,9 +121,9 @@ public class AutomationCustomValidationUtility {
     private boolean validateMethodSyntax(String methodNameWithParam) {
         String paramRegex = "(true|false|\\d+(\\.[\\d]*)?|\\\".*?\\\")";
         String commaSeperatedParamRegex = BeanUtil.getBean(AutomationUtility.class).fetchCommaSeperatedValueRegex(paramRegex);
-        String methodRegex = "^(.*?)\\("+commaSeperatedParamRegex+ "\\)$";
+        String methodRegex = "^(.*?)\\(("+commaSeperatedParamRegex+ ")?\\)$";
         boolean matches = methodNameWithParam.matches(methodRegex);
-        if(matches) {
+        if(!matches) {
             errorMessage.append(methodNameWithParam).append(" : Invalid method Syntax\n\n");
         }
         return matches;
