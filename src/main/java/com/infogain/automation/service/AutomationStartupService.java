@@ -51,22 +51,22 @@ public class AutomationStartupService {
 
     public void runTestCases(AutomationRunTestCasesDTO automationRunTestCasesDTO) {
         logger.traceEntry("runTestCases method of AutomationStartupService class");
-        String generateTokenAt = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);
+        String generateTokenAt = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_INSTANCE);
 
         Map<String, List<String>> testInputFiles = automationRunTestCasesDTO.getTestInputFiles();
         if (testInputFiles == null || testInputFiles.isEmpty()) {
             testInputFiles = new HashMap<>();
-            String[] excelFileNames = automationProperties.getProperty(AutomationConstants.FASTEST_EXCEL_SHEET_NAME)
+            String[] excelFileNames = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_EXCEL_SHEET_NAME)
                             .trim().split("\\|");
             String[] allExcelSheetNames = automationProperties
-                            .getProperty(AutomationConstants.APPLICATION_PROPERTIES_SHEET_NAME).trim().split("\\|");
+                            .getPropertyAsString(AutomationConstants.APPLICATION_PROPERTIES_SHEET_NAME).trim().split("\\|");
             for (int i = 0; i < excelFileNames.length; i++) {
                 testInputFiles.put(excelFileNames[i], Arrays.asList(allExcelSheetNames[i].split(",")));
             }
         }
         List<String> attachments = new ArrayList<>();
         int lastExecutedTestCount = 0;
-        String generateToken = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN);
+        String generateToken = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN);
         if (generateTokenAt.equalsIgnoreCase("beforeStartUp") && generateToken.equalsIgnoreCase("true")) {
             automationClaimsUtility.generateClaimId();
         }
@@ -77,7 +77,7 @@ public class AutomationStartupService {
             }
             String excelFileName = entry.getKey();
             String inputExcelFilePath =
-                            automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
+                            automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH) + "/"
                                             + excelFileName;
             XSSFWorkbook workbook = automationExcelUtility.readExcelFile(inputExcelFilePath);
             List<String> excelSheetNames = entry.getValue();
@@ -126,7 +126,7 @@ public class AutomationStartupService {
         String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss_a"));
         int extensionIndex = excelFileName.indexOf(".") - 1;
         // Setting Excel Sheet Name
-        return automationProperties.getProperty(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH) + "/"
+        return automationProperties.getPropertyAsString(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH) + "/"
                         + excelFileName.substring(0, extensionIndex + 1) + "_" + dateTime
                         + excelFileName.substring(extensionIndex + 1);
     }

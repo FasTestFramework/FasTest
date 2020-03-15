@@ -58,7 +58,7 @@ public class AutomationMailService {
         byte[] decoder = Base64.getDecoder().decode(fileBase64Data);
         String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss_a"));
         String automationReportFileName =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH) + "/"
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_OUTPUT_FOLDER_PATH) + "/"
                                         + "AutomationTestingReport_" + dateTime + ".pdf";
         // Creating PDF document object
         try (PDDocument document = PDDocument.load(decoder)) {

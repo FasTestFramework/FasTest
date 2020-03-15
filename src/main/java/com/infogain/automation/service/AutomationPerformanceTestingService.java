@@ -20,6 +20,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.JAXBIntrospector;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.jmeter.assertions.DurationAssertion;
@@ -120,7 +122,7 @@ public class AutomationPerformanceTestingService {
             Unmarshaller jaxbMarshaller = jaxbContext.createUnmarshaller();
             automationPerformanceTestingResultsTestResults =
                             (AutomationPerformanceTestingResultsTestResults) JAXBIntrospector.getValue(jaxbMarshaller
-                                            .unmarshal(new FileInputStream(new File(automationProperties.getProperty("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_").concat(dateTimesuffix).concat(".xml")))));
+                                            .unmarshal(new FileInputStream(new File(automationProperties.getPropertyAsString("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_").concat(dateTimesuffix).concat(".xml")))));
         } catch (FileNotFoundException | JAXBException e) {
             logger.debug("Exception Occured While Unmarshalling of XML file during Performance Testing : {} ", ExceptionUtils.getStackTrace(e));
         }
@@ -129,9 +131,9 @@ public class AutomationPerformanceTestingService {
         output.setSummary(summariser.results);
         if (automationPerformanceTestingResultsTestResults != null) {
             generateHtmlReport(testPlan, automationPerformanceTestingResultsTestResults, output);
-            output.setCsvReportPath(automationProperties.getProperty("fastest.jmetercsvreportsfilepath").concat("/csvResultreport_").concat(dateTimesuffix).concat(".csv"));
-            output.setJmxReportPath(automationProperties.getProperty("fastest.jmeterjmxfilepath").concat("/jmxreport_".concat(dateTimesuffix).concat(".jmx")));
-            output.setXmlReportPath(automationProperties.getProperty("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_".concat(dateTimesuffix).concat(".xml")));
+            output.setCsvReportPath(automationProperties.getPropertyAsString("fastest.jmetercsvreportsfilepath").concat("/csvResultreport_").concat(dateTimesuffix).concat(".csv"));
+            output.setJmxReportPath(automationProperties.getPropertyAsString("fastest.jmeterjmxfilepath").concat("/jmxreport_".concat(dateTimesuffix).concat(".jmx")));
+            output.setXmlReportPath(automationProperties.getPropertyAsString("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_".concat(dateTimesuffix).concat(".xml")));
         }
         return logger.traceExit(AutomationResponse.success(output));
 
@@ -162,10 +164,16 @@ public class AutomationPerformanceTestingService {
 
         try {
         	File sourceReportHtmlDirectory = new File(
-                    automationProperties.getProperty("fastest.jmeterhome").concat("/bin/report-output/"));
+                    automationProperties.getPropertyAsString("fastest.jmeterhome").concat("/bin/report-output/"));
+        	try {
+				Configuration conf = new PropertiesConfiguration(automationProperties.getPropertyAsString("fastest.jmeterreportpropertiespath"));
+			} catch (org.apache.commons.configuration.ConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	   Properties reportProps = new Properties();
                reportProps.load(new FileInputStream(
-                               automationProperties.getProperty("fastest.jmeterreportpropertiespath")));
+                               automationProperties.getPropertyAsString("fastest.jmeterreportpropertiespath")));
 
                File sourceReportJsonDirectory = new File(
                                reportProps.getProperty("jmeter.reportgenerator.exporter.json.property.output_dir"));
@@ -175,7 +183,7 @@ public class AutomationPerformanceTestingService {
                    FileUtils.cleanDirectory(sourceReportHtmlDirectory);
                    FileUtils.cleanDirectory(sourceReportJsonDirectory);
                }
-            File csvFile = new File(automationProperties.getProperty("fastest.jmetercsvreportsfilepath").concat("/csvResultreport_").concat(dateTimesuffix).concat(".csv"));
+            File csvFile = new File(automationProperties.getPropertyAsString("fastest.jmetercsvreportsfilepath").concat("/csvResultreport_").concat(dateTimesuffix).concat(".csv"));
             FileWriter myWriter = new FileWriter(csvFile);
             AutomationPerformanceTestingResultsHttpSample[] httpSamples =
                             automationPerformanceTestingResultsTestResults.getHttpSample();
@@ -200,11 +208,11 @@ public class AutomationPerformanceTestingService {
 
 
             ReportGenerator rg = new ReportGenerator(csvFile.getAbsolutePath(), null,
-                            automationProperties.getProperty("fastest.jmeterreportpropertiespath"));
+                            automationProperties.getPropertyAsString("fastest.jmeterreportpropertiespath"));
             rg.generate();
             
             
-            File destinationReportHtmlDirectory = new File(automationProperties.getProperty("fastest.jmeterhtmlreportfilepath")
+            File destinationReportHtmlDirectory = new File(automationProperties.getPropertyAsString("fastest.jmeterhtmlreportfilepath")
                     .concat("/htmlreport_".concat(dateTimesuffix)));
             java.nio.file.Files.createDirectories(Paths.get(destinationReportHtmlDirectory.getAbsolutePath()));
             
@@ -216,7 +224,7 @@ public class AutomationPerformanceTestingService {
 
 
          
-            File destinationReportJsonDirectory = new File(automationProperties.getProperty("fastest.jmeterjsonreportsfilepath")
+            File destinationReportJsonDirectory = new File(automationProperties.getPropertyAsString("fastest.jmeterjsonreportsfilepath")
                     .concat("/jsonreport_".concat(dateTimesuffix)));
             java.nio.file.Files.createDirectories(Paths.get(destinationReportJsonDirectory.getAbsolutePath()));
             
@@ -249,7 +257,7 @@ public class AutomationPerformanceTestingService {
 
         // Save this test plan as a .jmx for future reference
         try {
-            SaveService.saveTree(testHashTree, new FileOutputStream(automationProperties.getProperty("fastest.jmeterjmxfilepath").concat("/jmxreport_".concat(dateTimesuffix).concat(".jmx"))));
+            SaveService.saveTree(testHashTree, new FileOutputStream(automationProperties.getPropertyAsString("fastest.jmeterjmxfilepath").concat("/jmxreport_".concat(dateTimesuffix).concat(".jmx"))));
         } catch (IOException e) {
         	logger.debug("Exception Occured on creating Test HashTree during Performance Testing : {} ", ExceptionUtils.getStackTrace(e));
         }
@@ -258,7 +266,7 @@ public class AutomationPerformanceTestingService {
         // Collect results
         ResultCollector resultCollector = new ResultCollector(summariser);
 
-        resultCollector.setFilename(automationProperties.getProperty("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_".concat(dateTimesuffix).concat(".xml")));
+        resultCollector.setFilename(automationProperties.getPropertyAsString("fastest.jmeterxmlreportsfilepath").concat("/xmlResultreport_".concat(dateTimesuffix).concat(".xml")));
         testHashTree.add(testHashTree.getArray()[0], resultCollector);
 
     }
@@ -340,10 +348,10 @@ public class AutomationPerformanceTestingService {
     }
 
     public void configureTestEnvironment() {
-        JMeterUtils.setJMeterHome(automationProperties.getProperty("fastest.jmeterhome"));
+        JMeterUtils.setJMeterHome(automationProperties.getPropertyAsString("fastest.jmeterhome"));
 
         // import the jmeter properties, as is provided
-        JMeterUtils.loadJMeterProperties(automationProperties.getProperty("fastest.jmeterpropertiespath"));
+        JMeterUtils.loadJMeterProperties(automationProperties.getPropertyAsString("fastest.jmeterpropertiespath"));
         // Set locale
         JMeterUtils.initLocale();
 

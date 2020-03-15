@@ -66,7 +66,6 @@ public class AutomationClaimsUtility {
         this.automationUtility = automationUtility;
         this.automationHeadersUtility = automationHeadersUtility;
         this.automationJsonUtility = automationJsonUtility;
-       
     }
 
     /**
@@ -80,17 +79,17 @@ public class AutomationClaimsUtility {
     public void updateToken(AutomationInputDTO automationInputDTO) {
         logger.traceEntry("updateClaimId method of AutomationClaimsUtility class");
         String tokenPropertyNames =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_TOKEN_REPLACE_PROPERTY_NAMES);
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_TOKEN_REPLACE_PROPERTY_NAMES);
         Pair<Headers, String> updatedHeaders = replaceKeysInRequest(tokenPropertyNames, automationInputDTO.getHeaders(),
                         automationInputDTO.getTestCaseInputJson(), null);
         automationInputDTO.setHeaders(updatedHeaders.getFirst());
     }
 
     public void checkIfTokenResponse(String requestUrl, String requestType, Response response) {
-        if (automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN).equalsIgnoreCase("true")) {
+        if (automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN).equalsIgnoreCase("true")) {
             String urlWithType = requestUrl + "|" + requestType;
-            String generateTokenUrl = automationProperties.getProperty(
-                            automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_URL));
+            String generateTokenUrl = automationProperties.getPropertyAsString(
+                            automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_URL));
             if (urlWithType.equalsIgnoreCase(generateTokenUrl) && validateTokenResponse(response)) {
                 tokenResponse = response;
             }
@@ -110,7 +109,7 @@ public class AutomationClaimsUtility {
             if (!validateTokenResponse(tokenResponse)) {
                 tokenResponse = null;
                 throw new AutomationException("Invalid token response is received as Status code recieved is not "
-                                + automationProperties.getProperty(
+                                + automationProperties.getPropertyAsString(
                                                 AutomationConstants.FASTEST_GENERATE_TOKEN_RESPONSE_SUCCESS_STATUS_CODE)
                                 + " or required keys " + fetchTokenValidateKeys() + " does not exists in response.");
             }
@@ -120,7 +119,7 @@ public class AutomationClaimsUtility {
 
     private boolean validateTokenResponse(Response responseToValidate) {
         String statusCode = automationProperties
-                        .getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_RESPONSE_SUCCESS_STATUS_CODE);
+                        .getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_RESPONSE_SUCCESS_STATUS_CODE);
         if (!statusCode.equals(String.valueOf(responseToValidate.statusCode()))) {
             return false;
         }
@@ -136,7 +135,7 @@ public class AutomationClaimsUtility {
 
     private List<String> fetchTokenValidateKeys() {
         return Arrays.asList(automationProperties
-                        .getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_RESPONSE_KEYS_TO_VALIDATE).split(","));
+                        .getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_RESPONSE_KEYS_TO_VALIDATE).split(","));
     }
 
     public Object fetchKeyFromResponseString(String responseBody, String keyToFetch) {
@@ -150,7 +149,7 @@ public class AutomationClaimsUtility {
      */
     public void releaseAutomationServer() {
         logger.traceEntry("releaseAutomationServer method of AutomationClaimsUtility class");
-        if (automationProperties.getProperty(AutomationConstants.FASTEST_RELEASE_TOKEN).equalsIgnoreCase("true")
+        if (automationProperties.getPropertyAsString(AutomationConstants.FASTEST_RELEASE_TOKEN).equalsIgnoreCase("true")
                         && tokenResponse != null) {
             hitReleaseAutomationServer();
         }
@@ -159,24 +158,23 @@ public class AutomationClaimsUtility {
     }
 
     private Pair<String, HttpMethod> fetchUrlAndType(String url) {
-       
     	if (!url.contains("/")) {
-            url = automationProperties.getProperty(url);
-        }
-        String[] urlWithType = url.split("\\|");
-        HttpMethod urlType = automationUtility.getRequestMethodType(urlWithType[1]);
-        return Pair.of(urlWithType[0], urlType);
+    		url = automationProperties.getPropertyAsString(url);
+    	}
+    	String[] urlWithType = url.split("\\|");
+    	HttpMethod urlType = automationUtility.getRequestMethodType(urlWithType[1]);
+    	return Pair.of(urlWithType[0], urlType);
     }
 
     private String pathCheck(String jsonFilePath) {
- inputJSONfolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
+    	inputJSONfolderPath = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
     	String filePath;
-        if (StringUtils.isNotEmpty(jsonFilePath)) {
-            filePath = inputJSONfolderPath + "/" + jsonFilePath;
-        } else {
-            filePath = null;
-        }
-        return filePath;
+    	if (StringUtils.isNotEmpty(jsonFilePath)) {
+    		filePath = inputJSONfolderPath + "/" + jsonFilePath;
+    	} else {
+    		filePath = null;
+    	}
+    	return filePath;
     }
 
     private Map<String, Map<String, String>> tokenKeyValues(String tokenPropertyNames) {
@@ -303,17 +301,17 @@ public class AutomationClaimsUtility {
         logger.traceEntry("hitReleaseAutomationServer method of AutomationClaimsUtility class");
         baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
                 + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
-        String tokenReleaseUrl = automationProperties.getProperty(AutomationConstants.FASTEST_TOKEN_RELEASE_URL);
+        String tokenReleaseUrl = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_TOKEN_RELEASE_URL);
         Pair<String, HttpMethod> urlAndType = fetchUrlAndType(tokenReleaseUrl);
         tokenReleaseUrl = urlAndType.getFirst();
         HttpMethod tokenReleaseUrlType = urlAndType.getSecond();
-        String headerPath = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_HEADER_TO_USE);
+        String headerPath = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_HEADER_TO_USE);
         String tokenReleaseHeaderPath = pathCheck(headerPath);
         Headers headers = automationHeadersUtility.fetchHeaders(tokenReleaseHeaderPath);
         String tokenPropertyNames =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_TOKEN_RELEASE_PROPERTY_NAMES);
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_TOKEN_RELEASE_PROPERTY_NAMES);
         String releaseBodyPath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_RELEASE_TOKEN_BODY_TO_USE);
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_RELEASE_TOKEN_BODY_TO_USE);
         String tokenreleaseBodyPath = pathCheck(releaseBodyPath);
         JSONObject requestBody = automationJsonUtility.fetchJSONObject(tokenreleaseBodyPath);
         Pair<Headers, String> replaceKeysInRequest =
@@ -354,24 +352,24 @@ public class AutomationClaimsUtility {
      * @since Nov 27, 2019
      */
     private Response getTokenFromServer() {
-        logger.traceEntry("getClaimIdFromServer method of AutomationClaimsUtility class");
-        baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
-                + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
-inputJSONfolderPath = automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
-        String claimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_URL);
-        String headerPath = automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_HEADER_TO_USE);
-        String tokenGenerateHeaderPath = pathCheck(headerPath);
-        Pair<String, HttpMethod> urlAndType = fetchUrlAndType(claimUrl);
-        claimUrl = urlAndType.getFirst();
-        HttpMethod claimUrlType = urlAndType.getSecond();
-        Headers headers = automationHeadersUtility.fetchHeaders(tokenGenerateHeaderPath);
-        String claimJsonPath = inputJSONfolderPath + "/"
-                        + automationProperties.getProperty(AutomationConstants.FASTEST_GENERATE_TOKEN_BODY_TO_USE);
-        return logger.traceExit(
-                        automationEndpointHitUtility
-                                        .hitEndpoint(baseClaimUrl, claimUrl, headers, claimUrlType,
-                                                        automationJsonUtility.fetchJSONObject(claimJsonPath))
-                                        .getFirst());
+    	logger.traceEntry("getClaimIdFromServer method of AutomationClaimsUtility class");
+    	baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
+    			+ automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
+    	inputJSONfolderPath = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
+    	String claimUrl = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_URL);
+    	String headerPath = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_HEADER_TO_USE);
+    	String tokenGenerateHeaderPath = pathCheck(headerPath);
+    	Pair<String, HttpMethod> urlAndType = fetchUrlAndType(claimUrl);
+    	claimUrl = urlAndType.getFirst();
+    	HttpMethod claimUrlType = urlAndType.getSecond();
+    	Headers headers = automationHeadersUtility.fetchHeaders(tokenGenerateHeaderPath);
+    	String claimJsonPath = inputJSONfolderPath + "/"
+    			+ automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN_BODY_TO_USE);
+    	return logger.traceExit(
+    			automationEndpointHitUtility
+    			.hitEndpoint(baseClaimUrl, claimUrl, headers, claimUrlType,
+    					automationJsonUtility.fetchJSONObject(claimJsonPath))
+    			.getFirst());
     }
 
 }

@@ -49,7 +49,7 @@ public class AutomationUiRequestService {
         String requestUrl = automationUiRequestDTO.getRequestURL();
         String baseClaimUrl;
         String inputjsonFolderPath =
-                        automationProperties.getProperty(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
+                        automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_JSON_FOLDER_PATH);
         String body = automationUiRequestDTO.getBody();
         JSONObject bodyJson = null;
         if (body != null) {
@@ -67,8 +67,8 @@ public class AutomationUiRequestService {
             baseClaimUrl = requestUrl.substring(0, StringUtils.ordinalIndexOf(requestUrl, "/", 3));
 
         } else {
-            baseClaimUrl = automationProperties.getProperty(AutomationConstants.FASTEST_HOST_NAME) + ":"
-                            + automationProperties.getProperty(AutomationConstants.FASTEST_PORT);
+            baseClaimUrl = automationProperties.getPropertyAsString(AutomationConstants.FASTEST_HOST_NAME) + ":"
+                            + automationProperties.getPropertyAsString(AutomationConstants.FASTEST_PORT);
         }
         Headers headers = automationHeadersUtility.fetchHeaders(automationUiRequestDTO.getHeader());
 
