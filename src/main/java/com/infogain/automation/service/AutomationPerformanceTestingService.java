@@ -112,7 +112,7 @@ public class AutomationPerformanceTestingService {
         createThreadGroup(threadGroup);
         createTestPlan(testPlan);
         createTestHashTree(testPlan);
-        createAndAddAssertions(automationPerformanceTestingTest.getAssertions());
+        //createAndAddAssertions(automationPerformanceTestingTest.getAssertions());
         runTestCase(testHashTree);
         AutomationPerformanceTestingResultsTestResults automationPerformanceTestingResultsTestResults = null;
         try {

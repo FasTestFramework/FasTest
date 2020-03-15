@@ -8,7 +8,7 @@ public class AutomationPerformanceTestingTest {
     AutomationPerformanceTestingHttpHandlerDto httpHandler;
     AutomationPerformanceTestingTestPlanDto testPlan;
     AutomationPerformanceTestingThreadGroupDto threadGroup;
-    private AutomationPerformanceTestingAssertions assertions;
+	/* private AutomationPerformanceTestingAssertions assertions; */
 
     public AutomationPerformanceTestingCsvConfigDto getCsvConfig() {
         return csvConfig;
@@ -42,13 +42,13 @@ public class AutomationPerformanceTestingTest {
         this.threadGroup = threadGroup;
     }
 
-    public AutomationPerformanceTestingAssertions getAssertions() {
-        return assertions;
-    }
-
-    public void setAssertions(AutomationPerformanceTestingAssertions assertions) {
-        this.assertions = assertions;
-    }
+	/*
+	 * public AutomationPerformanceTestingAssertions getAssertions() { return
+	 * assertions; }
+	 * 
+	 * public void setAssertions(AutomationPerformanceTestingAssertions assertions)
+	 * { this.assertions = assertions; }
+	 */
 
     @Override
     public String toString() {
@@ -66,9 +66,9 @@ public class AutomationPerformanceTestingTest {
         if (threadGroup != null) {
             builder.append("threadGroup=").append(threadGroup).append(", ");
         }
-        if (assertions != null) {
-            builder.append("assertions=").append(assertions);
-        }
+		/*
+		 * if (assertions != null) { builder.append("assertions=").append(assertions); }
+		 */
         builder.append("]");
         return builder.toString();
     }

@@ -120,7 +120,7 @@ public class AutomationPerformanceTestingDTOValidatorImpl
             		automationPerfTestingTestPlanDto.setName("AutomationTestPlan");
             	}
             }
-            if (ObjectUtils.isEmpty(value.getAssertions())) {
+/*            if (ObjectUtils.isEmpty(value.getAssertions())) {
                 errorCodes.add(new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_PERF_TEST_MISSING_DATA_EXCEPTION, "assertions"));
             } else {
             	AutomationPerformanceTestingAssertions automationPerfTestingAssertions = value.getAssertions();
@@ -138,7 +138,7 @@ public class AutomationPerformanceTestingDTOValidatorImpl
             			automationPerfTestingDurationAssertion.setAllowedDuration(3000l);
             		}
             	}
-            }
+            }*/
             if (!errorCodes.isEmpty()) {
                 throw new FastTestBadRequestException(errorCodes);
             }
