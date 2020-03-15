@@ -1,6 +1,7 @@
 package com.infogain.automation.utilities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AutomationValidationUtility {
     private static final String FAILURE_COMMENTS_SEPERATOR = "----------------------------------------\n";
     private final Logger logger = LogManager.getLogger(AutomationValidationUtility.class);
-    private Map<String, String> customKeysValidation;
+    private Map<String, List<String>> customKeysValidation;
     private StringBuilder comments;
     private List<String> keysIgnored = new ArrayList<>();
 
@@ -116,21 +117,20 @@ public class AutomationValidationUtility {
         // ]}
         // }
 
-        Map<String, String> inputMap = new LinkedHashMap<>();
-        // inputMap.put("output.claimId", "notNull();isNotNull();contains(\"-\")");
-        // inputMap.put("output.receiptElements", "containsArrayEntries()");
-        // inputMap.put("output.receiptElements[x].barcode.data", "contains(1,3)");
-        // inputMap.put("output.receiptElements[x]", "isEqual()");
-        // inputMap.put("output.receiptElements[0].barcode.data", "isEqual()");
-        // inputMap.put("output.receiptElements[x]", "ignore()");
-        //
-        // inputMap.put("output.receiptElements[x].barcode",
-        // "containsKey(\"daa\");containsEntry(\"alignment\",\"Centr\")");
-        // inputMap.put("output", "containsKeys(\"receiptElements\",\"claimId\")");
-        // inputMap.put("output.receiptElements", "ignore()");
-        // inputMap.put("output.receiptElements[2].barcode", "sdfhghdfg()");
+        Map<String, List<String>> inputMap = new LinkedHashMap<>();
+        inputMap.put("output.claimId", Arrays.asList("notNull()", "isNotNull()", "contains(\"-\")"));
+        inputMap.put("output.receiptElements", Arrays.asList("containsArrayEntries()"));
+        inputMap.put("output.receiptElements[x].barcode.data", Arrays.asList("contains(1,3)"));
+        inputMap.put("output.receiptElements[x]", Arrays.asList("isEqual()"));
+        inputMap.put("output.receiptElements[0].barcode.data", Arrays.asList("isEqual()"));
+        inputMap.put("output.receiptElements[x]", Arrays.asList("ignore()"));
 
-        // customKeysValidation = inputMap;
+        inputMap.put("output.receiptElements[x].barcode",
+                        Arrays.asList("containsKey(\"daa\")", "containsEntry(\"alignment\",\"Centr\")"));
+        inputMap.put("output", Arrays.asList("containsKeys(\"receiptElements\",\"claimId\")"));
+        inputMap.put("output.receiptElements", Arrays.asList("ignore()"));
+        inputMap.put("output.receiptElements[2].barcode", Arrays.asList("sdfhghdfg()"));
+System.out.println(new JSONObject().toJSONString(inputMap));
         AutomationValidationUtility automationValidationUtility =
                         new AutomationValidationUtility(new AutomationJsonUtility(new AutomationUtility()));
         automationValidationUtility.customKeysValidation = inputMap;
@@ -221,7 +221,7 @@ public class AutomationValidationUtility {
     private void objectValidate(Object key, Object objectExpected, Object objectActual, StringBuilder currentKeyPath) {
         logger.traceEntry("objectValidate method of AutomationValidationUtility class");
         String keyPath = currentKeyPath.toString();
-        String customValidations = getCustomValidationsByKey(keyPath);
+        List<String> customValidations = getCustomValidationsByKey(keyPath);
         boolean customValidationsFound = customValidations != null;
         if (customValidationsFound) {
             doCustomValidations(objectExpected, objectActual, keyPath, customValidations);
@@ -240,7 +240,7 @@ public class AutomationValidationUtility {
     }
 
     private void doCustomValidations(Object objectExpected, Object objectActual, String keyPath,
-                    String customValidations) {
+                    List<String> customValidations) {
         try {
             new AutomationCustomValidationUtility().validate(objectActual, objectExpected, customValidations);
         } catch (CustomValidationFailure e) {
@@ -396,7 +396,7 @@ public class AutomationValidationUtility {
         logger.traceExit();
     }
 
-    private String getCustomValidationsByKey(String currentKeyPath) {
+    private List<String> getCustomValidationsByKey(String currentKeyPath) {
         Set<String> allKeyPaths = extractArrayGenericKeyPaths(currentKeyPath);
         for (String keyPath : allKeyPaths) {
             if (customKeysValidation.containsKey(keyPath)) {

@@ -1,20 +1,15 @@
 package com.infogain.automation.mapper;
 
 
-import java.util.List;
-import java.util.Map;
-
-import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import com.infogain.automation.dto.AutomationBoundaryValueAnalysisDTO;
 import com.infogain.automation.dto.ErrorCodesDTO;
 import com.infogain.automation.errors.AutomationErrorCodes;
 import com.infogain.automation.exception.FastTestBadRequestException;
 import com.infogain.automation.model.AutomationBoundaryValueAnalysisModel;
+import com.infogain.automation.utilities.AutomationJsonUtility;
+import com.infogain.automation.utilities.BeanUtil;
 
 public class AutomationBoundaryValueAnalysisDTOtoModel {
 
@@ -22,20 +17,13 @@ public class AutomationBoundaryValueAnalysisDTOtoModel {
 
     public static AutomationBoundaryValueAnalysisModel convert(
                     AutomationBoundaryValueAnalysisDTO automationBoundaryValueAnalysisDTO) {
+        AutomationJsonUtility automationJsonUtility = BeanUtil.getBean(AutomationJsonUtility.class);
+
         Object data = automationBoundaryValueAnalysisDTO.getData();
-        JSONAware jsonAware = null;
-        try {
-            if (data instanceof Map) {
-                jsonAware = (JSONAware) new JSONParser().parse(JSONObject.toJSONString(((Map) data)));
-            } else if (data instanceof List) {
-                jsonAware = (JSONAware) new JSONParser().parse(JSONArray.toJSONString(((List) data)));
-            }
-        } catch (ParseException e) {
-            // No handling is needed
-        }
+        JSONAware jsonAware = automationJsonUtility.extractJsonObjectFromMapOrList(data);
         if (jsonAware == null) {
             throw new FastTestBadRequestException(
-                            new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_BVA_INVALID_DATA_EXCEPTION, "data",
+                            new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_BVA_INVALID_DATA_EXCEPTION, "data", data,
                                             "Object is not in Json format."));
         }
         return new AutomationBoundaryValueAnalysisModel(jsonAware, automationBoundaryValueAnalysisDTO.getMetaData(),
@@ -43,4 +31,5 @@ public class AutomationBoundaryValueAnalysisDTOtoModel {
                         automationBoundaryValueAnalysisDTO.getFileName());
 
     }
+
 }

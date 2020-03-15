@@ -10,10 +10,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.infogain.automation.dto.AutomationBoundaryValueAnalysisDTO;
-import com.infogain.automation.dto.AutomationPerformanceTestingAssertions;
 import com.infogain.automation.dto.AutomationPerformanceTestingCsvConfigDto;
-import com.infogain.automation.dto.AutomationPerformanceTestingDurationAssertion;
 import com.infogain.automation.dto.AutomationPerformanceTestingHttpHandlerDto;
 import com.infogain.automation.dto.AutomationPerformanceTestingTest;
 import com.infogain.automation.dto.AutomationPerformanceTestingTestPlanDto;
@@ -92,7 +89,7 @@ public class AutomationPerformanceTestingDTOValidatorImpl
             		errorCodes.add(new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_PERF_TEST_MISSING_DATA_EXCEPTION, "httpHandler Domain"));
             	}
             	if(ObjectUtils.isEmpty(automationPerfTestingHttpHandlerDto.getHeaders())) {
-            		HashMap<String, String> headers = new HashMap<String,String>();
+            		HashMap<String, String> headers = new HashMap<>();
             		headers.put("Content-Type", "application/json");
             		automationPerfTestingHttpHandlerDto.setHeaders(headers);
             	}

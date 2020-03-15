@@ -67,11 +67,9 @@ public class AutomationProperties {
 		this.automationApplicationRestartService = automationApplicationRestartService;
 		try (InputStream input = StringUtils.isNotBlank(propertyFilePath) ? new FileInputStream(propertyFilePath)
                         : this.getClass().getClassLoader().getResourceAsStream("application.properties");) {
-           // props = new Properties();
             propertiesConfiguration = new PropertiesConfiguration();
             propertiesConfiguration.setDelimiterParsingDisabled(true);
             propertiesConfiguration.load(input);
-            //props.load(input);
         } catch (ConfigurationException | IOException ex) {
             logger.debug("Exception Occured While Reading Properties File With Path {} : {} ", propertyFilePath,
                             ExceptionUtils.getStackTrace(ex));
@@ -81,11 +79,7 @@ public class AutomationProperties {
     }
 
     public String getPropertyAsString(String key) {
-    	Object property = propertiesConfiguration.getProperty(key);
-    	if(property instanceof String) {
-    		return (String) property;
-    	}
-    	return null;
+        return propertiesConfiguration.getProperty(key).toString();
     }
     
     public Object getProperty(String key) {

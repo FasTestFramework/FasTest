@@ -12,11 +12,12 @@ import com.infogain.automation.dto.AutomationExcelInputDTO;
 import com.infogain.automation.dto.AutomationExcelRequestDTO;
 import com.infogain.automation.model.AutomationExcelRequestModel;
 import com.infogain.automation.model.AutomationExcelRowModel;
+import com.infogain.automation.utilities.AutomationJsonUtility;
+import com.infogain.automation.utilities.BeanUtil;
 
 public class AutomationExcelRequestDTOtoAutomationExcelRequestModelList {
 
-    public static List<AutomationExcelRequestModel> mapExcelRequestDtoToExcelRequestModelList(
-                    AutomationExcelRequestDTO automationExcelRequestDTO) {
+    public static List<AutomationExcelRequestModel> convert(AutomationExcelRequestDTO automationExcelRequestDTO) {
         List<AutomationExcelInputDTO> rowData = automationExcelRequestDTO.getRowData();
         Collections.sort(rowData, Comparator.comparing(AutomationExcelInputDTO::getInputExcelFolderName)
                         .thenComparing(AutomationExcelInputDTO::getInputExcelFileName));
@@ -61,10 +62,16 @@ public class AutomationExcelRequestDTOtoAutomationExcelRequestModelList {
 
     private static AutomationExcelRowModel automationExcelDTOtoAutomationExcelRowModel(
                     AutomationExcelInputDTO automationExcelInputDTO) {
+        AutomationJsonUtility automationJsonUtility = BeanUtil.getBean(AutomationJsonUtility.class);
+
+        String skipTest = automationExcelInputDTO.isSkipTest() ? "Y" : "N";
+        Map<String, List<String>> customValidationsMap = automationExcelInputDTO.getCustomValidations();
+        String customValidations =
+                        customValidationsMap != null ? automationJsonUtility.beautifyJson(customValidationsMap) : "";
         return new AutomationExcelRowModel(automationExcelInputDTO.getTestCaseDescription(),
                         automationExcelInputDTO.getRequestUrl(), automationExcelInputDTO.getRequestType(),
                         automationExcelInputDTO.getHeaderJson(), automationExcelInputDTO.getInputJson(),
                         automationExcelInputDTO.getExpectedOutput(), automationExcelInputDTO.getExpectedHttpStatus(),
-                        automationExcelInputDTO.getParams());
+                        automationExcelInputDTO.getParams(), skipTest, customValidations);
     }
 }
