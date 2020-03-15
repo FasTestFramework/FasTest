@@ -18,7 +18,7 @@ public class AutomationRunTestCasesDTO {
             example = "{\n" + 
             		"\"Peripheral Server Test.xlsx\":[\"PeripheralDeviceHealthTest\",\"ReceiptPrinterJSONTest\"]\n" + 
             		"    }")
-    Map<String, List<String>> testInputFiles;
+    private Map<String, List<String>> testInputFiles;
 
     /**
      * @return the sendMail

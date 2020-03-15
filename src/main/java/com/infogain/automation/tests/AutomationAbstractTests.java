@@ -213,7 +213,7 @@ public abstract class AutomationAbstractTests {
             if (StringUtils.isNotBlank(inputJson)) {
                 inputJson = inputJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + inputJson
                                 : inputJson;
-                automationInputDTO.setTestCaseInputJson(automationJsonUtility.fetchJSONObject(inputJson));
+                automationInputDTO.setTestCaseInputJson(automationJsonUtility.fetchJSONObject(inputJson, true));
             }
             // sets Header Object in AutomationInputDTO
             if (StringUtils.isNotBlank(headerJson)) {

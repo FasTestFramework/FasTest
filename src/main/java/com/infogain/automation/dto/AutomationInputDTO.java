@@ -1,6 +1,7 @@
 package com.infogain.automation.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,24 +23,24 @@ import io.restassured.http.Headers;
  */
 public class AutomationInputDTO {
 
-    String serialNo;
-    String testCaseDescription;
-    String headerJson;
-    String inputJson;
-    String inputParam;
-    String expectedOutput;
-    Integer expectedHttpStatus;
-    JSONObject testCaseInputJson;
-    String actualOutput;
-    String failureComments;
-    Integer actualHttpStatus;
-    String testCaseResult;
-    LocalDateTime executionDateTime;
-    Headers headers;
-    String requestURL;
-    HttpMethod requestType;
-    Map<String, String> keyValidation;
-    Double runtime;
+    private String serialNo;
+    private String testCaseDescription;
+    private String headerJson;
+    private String inputJson;
+    private String inputParam;
+    private String expectedOutput;
+    private Integer expectedHttpStatus;
+    private JSONObject testCaseInputJson;
+    private String actualOutput;
+    private String failureComments;
+    private Integer actualHttpStatus;
+    private String testCaseResult;
+    private LocalDateTime executionDateTime;
+    private Headers headers;
+    private String requestURL;
+    private HttpMethod requestType;
+    private Map<String, List<String>> keyValidation;
+    private Double runtime;
 
     /**
      * @return the inputParam
@@ -58,14 +59,14 @@ public class AutomationInputDTO {
     /**
      * @return the keyValidation
      */
-    public Map<String, String> getKeyValidation() {
+    public Map<String, List<String>> getKeyValidation() {
         return keyValidation;
     }
 
     /**
      * @param keyValidation the keyValidation to set
      */
-    public void setKeyValidation(Map<String, String> keyValidation) {
+    public void setKeyValidation(Map<String, List<String>> keyValidation) {
         this.keyValidation = keyValidation;
     }
 
@@ -179,7 +180,7 @@ public class AutomationInputDTO {
 
     public AutomationInputDTO(String serialNo, String testCaseDescription, String headerJson, String inputJson,
                     String inputParam, String expectedOutput, Integer expectedHttpStatus, String requestURL,
-                    HttpMethod requestType, Map<String, String> keyValidation) {
+                    HttpMethod requestType, Map<String, List<String>> keyValidation) {
         this.serialNo = serialNo;
         this.testCaseDescription = testCaseDescription;
         this.headerJson = headerJson;

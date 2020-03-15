@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -40,6 +41,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.infogain.automation.constants.AutomationConstants;
 import com.infogain.automation.constants.FastTestExcelHeaders;
 import com.infogain.automation.dto.AutomationInputDTO;
@@ -131,7 +133,7 @@ public class AutomationExcelUtility {
                                     currentRow, FastTestExcelHeaders.EXPECTED_HTTP_STATUS));
                     if (StringUtils.isNotBlank(serialNumber) && StringUtils.isNotBlank(testCaseDescription)
                                     && StringUtils.isNotBlank(endpoint) && expectedHttpStatus != null) {
-                        Map<String, String> keyValidationMap =
+                        Map<String, List<String>> keyValidationMap =
                                         extractingCustomKeyValidations(fetchCellValue(headerIndexes, currentRow,
                                                         FastTestExcelHeaders.KEYS_VALIDATION));
                         String headerJson = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.HEADERS);
@@ -164,6 +166,15 @@ public class AutomationExcelUtility {
                             + " is not found or is not having any valid row data");
         }
         return jsonFileList;
+    }
+
+    private Map<String, List<String>> extractingCustomKeyValidations(String keyValdiationsString) {
+        Map<String, List<String>> keyValidationMap = new HashMap<>();
+        if (StringUtils.isNotBlank(keyValdiationsString)) {
+            keyValidationMap = automationJsonUtility.fetchObject(keyValdiationsString,
+                            new TypeReference<LinkedHashMap<String, List<String>>>() {});
+        }
+        return keyValidationMap;
     }
 
     /**
@@ -433,20 +444,6 @@ public class AutomationExcelUtility {
             serialNumber = cell.toString();
         }
         return serialNumber;
-    }
-
-    private Map<String, String> extractingCustomKeyValidations(String keyValdiationsString) {
-        Map<String, String> keyValidationMap = new HashMap<>();
-        if (StringUtils.isNotBlank(keyValdiationsString)) {
-            String[] allKeyAndValues = keyValdiationsString.split("\\|");
-            for (String keyWithValue : allKeyAndValues) {
-                String[] keyValue = keyWithValue.split("=");
-                if (keyValue.length == 2) {
-                    keyValidationMap.put(keyValue[0], keyValue[1]);
-                }
-            }
-        }
-        return keyValidationMap;
     }
 
     /**
@@ -730,12 +727,6 @@ public class AutomationExcelUtility {
                 }
                 rowCreated = true;
                 // Create column in main sheet
-                if(toColumn>7)
-                {
-                	System.out.println("stop");
-                }
-                System.out.println(toColumn);
-                System.out.println(cell);
                 Cell tempCell = mrow.createCell(toColumn);
                 cloneCell(tempCell, cell);
                 if (delete) {

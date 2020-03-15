@@ -55,7 +55,7 @@ public class AutomationUiRequestService {
         if (body != null) {
             try {
                 body = body.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + body : body;
-                bodyJson = automationJsonUtility.fetchJSONObject(body);
+                bodyJson = automationJsonUtility.fetchJSONObject(body, true);
                 body = bodyJson.toJSONString();
             } catch (AutomationException e) {
                 if (!(e.getCause() instanceof ParseException)) {

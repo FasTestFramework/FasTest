@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -42,8 +41,7 @@ import com.infogain.automation.service.AutomationApplicationRestartService;
  * 
  * Theme - Automation<br>
  * Feature - Automation and Testing<br>
- * Description - This class is for reading properties from Peripheral Properties
- * file externally with single
+ * Description - This class is for reading properties from Peripheral Properties file externally with single
  * 
  * @author Rudhra Koul [103264]
  * @version 1.0.0
@@ -52,136 +50,134 @@ import com.infogain.automation.service.AutomationApplicationRestartService;
 @Component
 public class AutomationProperties {
 
-	private static final Logger logger = LogManager.getLogger(AutomationProperties.class);
+    private static final Logger logger = LogManager.getLogger(AutomationProperties.class);
 
-	public static final String SERVER_PORT = "server.port";
-	public static final String INSTALLATION_DRIVE = "installation-drive";
+    public static final String SERVER_PORT = "server.port";
+    public static final String INSTALLATION_DRIVE = "installation-drive";
 
-	public static String propertyFilePath;
-	private CompositeConfiguration propertiesConfiguration;
+    public static String propertyFilePath;
+    private CompositeConfiguration propertiesConfiguration;
 
-	@Autowired
-	private final AutomationApplicationRestartService automationApplicationRestartService;
+    @Autowired
+    private final AutomationApplicationRestartService automationApplicationRestartService;
 
-	/**
-	 * This method reads the properties from Automation Properties file and throws
-	 * Exception if any error occurred
-	 */
-	public AutomationProperties(final AutomationApplicationRestartService automationApplicationRestartService) {
-		this.automationApplicationRestartService = automationApplicationRestartService;
-		try (InputStream input = StringUtils.isNotBlank(propertyFilePath) ? new FileInputStream(propertyFilePath)
-				: this.getClass().getClassLoader().getResourceAsStream("application.properties");) {
-			propertiesConfiguration = new CompositeConfiguration();
-			propertiesConfiguration.addConfiguration(new SystemConfiguration());
-			PropertiesConfiguration props = new PropertiesConfiguration();
-			props.setDelimiterParsingDisabled(true);
-			props.load(input);
-			props = (PropertiesConfiguration) props.interpolatedConfiguration();
-			propertiesConfiguration.addConfiguration(props);
-		} catch (ConfigurationException | IOException ex) {
-			logger.debug("Exception Occured While Reading Properties File With Path {} : {} ", propertyFilePath,
-					ExceptionUtils.getStackTrace(ex));
-			throw new AutomationException(
-					"Exception Occured While Reading Properties File With Path " + propertyFilePath, ex);
-		}
-	}
+    /**
+     * This method reads the properties from Automation Properties file and throws Exception if any error occurred
+     */
+    public AutomationProperties(final AutomationApplicationRestartService automationApplicationRestartService) {
+        this.automationApplicationRestartService = automationApplicationRestartService;
+        try (InputStream input = StringUtils.isNotBlank(propertyFilePath) ? new FileInputStream(propertyFilePath)
+                        : this.getClass().getClassLoader().getResourceAsStream("application.properties");) {
+            propertiesConfiguration = new CompositeConfiguration();
+            propertiesConfiguration.addConfiguration(new SystemConfiguration());
+            PropertiesConfiguration props = new PropertiesConfiguration();
+            props.setDelimiterParsingDisabled(true);
+            props.load(input);
+            props = (PropertiesConfiguration) props.interpolatedConfiguration();
+            propertiesConfiguration.addConfiguration(props);
+        } catch (ConfigurationException | IOException ex) {
+            logger.debug("Exception Occured While Reading Properties File With Path {} : {} ", propertyFilePath,
+                            ExceptionUtils.getStackTrace(ex));
+            throw new AutomationException(
+                            "Exception Occured While Reading Properties File With Path " + propertyFilePath, ex);
+        }
+    }
 
-	public String getPropertyAsString(String key) {
-		Object property = propertiesConfiguration.getProperty(key);
-		if (property instanceof String) {
-			return (String) property;
-		}
-		return null;
-	}
+    public String getPropertyAsString(String key) {
+        Object property = propertiesConfiguration.getProperty(key);
+        if (property instanceof String) {
+            return (String) property;
+        }
+        return null;
+    }
 
-	public Object getProperty(String key) {
-		return propertiesConfiguration.getProperty(key);
-	}
+    public Object getProperty(String key) {
+        return propertiesConfiguration.getProperty(key);
+    }
 
-	public String getKeyNameByValue(String value) {
-		String urlParameterKey = null;
-		for (final Iterator<String> itr = propertiesConfiguration.getKeys(); itr.hasNext();) {
-			String key = itr.next();
-			List valuesList = propertiesConfiguration.getList(key);
-			if (valuesList.get(0).equals(value)) {
-				urlParameterKey = key;
-				break;
-			}
-		}
-		return urlParameterKey;
-	}
+    public String getKeyNameByValue(String value) {
+        String urlParameterKey = null;
+        for (final Iterator<String> itr = propertiesConfiguration.getKeys(); itr.hasNext();) {
+            String key = itr.next();
+            List valuesList = propertiesConfiguration.getList(key);
+            if (valuesList.get(0).equals(value)) {
+                urlParameterKey = key;
+                break;
+            }
+        }
+        return urlParameterKey;
+    }
 
-	public void reloadProperties() {
-		PropertiesConfiguration newPropertiesConfiguration;
-		try (InputStream input = new FileInputStream(propertyFilePath)) {
+    public void reloadProperties() {
+        PropertiesConfiguration newPropertiesConfiguration;
+        try (InputStream input = new FileInputStream(propertyFilePath)) {
 
-			newPropertiesConfiguration = new PropertiesConfiguration();
-			newPropertiesConfiguration.load(input);
-			newPropertiesConfiguration = (PropertiesConfiguration) newPropertiesConfiguration
-					.interpolatedConfiguration();
-			updateServiceXmlAndRestart(newPropertiesConfiguration);
+            newPropertiesConfiguration = new PropertiesConfiguration();
+            newPropertiesConfiguration.load(input);
+            newPropertiesConfiguration =
+                            (PropertiesConfiguration) newPropertiesConfiguration.interpolatedConfiguration();
+            updateServiceXmlAndRestart(newPropertiesConfiguration);
 
-			propertiesConfiguration = new CompositeConfiguration();
-			propertiesConfiguration.addConfiguration(new SystemConfiguration());
-			propertiesConfiguration.addConfiguration(newPropertiesConfiguration);
+            propertiesConfiguration = new CompositeConfiguration();
+            propertiesConfiguration.addConfiguration(new SystemConfiguration());
+            propertiesConfiguration.addConfiguration(newPropertiesConfiguration);
 
-		} catch (ConfigurationException | IOException | ParserConfigurationException | SAXException
-				| TransformerException ex) {
-			logger.debug("Exception Occured While Reading Properties File With Path {} : {} ", propertyFilePath,
-					ExceptionUtils.getStackTrace(ex));
-		}
-	}
+        } catch (ConfigurationException | IOException | ParserConfigurationException | SAXException
+                        | TransformerException ex) {
+            logger.debug("Exception Occured While Reading Properties File With Path {} : {} ", propertyFilePath,
+                            ExceptionUtils.getStackTrace(ex));
+        }
+    }
 
-	private void updateServiceXmlAndRestart(PropertiesConfiguration newPropertiesConfiguration)
-			throws ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError,
-			TransformerException {
-		
+    private void updateServiceXmlAndRestart(PropertiesConfiguration newPropertiesConfiguration)
+                    throws ParserConfigurationException, SAXException, IOException,
+                    TransformerFactoryConfigurationError, TransformerException {
 
-		if (!propertiesConfiguration.getProperty(SERVER_PORT)
-				.equals(newPropertiesConfiguration.getProperty(SERVER_PORT))) {
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-			Document doc = docBuilder.parse(System.getenv(INSTALLATION_DRIVE) + "\\fasTest\\serviceInstaller\\fastest.xml");
-			// Get the root element
-			Node staff = doc.getElementsByTagName("service").item(0);
-			NodeList nodes = staff.getChildNodes();
-			xmlPropertyUpdation(newPropertiesConfiguration, nodes, SERVER_PORT);
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
+        if (!propertiesConfiguration.getProperty(SERVER_PORT)
+                        .equals(newPropertiesConfiguration.getProperty(SERVER_PORT))) {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(
-					new File(System.getenv(INSTALLATION_DRIVE) + "\\fasTest\\serviceInstaller\\fastest.xml"));
-			transformer.transform(source, result);
-			automationApplicationRestartService.restartApp();
-		}
-		else
-		{
-			logger.info("fastest properties updated restart not required");
-		}
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder
+                            .parse(System.getenv(INSTALLATION_DRIVE) + "\\fasTest\\serviceInstaller\\fastest.xml");
+            // Get the root element
+            Node staff = doc.getElementsByTagName("service").item(0);
+            NodeList nodes = staff.getChildNodes();
+            xmlPropertyUpdation(newPropertiesConfiguration, nodes, SERVER_PORT);
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
 
-	}
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(
+                            new File(System.getenv(INSTALLATION_DRIVE) + "\\fasTest\\serviceInstaller\\fastest.xml"));
+            transformer.transform(source, result);
+            automationApplicationRestartService.restartApp();
+        } else {
+            logger.info("fastest properties updated restart not required");
+        }
 
-	/**
-	 * @param newPropertiesConfiguration
-	 * @param nodes
-	 */
-	private void xmlPropertyUpdation(PropertiesConfiguration newPropertiesConfiguration, NodeList nodes,
-			String property) {
-		for (int i = 0; i < nodes.getLength(); i++) {
-			Node element = nodes.item(i);
-			if ("env".equals(element.getNodeName())) {
-				NamedNodeMap attributes = element.getAttributes();
-				Node item = attributes.getNamedItem("name");
-				if (item.getTextContent().equals(property)) {
-					Node valueNode = attributes.getNamedItem("value");
-					valueNode.setTextContent(newPropertiesConfiguration.getProperty(property).toString());
-				}
-			}
-		}
+    }
 
-	}
+    /**
+     * @param newPropertiesConfiguration
+     * @param nodes
+     */
+    private void xmlPropertyUpdation(PropertiesConfiguration newPropertiesConfiguration, NodeList nodes,
+                    String property) {
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node element = nodes.item(i);
+            if ("env".equals(element.getNodeName())) {
+                NamedNodeMap attributes = element.getAttributes();
+                Node item = attributes.getNamedItem("name");
+                if (item.getTextContent().equals(property)) {
+                    Node valueNode = attributes.getNamedItem("value");
+                    valueNode.setTextContent(newPropertiesConfiguration.getProperty(property).toString());
+                }
+            }
+        }
+
+    }
 
 }

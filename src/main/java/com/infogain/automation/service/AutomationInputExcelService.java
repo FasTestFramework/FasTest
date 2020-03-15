@@ -46,14 +46,13 @@ public class AutomationInputExcelService {
 
     public void insertDataToExcel(AutomationExcelRequestDTO automationExcelRequestDTO) {
         List<AutomationExcelRequestModel> automationExcelRequestModelList =
-                        AutomationExcelRequestDTOtoAutomationExcelRequestModelList
-                                        .mapExcelRequestDtoToExcelRequestModelList(automationExcelRequestDTO);
+                        AutomationExcelRequestDTOtoAutomationExcelRequestModelList.convert(automationExcelRequestDTO);
         automationExcelRequestModelList.forEach(automationExcelRequestModel -> {
             String inputExcelFolderName = automationExcelRequestModel.getInputExcelFolderName();
             String inputExcelName = automationExcelRequestModel.getInputExcelFileName();
             Map<String, List<AutomationExcelRowModel>> inputExcelSheetsMap = automationExcelRequestModel.getSheets();
-            String inputExcelFolderPath =
-                            automationProperties.getPropertyAsString(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
+            String inputExcelFolderPath = automationProperties
+                            .getPropertyAsString(AutomationConstants.FASTEST_INPUT_EXCEL_FOLDER_PATH);
             if (StringUtils.isNotEmpty(inputExcelFolderName)) {
                 inputExcelFolderPath = inputExcelFolderPath + "/" + inputExcelFolderName;
             }
@@ -76,13 +75,13 @@ public class AutomationInputExcelService {
 
     private void insertRowsInAllExcels(Map<String, List<AutomationExcelRowModel>> inputExcelSheetsMap,
                     XSSFWorkbook workbookInput) {
-        for (Map.Entry<String, List<AutomationExcelRowModel>> entry : inputExcelSheetsMap.entrySet()) {
-            String excelSheetName = entry.getKey();
+        for (Map.Entry<String, List<AutomationExcelRowModel>> inputExcelSheetEntry : inputExcelSheetsMap.entrySet()) {
+            String excelSheetName = inputExcelSheetEntry.getKey();
             XSSFSheet excelSheet = workbookInput.getSheet(excelSheetName);
             if (excelSheet == null) {
                 excelSheet = createNewSheet(excelSheetName, workbookInput);
             }
-            insertDataInExcelSheet(entry.getValue(), excelSheet);
+            insertDataInExcelSheet(inputExcelSheetEntry.getValue(), excelSheet);
         }
     }
 
@@ -95,10 +94,9 @@ public class AutomationInputExcelService {
     private void insertDataInExcelSheet(List<AutomationExcelRowModel> automationExcelRowModelList, XSSFSheet sheet) {
         Iterator<Row> row = sheet.iterator();
         Row firstRow = row.next();
-        Map<FastTestExcelHeaders, Integer> headerIndexes =
-                        automationExcelUtility.reArrangeHeaders(firstRow);
+        Map<FastTestExcelHeaders, Integer> headerIndexes = automationExcelUtility.reArrangeHeaders(firstRow);
         int lastSNoCount = sheet.getLastRowNum();
-        while(automationExcelUtility.removeRowIfEmpty(sheet, lastSNoCount)) {
+        while (automationExcelUtility.removeRowIfEmpty(sheet, lastSNoCount)) {
             lastSNoCount--;
         }
         Map<FastTestExcelHeaders, Object> cellData = new EnumMap<>(FastTestExcelHeaders.class);
@@ -107,11 +105,12 @@ public class AutomationInputExcelService {
             cellData.clear();
             cellData.put(FastTestExcelHeaders.SERIAL_NO, lastSNoCount);
             cellData.put(FastTestExcelHeaders.TEST_CASE_DESCRIPTION, automationExcelRowModel.getTestCaseDescription());
-            cellData.put(FastTestExcelHeaders.SKIP_TEST, "N");
+            cellData.put(FastTestExcelHeaders.SKIP_TEST, automationExcelRowModel.getSkipTest());
             cellData.put(FastTestExcelHeaders.URL_PARAMETER, getUrlParamter(automationExcelRowModel));
             cellData.put(FastTestExcelHeaders.PARAMS, automationExcelRowModel.getParams());
             cellData.put(FastTestExcelHeaders.HEADERS, automationExcelRowModel.getHeaderJson());
             cellData.put(FastTestExcelHeaders.INPUT_JSON, automationExcelRowModel.getInputJson());
+            cellData.put(FastTestExcelHeaders.KEYS_VALIDATION, automationExcelRowModel.getCustomValidations());
             cellData.put(FastTestExcelHeaders.EXPECTED_OUTPUT, automationExcelRowModel.getExpectedOutput());
             cellData.put(FastTestExcelHeaders.EXPECTED_HTTP_STATUS, automationExcelRowModel.getExpectedHttpStatus());
             automationExcelUtility.insertRowData(currentRow, headerIndexes, cellData);

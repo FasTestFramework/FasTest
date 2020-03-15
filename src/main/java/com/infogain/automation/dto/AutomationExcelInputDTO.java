@@ -1,62 +1,52 @@
 package com.infogain.automation.dto;
 
+import java.util.List;
+import java.util.Map;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value="AutomationExcelInputDTO", description = "Request body required to set properties and request the controller of Automation to generate Excels.")
+@ApiModel(value = "AutomationExcelInputDTO",
+                description = "Request body required to set properties and request the controller of Automation to generate Excels.")
 public class AutomationExcelInputDTO {
 
-	@ApiModelProperty(value = "This reflects the value of test case description", required = false,example="Print Receipt with Barcode Symbology ITF and height 1")
-    String testCaseDescription;
-	@ApiModelProperty(value = "whether to skip the test or not", required = false,example="true")
-	boolean skipTest;
-	@ApiModelProperty(value = "required parameters", required = false,example="123e4567-e89b-12d3-a456-556642440000")
-    String params;
-	@ApiModelProperty(value = "Header Json in String", required = false,example="headers/headers.json")
-    String headerJson;
-	@ApiModelProperty(value = "Input Json in String", required = false,example="receiptPrinter/PrintReceiptJSON_BarcodeSymbology_ITF_Height_1.json")
-    String inputJson;
-	@ApiModelProperty(value = "Expected Output", required = false,example="\"{\n" + 
-			"  \"errors\": [\n" + 
-			"    {\n" + 
-			"      \"code\": \"PERIPHERALSERVER.CLAIMID.INVALIDDATAEXCEPTION\",\n" + 
-			"      \"message\": \"'claimId' field has invalid data({0}). Please try again.\"\n" + 
-			"    }\n" + 
-			"  ]\n" + 
-			"}\"")
-    String expectedOutput;
-	@ApiModelProperty(value = "Expected HTTP Status", required = false,example="405")
-    Integer expectedHttpStatus;
-	@ApiModelProperty(value = "URL to hit", required = false,example="http://localhost:8085/peripherals/fedexoffice/v1/claims/")
-    String requestUrl;
-	@ApiModelProperty(value = "Type of request", required = false,example="DELETE")
-    String requestType;
-	@ApiModelProperty(value = "Name of input excel file", required = true,example="file1.xlsx")
-    String inputExcelFileName;
-	@ApiModelProperty(value = "Sheet name of input excel file", required = true,example="sheet1")
-    String inputExcelSheetName;
-	@ApiModelProperty(value = "Folder name for input excel files", required = false,example="Barcode")
-    String inputExcelFolderName;
-
-
-
-    public AutomationExcelInputDTO(String testCaseDescription, boolean skipTest, String params, String headerJson,
-                    String inputJson, String expectedOutput, Integer expectedHttpStatus, String requestUrl,
-                    String requestType, String inputExcelFileName, String inputExcelSheetName,
-                    String inputExcelFolderName) {
-        this.testCaseDescription = testCaseDescription;
-        this.skipTest = skipTest;
-        this.params = params;
-        this.headerJson = headerJson;
-        this.inputJson = inputJson;
-        this.expectedOutput = expectedOutput;
-        this.expectedHttpStatus = expectedHttpStatus;
-        this.requestUrl = requestUrl;
-        this.requestType = requestType;
-        this.inputExcelFileName = inputExcelFileName;
-        this.inputExcelSheetName = inputExcelSheetName;
-        this.inputExcelFolderName = inputExcelFolderName;
-    }
+    @ApiModelProperty(value = "This reflects the value of test case description", required = false,
+                    example = "Print Receipt with Barcode Symbology ITF and height 1")
+    private String testCaseDescription;
+    @ApiModelProperty(value = "whether to skip the test or not", required = false, example = "true")
+    private boolean skipTest;
+    @ApiModelProperty(value = "required parameters", required = false, example = "123e4567-e89b-12d3-a456-556642440000")
+    private String params;
+    @ApiModelProperty(value = "Header Json in String", required = false, example = "headers/headers.json")
+    private String headerJson;
+    @ApiModelProperty(value = "Input Json in String", required = false,
+                    example = "receiptPrinter/PrintReceiptJSON_BarcodeSymbology_ITF_Height_1.json")
+    private String inputJson;
+    @ApiModelProperty(value = "Expected Output", required = false, example = "\"{\n" + "  \"errors\": [\n" + "    {\n"
+                    + "      \"code\": \"PERIPHERALSERVER.CLAIMID.INVALIDDATAEXCEPTION\",\n"
+                    + "      \"message\": \"'claimId' field has invalid data({0}). Please try again.\"\n" + "    }\n"
+                    + "  ]\n" + "}\"")
+    private String expectedOutput;
+    @ApiModelProperty(value = "Expected HTTP Status", required = false, example = "405")
+    private Integer expectedHttpStatus;
+    @ApiModelProperty(value = "URL to hit", required = false,
+                    example = "http://localhost:8085/peripherals/fedexoffice/v1/claims/")
+    private String requestUrl;
+    @ApiModelProperty(value = "custom validations for response", required = false,
+                    example = "{\r\n" + "  \"output.claimId\": [\r\n" + "    \"isNotNull()\",\r\n"
+                                    + "    \"contains(\\\"-\\\")\"\r\n" + "  ],\r\n"
+                                    + "  \"output.receiptElements\": [\r\n" + "    \"isArray()\"\r\n" + "  ],\r\n"
+                                    + "  \"receiptElements[0].image.alignment\": [\r\n" + "    \"notNull()\",\r\n"
+                                    + "    \"isEqualTo(\\\"Left\\\")\"\r\n" + "  ]\r\n" + "}")
+    private Map<String, List<String>> customValidations;
+    @ApiModelProperty(value = "Type of request", required = false, example = "DELETE")
+    private String requestType;
+    @ApiModelProperty(value = "Name of input excel file", required = true, example = "file1.xlsx")
+    private String inputExcelFileName;
+    @ApiModelProperty(value = "Sheet name of input excel file", required = true, example = "sheet1")
+    private String inputExcelSheetName;
+    @ApiModelProperty(value = "Folder name for input excel files", required = false, example = "Barcode")
+    private String inputExcelFolderName;
 
     /**
      * @return the testCaseDescription
@@ -226,26 +216,13 @@ public class AutomationExcelInputDTO {
         this.inputExcelFolderName = inputExcelFolderName;
     }
 
-    public AutomationExcelInputDTO() {
+    public Map<String, List<String>> getCustomValidations() {
+        return customValidations;
     }
 
-    /**
-     * This method
-     * 
-     * @return
-     * @since Mar 5, 2020
-     */
-    @Override
-    public String toString() {
-        return "AutomationExcelInputDTO [testCaseDescription=" + testCaseDescription + ", skipTest=" + skipTest
-                        + ", params=" + params + ", headerJson=" + headerJson + ", inputJson=" + inputJson
-                        + ", expectedOutput=" + expectedOutput + ", expectedHttpStatus=" + expectedHttpStatus
-                        + ", requestUrl=" + requestUrl + ", requestType=" + requestType + ", inputExcelFileName="
-                        + inputExcelFileName + ", inputExcelSheetName=" + inputExcelSheetName
-                        + ", inputExcelFolderName=" + inputExcelFolderName + "]";
+    public void setCustomValidations(Map<String, List<String>> customValidations) {
+        this.customValidations = customValidations;
     }
-
-
 
 }
 
