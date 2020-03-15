@@ -90,12 +90,12 @@ public enum AutomationErrorCodes implements ErrorCodes {
     AUTOMATION_KEY_PATHS_MISSING_DATA_EXCEPTION("AUTOMATION.KEYPATHS.MISSINGEXCEPTION",
                     "'data' field is required. Please try again."),
     AUTOMATION_KEY_PATHS_INVALID_DATA_EXCEPTION("AUTOMATION.KEYPATHS.INVALIDDATAEXCEPTION",
-                    "'data' field has invalid data: '{0}'. Object is not in Json format. Please try again."),
+                    "'data' field has invalid data: '{0}'. Object is not in Json format or Object is Empty. Please try again."),
     
     AUTOMATION_TEST_CUSTOM_VALIDATIONS_MISSING_DATA_EXCEPTION("AUTOMATION.TESTCUSTOMVALIDATIONS.MISSINGEXCEPTION",
                     "'{0}' field is required. Please try again."),
     AUTOMATION_TEST_CUSTOM_VALIDATIONS_INVALID_DATA_EXCEPTION("AUTOMATION.TESTCUSTOMVALIDATIONS.INVALIDDATAEXCEPTION",
-                    "'data' field has invalid data: '{0}'. Object is not in Json format. Please try again.");
+                    "'data' field has invalid data: '{0}'. Object is not in Json format or Object is Empty. Please try again.");
     
     private String message;
     private String code;

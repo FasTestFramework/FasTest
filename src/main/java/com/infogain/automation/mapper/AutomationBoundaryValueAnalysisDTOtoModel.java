@@ -24,7 +24,7 @@ public class AutomationBoundaryValueAnalysisDTOtoModel {
         if (jsonAware == null) {
             throw new FastTestBadRequestException(
                             new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_BVA_INVALID_DATA_EXCEPTION, "data", data,
-                                            "Object is not in Json format."));
+                                            "Object is not in Json format or Object is Empty."));
         }
         return new AutomationBoundaryValueAnalysisModel(jsonAware, automationBoundaryValueAnalysisDTO.getMetaData(),
                         automationBoundaryValueAnalysisDTO.getFolderName(),
