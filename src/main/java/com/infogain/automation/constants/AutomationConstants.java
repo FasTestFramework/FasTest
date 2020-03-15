@@ -28,30 +28,30 @@ public final class AutomationConstants {
     public static final String EXCEL_EXTENSION = ".xlsx";
 
     public static final String FASTEST_SERVER_PORT = "server.port";
-    public static final String APPLICATION_PROPERTIES_SHEET_NAME = "fastest.testClass";
+    public static final String APPLICATION_PROPERTIES_SHEET_NAME = "fastest.test-class";
     public static final String FASTEST_EXCEL_SHEET_NAME = "fastest.excelSheetName";
-    public static final String FASTEST_OUTPUT_FOLDER_PATH = "fastest.outputFolderPath";
-    public static final String FASTEST_INPUT_JSON_FOLDER_PATH = "fastest.inputJsonFolderPath";
-    public static final String FASTEST_INPUT_EXCEL_FOLDER_PATH = "fastest.inputExcelFolderPath";
-    public static final String FASTEST_HOST_NAME = "fastest.HostName";
-    public static final String FASTEST_PORT = "fastest.Port";
+    public static final String FASTEST_OUTPUT_FOLDER_PATH = "fastest.outputfolderpath";
+    public static final String FASTEST_INPUT_JSON_FOLDER_PATH = "fastest.input-json-folder-path";
+    public static final String FASTEST_INPUT_EXCEL_FOLDER_PATH = "fastest.input-excel-folder-path";
+    public static final String FASTEST_HOST_NAME = "fastest.hostname";
+    public static final String FASTEST_PORT = "fastest.port";
     public static final String FASTEST_URL_PREFIX = "fastest.";
 
-    public static final String FASTEST_GENERATE_TOKEN = "fastest.tokenGenerate";
-    public static final String FASTEST_GENERATE_TOKEN_INSTANCE = "fastest.tokenGenerationInstance";
-    public static final String FASTEST_GENERATE_TOKEN_URL = "fastest.tokenGenerateUrl";
-    public static final String FASTEST_GENERATE_TOKEN_BODY_TO_USE = "fastest.tokenGenerateBody";
-    public static final String FASTEST_GENERATE_TOKEN_HEADER_TO_USE = "fastest.tokenGenerateHeaders";
-    public static final String FASTEST_GENERATE_TOKEN_RESPONSE_KEYS_TO_VALIDATE = "fastest.tokenResponseKeysToValidate";
-    public static final String FASTEST_GENERATE_TOKEN_RESPONSE_SUCCESS_STATUS_CODE = "fastest.tokenResponseSuccessStatusCode";
+    public static final String FASTEST_GENERATE_TOKEN = "fastest.tokengenerate";
+    public static final String FASTEST_GENERATE_TOKEN_INSTANCE = "fastest.tokengenerationinstance";
+    public static final String FASTEST_GENERATE_TOKEN_URL = "fastest.token-generate-url";
+    public static final String FASTEST_GENERATE_TOKEN_BODY_TO_USE = "fastest.token-generate-body";
+    public static final String FASTEST_GENERATE_TOKEN_HEADER_TO_USE = "fastest.token-generate-headers";
+    public static final String FASTEST_GENERATE_TOKEN_RESPONSE_KEYS_TO_VALIDATE = "fastest.token-response-keys-tovalidate";
+    public static final String FASTEST_GENERATE_TOKEN_RESPONSE_SUCCESS_STATUS_CODE = "fastest.token-response-success-status-code";
 
-    public static final String FASTEST_RELEASE_TOKEN = "fastest.tokenRelease";
-    public static final String FASTEST_TOKEN_RELEASE_URL = "fastest.tokenReleaseUrl";
-    public static final String FASTEST_RELEASE_TOKEN_BODY_TO_USE = "fastest.tokenReleaseBody";
-    public static final String FASTEST_RELEASE_TOKEN_HEADER_TO_USE = "fastest.tokenReleaseHeaders";
-    public static final String FASTEST_TOKEN_RELEASE_PROPERTY_NAMES = "fastest.tokenReleaseReplaceRequestKeys";
+    public static final String FASTEST_RELEASE_TOKEN = "fastest.token-release";
+    public static final String FASTEST_TOKEN_RELEASE_URL = "fastest.token-release-url";
+    public static final String FASTEST_RELEASE_TOKEN_BODY_TO_USE = "fastest.token-release-body";
+    public static final String FASTEST_RELEASE_TOKEN_HEADER_TO_USE = "fastest.token-release-headers";
+    public static final String FASTEST_TOKEN_RELEASE_PROPERTY_NAMES = "fastest.token-release-replace-request-keys";
 
-    public static final String FASTEST_TOKEN_REPLACE_PROPERTY_NAMES = "fastest.tokenReplaceRequestKeys";
+    public static final String FASTEST_TOKEN_REPLACE_PROPERTY_NAMES = "fastest.token-replace-request-keys";
     public static final String FASTEST_CLAIM_URL = "fastest.claimUrl";
     public static final String FASTEST_RELEASE_URL = "fastest.releaseUrl";
     public static final String FASTEST_SERVER_INFO_URL = "fastest.serverInfoUrl";

@@ -35,12 +35,12 @@ import com.infogain.automation.properties.AutomationProperties;
 @Component
 public class AutomationEmailUtility {
 	private static final Logger logger = LogManager.getLogger(AutomationEmailUtility.class);
-    public static final String EMAIL_FROM = "fastest.emailFrom";
-    public static final String PORT = "fastest.emailport";
-    public static final String EMAIL_HOST = "fastest.emailHost";
-    public static final String EMAIL_TO = "fastest.emailTo";
-    public static final String EMAIL_SUBJECT = "fastest.emailSubject";
-    public static final String MESSAGE_BODY = "fastest.messageBody";
+    public static final String EMAIL_FROM = "fastest.email-from";
+    public static final String PORT = "fastest.email-port";
+    public static final String EMAIL_HOST = "fastest.email-host";
+    public static final String EMAIL_TO = "fastest.email-to";
+    public static final String EMAIL_SUBJECT = "fastest.email-subject";
+    public static final String MESSAGE_BODY = "fastest.email-message-body";
     
     private String emailFrom;
     private int emailPort;

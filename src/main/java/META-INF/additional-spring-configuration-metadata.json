@@ -1,5 +1,252 @@
-{"properties": [{
-  "name": "fastest.tokenReplaceRequestKeys",
-  "type": "java.lang.String",
-  "description": "A description for 'fastest.tokenReplaceRequestKeys'"
-}]}
+{"properties": [
+  {
+    "name": "fastest.git.id",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.git.id'"
+  },
+  {
+    "name": "fastest.git.password",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.git.password'"
+  },
+  {
+    "name": "fastest.port",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.port'"
+  },
+  {
+    "name": "fastest.hostname",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.hostname'"
+  },
+  {
+    "name": "fastest.git.branch",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.git.branch'"
+  },
+  {
+    "name": "fastest.git.clone-url",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.git.clone-url'"
+  },
+  {
+    "name": "fastest.git.project-name",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.git.project-name'"
+  },
+  {
+    "name": "fastest.inputexcelfolderpath",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.inputexcelfolderpath'"
+  },
+  {
+    "name": "fastest.inputjsonfolderpath",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.inputjsonfolderpath'"
+  },
+  {
+    "name": "fastest.outputfolderpath",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.outputfolderpath'"
+  },
+  {
+    "name": "fastest.tokengenerate",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokengenerate'"
+  },
+  {
+    "name": "fastest.tokengenerationinstance",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokengenerationinstance'"
+  },
+  {
+    "name": "fastest.tokengenerateurl",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokengenerateurl'"
+  },
+  {
+    "name": "fastest.tokengeneratebody",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokengeneratebody'"
+  },
+  {
+    "name": "fastest.tokengenerateheaders",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokengenerateheaders'"
+  },
+  {
+    "name": "fastest.tokenresponsesuccessstatuscode",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokenresponsesuccessstatuscode'"
+  },
+  {
+    "name": "fastest.tokenresponsekeystovalidate",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokenresponsekeystovalidate'"
+  },
+  {
+    "name": "fastest.tokenrelease",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.tokenrelease'"
+  },
+  {
+    "name": "fastest.token-generate-url",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-generate-url'"
+  },
+  {
+    "name": "fastest.token-generate-body",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-generate-body'"
+  },
+  {
+    "name": "fastest.token-generate-headers",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-generate-headers'"
+  },
+  {
+    "name": "fastest.token-response-success-status-code",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-response-success-status-code'"
+  },
+  {
+    "name": "fastest.token-response-keys-tovalidate",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-response-keys-tovalidate'"
+  },
+  {
+    "name": "fastest.token-release",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-release'"
+  },
+  {
+    "name": "fastest.token-release-url",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-release-url'"
+  },
+  {
+    "name": "fastest.token-release-body",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-release-body'"
+  },
+  {
+    "name": "fastest.token-release-headers",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-release-headers'"
+  },
+  {
+    "name": "fastest.token-release-replace-request-keys",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-release-replace-request-keys'"
+  },
+  {
+    "name": "fastest.token-replace-request-keys",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.token-replace-request-keys'"
+  },
+  {
+    "name": "fastest.test-class",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.test-class'"
+  },
+  {
+    "name": "fastest.jmeter-home",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-home'"
+  },
+  {
+    "name": "fastest.jmeter-properties-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-properties-path'"
+  },
+  {
+    "name": "fastest.jmeter-report-properties-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-report-properties-path'"
+  },
+  {
+    "name": "fastest.jmeter-html-report-file-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-html-report-file-path'"
+  },
+  {
+    "name": "fastest.jmeter-jmx-file-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-jmx-file-path'"
+  },
+  {
+    "name": "fastest.jmeter-csv-reports-file-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-csv-reports-file-path'"
+  },
+  {
+    "name": "fastest.jmeter-json-reports-file-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-json-reports-file-path'"
+  },
+  {
+    "name": "fastest.jmeter-xml-reports-file-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.jmeter-xml-reports-file-path'"
+  },
+  {
+    "name": "fastest.email-from",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.email-from'"
+  },
+  {
+    "name": "fastest.email-port",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.email-port'"
+  },
+  {
+    "name": "fastest.email-host",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.email-host'"
+  },
+  {
+    "name": "fastest.email-to",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.email-to'"
+  },
+  {
+    "name": "fastest.email-subject",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.email-subject'"
+  },
+  {
+    "name": "fastest.email-message-body",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.email-message-body'"
+  },
+  {
+    "name": "installation-drive",
+    "type": "java.lang.String",
+    "description": "A description for 'installation-drive'"
+  },
+  {
+    "name": "db-host",
+    "type": "java.lang.String",
+    "description": "A description for 'db-host'"
+  },
+  {
+    "name": "db-port",
+    "type": "java.lang.String",
+    "description": "A description for 'db-port'"
+  },
+  {
+    "name": "fastest.input-excel-folder-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.input-excel-folder-path'"
+  },
+  {
+    "name": "fastest.input-json-folder-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.input-json-folder-path'"
+  },
+  {
+    "name": "fastest.input-json-folder-path",
+    "type": "java.lang.String",
+    "description": "A description for 'fastest.input-json-folder-path'"
+  }
+]}
