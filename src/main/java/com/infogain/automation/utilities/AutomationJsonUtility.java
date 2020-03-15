@@ -363,9 +363,15 @@ public class AutomationJsonUtility {
         JSONAware jsonAware = null;
         try {
             if (data instanceof Map) {
-                jsonAware = (JSONAware) new JSONParser().parse(JSONObject.toJSONString(((Map) data)));
+                JSONObject parsedObj = (JSONObject) new JSONParser().parse(JSONObject.toJSONString(((Map) data)));
+                if (!parsedObj.isEmpty()) {
+                    jsonAware = parsedObj;
+                }
             } else if (data instanceof List) {
-                jsonAware = (JSONAware) new JSONParser().parse(JSONArray.toJSONString(((List) data)));
+                JSONArray parsedObj = (JSONArray) new JSONParser().parse(JSONArray.toJSONString(((List) data)));
+                if (!parsedObj.isEmpty()) {
+                    jsonAware = parsedObj;
+                }
             }
         } catch (ParseException e) {
             // No handling is needed

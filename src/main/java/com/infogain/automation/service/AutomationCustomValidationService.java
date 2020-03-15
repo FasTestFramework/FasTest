@@ -2,6 +2,8 @@ package com.infogain.automation.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.simple.JSONAware;
@@ -20,6 +22,10 @@ import com.infogain.automation.mapper.AutomationTestCustomValidationsDTOtoModel;
 import com.infogain.automation.model.AutomationTestCustomValidationsModel;
 import com.infogain.automation.utilities.AutomationCustomValidationUtility;
 import com.infogain.automation.utilities.AutomationJsonUtility;
+import com.infogain.automation.utilities.AutomationValidationUtility;
+import com.infogain.automation.utilities.BeanUtil;
+
+import static com.infogain.automation.utilities.AutomationValidationUtility.FAILURE_COMMENTS_SEPERATOR;
 
 /**
  * Copyright (c) 2019 Infogain. All Rights Reserved.<br>
@@ -34,10 +40,8 @@ import com.infogain.automation.utilities.AutomationJsonUtility;
  */
 @Service
 public class AutomationCustomValidationService {
-    private static final String FAILURE_COMMENTS_SEPERATOR = "----------------------------------------\n";
 
     private final AutomationJsonUtility automationJsonUtility;
-    private StringBuilder comments;
 
     @Autowired
     public AutomationCustomValidationService(final AutomationJsonUtility automationJsonUtility) {
@@ -48,23 +52,35 @@ public class AutomationCustomValidationService {
                     AutomationTestCustomValidationsDTO automationTestCustomValidationsDTO) {
         AutomationTestCustomValidationsModel automationTestCustomValidationsModel =
                         AutomationTestCustomValidationsDTOtoModel.convert(automationTestCustomValidationsDTO);
-        comments = new StringBuilder();
-        automationTestCustomValidationsModel.getCustomValidations().forEach((keyPath, listOfMethods) -> {
-            doCustomValidations(automationJsonUtility.getObjectUsingJsonPath(
-                            automationTestCustomValidationsModel.getData(), keyPath), keyPath, listOfMethods);
+        StringBuilder comments = new StringBuilder();
+        boolean isSuccess = false;
+        JSONAware jsonData = automationTestCustomValidationsModel.getData();
+        Map<String, List<String>> customValidations = automationTestCustomValidationsModel.getCustomValidations();
+        Set<String> allKeyPaths = automationJsonUtility.fetchAllKeyPaths(jsonData, true);
+        customValidations.keySet().removeIf(keyPath -> {
+            boolean keyPathNotExist = !allKeyPaths.contains(keyPath);
+            if (keyPathNotExist) {
+                addComment(keyPath, "Invalid Key Path.", comments);
+            }
+            return keyPathNotExist;
         });
-        return new AutomationTestCustomValidationsResponseDTO(comments.length() == 0, comments.toString().replace("\n", "<br>"));
-    }
-
-    private void doCustomValidations(Object object, String keyPath, List<String> customValidations) {
         try {
-            new AutomationCustomValidationUtility().validate(object, object, customValidations);
+            new AutomationValidationUtility(BeanUtil.getBean(AutomationJsonUtility.class)).performValidations(jsonData,
+                            customValidations);
         } catch (CustomValidationFailure e) {
-            addComment(keyPath, e.getMessage());
+            if (comments.length() != 0) {
+                comments.append(FAILURE_COMMENTS_SEPERATOR);
+            }
+            comments.append(e.getMessage());
         }
+        if (comments.length() == 0) {
+            comments.append("Validations Pass!");
+            isSuccess = true;
+        }
+        return new AutomationTestCustomValidationsResponseDTO(isSuccess, comments.toString().replace("\n", "<br>"));
     }
 
-    private void addComment(String keyPath, String message) {
+    private void addComment(String keyPath, String message, StringBuilder comments) {
         if (comments.length() != 0) {
             comments.append(FAILURE_COMMENTS_SEPERATOR);
         }

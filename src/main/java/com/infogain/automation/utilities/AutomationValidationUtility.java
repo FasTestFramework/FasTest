@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
 public class AutomationValidationUtility {
-    private static final String FAILURE_COMMENTS_SEPERATOR = "----------------------------------------\n";
+    public static final String FAILURE_COMMENTS_SEPERATOR = "----------------------------------------\n";
     private final Logger logger = LogManager.getLogger(AutomationValidationUtility.class);
     private Map<String, List<String>> customKeysValidation;
     private StringBuilder comments;
@@ -130,7 +131,7 @@ public class AutomationValidationUtility {
         inputMap.put("output", Arrays.asList("containsKeys(\"receiptElements\",\"claimId\")"));
         inputMap.put("output.receiptElements", Arrays.asList("ignore()"));
         inputMap.put("output.receiptElements[2].barcode", Arrays.asList("sdfhghdfg()"));
-System.out.println(new JSONObject().toJSONString(inputMap));
+        System.out.println(new JSONObject().toJSONString(inputMap));
         AutomationValidationUtility automationValidationUtility =
                         new AutomationValidationUtility(new AutomationJsonUtility(new AutomationUtility()));
         automationValidationUtility.customKeysValidation = inputMap;
@@ -201,6 +202,16 @@ System.out.println(new JSONObject().toJSONString(inputMap));
         }
         logger.traceExit();
     }
+
+    public void performValidations(JSONAware jsonBody, Map<String, List<String>> customValidations) throws CustomValidationFailure {
+        comments = new StringBuilder();
+        customKeysValidation = customValidations;
+        compareJSONs(jsonBody, jsonBody);
+        if (comments.length() != 0) {
+            throw new CustomValidationFailure(comments.toString());
+        }
+    }
+
 
     public void compareJSONs(Object jsonObjectExpectedOutput, Object jsonObjectActualOutput) {
         objectValidate("", jsonObjectExpectedOutput, jsonObjectActualOutput, new StringBuilder());
