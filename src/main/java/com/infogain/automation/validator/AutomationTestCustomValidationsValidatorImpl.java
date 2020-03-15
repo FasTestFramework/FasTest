@@ -39,7 +39,7 @@ public class AutomationTestCustomValidationsValidatorImpl implements
             Map<String, List<String>> metaDataList = value.getCustomValidations();
             if (metaDataList == null || metaDataList.isEmpty()) {
                 errorCodes.add(new ErrorCodesDTO(AutomationErrorCodes.AUTOMATION_TEST_CUSTOM_VALIDATIONS_MISSING_DATA_EXCEPTION,
-                                "metaData"));
+                                "customValidations"));
             }
             if (!errorCodes.isEmpty()) {
                 throw new FastTestBadRequestException(errorCodes);
