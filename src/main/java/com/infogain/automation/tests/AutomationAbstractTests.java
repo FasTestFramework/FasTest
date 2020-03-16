@@ -211,14 +211,16 @@ public abstract class AutomationAbstractTests {
             String inputJson = automationInputDTO.getInputJson();
             String headerJson = automationInputDTO.getHeaderJson();
             if (StringUtils.isNotBlank(inputJson)) {
-                inputJson = inputJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + inputJson
-                                : inputJson;
+                if (inputJson.toLowerCase().endsWith(".json") && !inputJson.startsWith(inputjsonFolderPath)) {
+                    inputJson = inputjsonFolderPath + "/" + inputJson;
+                }
                 automationInputDTO.setTestCaseInputJson(automationJsonUtility.fetchJSONObject(inputJson, true));
             }
             // sets Header Object in AutomationInputDTO
             if (StringUtils.isNotBlank(headerJson)) {
-                headerJson = headerJson.toLowerCase().endsWith(".json") ? inputjsonFolderPath + "/" + headerJson
-                                : headerJson;
+                if (headerJson.toLowerCase().endsWith(".json") && !headerJson.startsWith(inputjsonFolderPath)) {
+                    headerJson = inputjsonFolderPath + "/" + headerJson;
+                }
                 Headers fetchHeaders = automationHeadersUtility.fetchHeaders(headerJson);
                 automationInputDTO.setHeaders(fetchHeaders);
             }
