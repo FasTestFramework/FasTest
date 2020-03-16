@@ -49,7 +49,7 @@ public class AutomationHeadersUtility {
         if (StringUtils.isEmpty(fileNameorHeadersJson)) {
             return new Headers();
         } else {
-            return fetchHeaders(automationJsonUtility.fetchJSONArray(fileNameorHeadersJson));
+            return fetchHeaders(automationJsonUtility.fetchJSONArray(fileNameorHeadersJson, true));
         }
     }
 

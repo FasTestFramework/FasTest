@@ -56,7 +56,7 @@ public class AutomationCustomAssertions {
     public void isArray() {
         if (!(actualObj instanceof JSONArray)) {
             StringBuilder sb = new StringBuilder();
-            sb.append("Expecting to be Array but was");
+            sb.append("Expecting to be Array but was ");
             sb.append(getNameOfClass(actualObj));
             sb.append(".");
             throw new AssertionError(sb.toString());
@@ -66,7 +66,7 @@ public class AutomationCustomAssertions {
     public void isObject() {
         if (!(actualObj instanceof JSONObject)) {
             StringBuilder sb = new StringBuilder();
-            sb.append("Expecting to be Object but was");
+            sb.append("Expecting to be Object but was ");
             sb.append(getNameOfClass(actualObj));
             sb.append(".");
             throw new AssertionError(sb.toString());

@@ -4,11 +4,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,61 +23,80 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AutomationCustomValidationUtility {
     private static final Logger logger = LogManager.getLogger(AutomationCustomValidationUtility.class);
 
-    private StringBuilder errorMessage = new StringBuilder();
-    private StringBuilder successMessage = new StringBuilder();
+    private StringBuilder errorMessage;
+    private StringBuilder successMessage;
     private Object actualObj;
     private Object expectedObj;
 
     public static void main(String[] args) {
+        String expectedXml =
+                        "<rings>\n" +
+                            "  <bearer>\n" +
+                            "    <name>Frodo</name>\n" +
+                            "    <ring>\n" +
+                            "      <name>one ring</name>\n" +
+                            "      <createdBy>Sauron</createdBy>\n" +
+                            "    </ring>\n" +
+                            "  </bearer>\n" +
+                            "</rings>";
 
-        // to be removed
-        Map<Object, String> inputMap = new LinkedHashMap<>();
-        // inputMap.put(null, "notNull();isNotNull();containsOnlyDigits()");
-        inputMap.put("myName",
-                        "contains(\"Name\",\"my22\");matches(\".*\");isEqualTo(\"aa\");startsWith(\"my\");asdgdf();hasSizeBetween(10,12);matches(234);isSubstringOf(\"hellomyName is Namit\")");
-        // inputMap.put("myName", "hasSizeBetween(10,12)");
-        // inputMap.put(true, "isNotEqualTo(\"false\");isNotNull()");
-        // inputMap.put(12, "isGreaterThan(13);isLessThan(13)");
-        // inputMap.put(12.55, "isEqualTo(12.5)");
-        // inputMap.put(new SendMailRequestDTO(), "hasFieldOrProperty(\"base64String\")");
-        AutomationCustomValidationUtility testObject = new AutomationCustomValidationUtility();
-        inputMap.forEach((k, v) -> {
-            try {
-                testObject.validate(k, k, v);
-                System.out.println("Success");
-            } catch (CustomValidationFailure cvf) {
-                System.out.print(cvf.getMessage());
-            }
-            System.out.println("------------------------------");
-        });
+                    // No matter how your xml string is formated, isXmlEqualTo is able to compare it's content with another xml String.
+                    String oneLineXml = "<rings><bearer><name>Frodo</name><ring><name>one ring</name><createdBy>Sauron</createdBy></ring></bearer></rings>";
+                    //assertThat(oneLineXml).isXmlEqualTo(expectedXml);
 
+                    String xmlWithNewLine =
+                                    "<rings>\n\n" +
+                                                    "  <bearer>\n" +
+                                                    "    <name>Frodo</name>\n" +
+                                                    "    <ring>\n" +
+                                                    "      <name>one ring</name>\n" +
+                                                    "      <createdBy>Sauron</createdBy>\n" +
+                                                    "    </ring>\n" +
+                                                    "  </bearer>\n" +
+                                                    "</rings>";
+                    assertThat(xmlWithNewLine).isXmlEqualTo(expectedXml);
 
-        //
-        // Map<String, String> inputMap = new LinkedHashMap<>();
-        // inputMap.put("output.claim", "1");
-        // inputMap.put("output.claim[x].idle", "2");
-        // inputMap.put("output.claim[1].saap", "3");
-        // inputMap.put("output.claim[1].needle[1]", "4");
-        // inputMap.put("output.claim[5].needle.money[x]", "5");
-        // inputMap.put("output.claim[x].needle[9]", "6");
-        // inputMap.put("output.claim[x].needle[x]", "7");
-        // String tocheck = "output.claim[5].needle.money[0]";
+                    // You can compare it with oneLineXml
+                    assertThat(xmlWithNewLine).isXmlEqualTo(oneLineXml);
 
+//        // to be removed
+//        Map<Object, List<String>> inputMap = new LinkedHashMap<>();
+//        // inputMap.put(null, "notNull();isNotNull();containsOnlyDigits()");
+//        inputMap.put("myName",
+//                        Arrays.asList("contains(\"Name\",\"my22\")", "matches(\".*\")", "isEqualTo(\"aa\")", "startsWith(\"my\")", "asdgdf()", "hasSizeBetween(10,12)", "matches(234)", "isSubstringOf(\"hellomyName is Namit\")"));
+//        // inputMap.put("myName", "hasSizeBetween(10,12)");
+//        // inputMap.put(true, "isNotEqualTo(\"false\");isNotNull()");
+//        // inputMap.put(12, "isGreaterThan(13);isLessThan(13)");
+//        // inputMap.put(12.55, "isEqualTo(12.5)");
+//        // inputMap.put(new SendMailRequestDTO(), "hasFieldOrProperty(\"base64String\")");
+//        AutomationCustomValidationUtility testObject = new AutomationCustomValidationUtility();
+//        inputMap.forEach((k, v) -> {
+//            try {
+//                testObject.validate(k, k, v);
+//                System.out.println("Success");
+//            } catch (CustomValidationFailure cvf) {
+//                System.out.print(cvf.getMessage());
+//            }
+//            System.out.println("------------------------------");
+//        });
     }
 
-    public void validate(Object actualObj, Object expectedObj, String methodsToExecute) throws CustomValidationFailure {
+    public void validate(Object actualObj, Object expectedObj, List<String> methodsToExecute) throws CustomValidationFailure {
         logger.info("\nValidating value: {} against custom validations: {}", String.valueOf(actualObj),
                         methodsToExecute);
         this.actualObj = actualObj;
         this.expectedObj = expectedObj;
-
+        errorMessage = new StringBuilder();
+        successMessage = new StringBuilder();
         Object assertObject = checkTestClass(actualObj);
         Class<?> assertClass = assertObject.getClass();
-        List<String> methodNamesWithParam = seperateMethodParams(methodsToExecute);
-        for (String methodNameWithParam : methodNamesWithParam) {
+        for (String methodNameWithParam : methodsToExecute) {
+            if (!validateMethodSyntax(methodNameWithParam)) {
+                continue;
+            }
             String methodName = null;
             String paramString = null;
-            Matcher matcher2 = Pattern.compile("(.*?)\\((.*)\\)").matcher(methodNameWithParam);
+            Matcher matcher2 = Pattern.compile("^(.*?)\\((.*)\\)$").matcher(methodNameWithParam);
             while (matcher2.find()) {
                 methodName = matcher2.group(1);
                 paramString = matcher2.group(2);
@@ -98,13 +114,19 @@ public class AutomationCustomValidationUtility {
         if (errorMessage.length() != 0) {
             String errorMsg = successMessage.append("\n").append(errorMessage).toString();
             errorMsg = errorMsg.substring(0, errorMsg.length() - 1);
-            errorMessage = new StringBuilder();
-            successMessage = new StringBuilder();
             throw new CustomValidationFailure(errorMsg);
-        } else {
-            errorMessage = new StringBuilder();
-            successMessage = new StringBuilder();
         }
+    }
+
+    private boolean validateMethodSyntax(String methodNameWithParam) {
+        String paramRegex = "(true|false|\\d+(\\.[\\d]*)?|\\\".*?\\\")";
+        String commaSeperatedParamRegex = BeanUtil.getBean(AutomationUtility.class).fetchCommaSeperatedValueRegex(paramRegex);
+        String methodRegex = "^(.*?)\\(("+commaSeperatedParamRegex+ ")?\\)$";
+        boolean matches = methodNameWithParam.matches(methodRegex);
+        if(!matches) {
+            errorMessage.append(methodNameWithParam).append(" : Invalid method Syntax\n\n");
+        }
+        return matches;
     }
 
     @SuppressWarnings("unchecked")
@@ -159,7 +181,7 @@ public class AutomationCustomValidationUtility {
             } else if (Pattern.compile("^\\d+$").matcher(tempString).matches()) {
                 paramsObject[x] = Integer.parseInt(tempString);
                 paramClasses[x] = Integer.class;
-            } else if (Pattern.compile("^\\d+(.[\\d]*)?$").matcher(tempString).matches()) {
+            } else if (Pattern.compile("^\\d+(\\.[\\d]*)?$").matcher(tempString).matches()) {
                 paramsObject[x] = Double.parseDouble(tempString);
                 paramClasses[x] = Double.class;
             } else {
@@ -241,21 +263,6 @@ public class AutomationCustomValidationUtility {
         errorMessage.append(assertionErrorMessage).append("\n\n");
     }
 
-    private List<String> seperateMethodParams(String methodsToExecute) {
-        Matcher matcher = Pattern.compile("(?:.*?\\(.*?\\);)*?.*?\\(.*?\\)").matcher(methodsToExecute);
-        List<String> methodNamesWithParam = new ArrayList<>();
-        while (matcher.find()) {
-            for (int j = 0; j <= matcher.groupCount(); j++) {
-                String temp = matcher.group(j);
-                if (temp.charAt(0) == ';') {
-                    temp = temp.substring(1);
-                }
-                methodNamesWithParam.add(temp);
-            }
-        }
-        return methodNamesWithParam;
-    }
-
     private boolean isMethodFound(Object[] paramsObject, Class<?>[] paramClasses, Method methodFetched) {
         Class<?>[] parameters = methodFetched.getParameterTypes();
         if (parameters.length == 0) {
@@ -284,7 +291,7 @@ public class AutomationCustomValidationUtility {
                         && !(expectedClass.isPrimitive() && getWrapperClass(expectedClass).equals(actualClass));
     }
 
-    private static Class<?> getWrapperClass(Class<?> primitiveClass) {
+    private Class<?> getWrapperClass(Class<?> primitiveClass) {
         return Array.get(Array.newInstance(primitiveClass, 1), 0).getClass();
     }
 
@@ -300,7 +307,7 @@ public class AutomationCustomValidationUtility {
         paramsObject[k] = paramArray;
     }
 
-    private static <T> T safeCastTo(Object obj, Class<T> to) {
+    private <T> T safeCastTo(Object obj, Class<T> to) {
         if (obj != null) {
             Class<?> c = obj.getClass();
             if (to.isAssignableFrom(c)) {

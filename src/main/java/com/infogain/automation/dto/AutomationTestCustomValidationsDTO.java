@@ -1,17 +1,17 @@
 package com.infogain.automation.dto;
 
 import java.util.List;
-
-import org.json.simple.JSONObject;
+import java.util.Map;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import com.infogain.automation.validator.AutomationBVAValidator;
-@AutomationBVAValidator
-@ApiModel(value = "AutomationBoundaryValueAnalysisDTO",
-                description = "Request body for Automation boundary value JSONs creation")
-public class AutomationBoundaryValueAnalysisDTO {
+import com.infogain.automation.validator.AutomationTestCustomValidationsValidator;
+
+@AutomationTestCustomValidationsValidator
+@ApiModel(value = "AutomationTestCustomValidationsDTO",
+                description = "Request body for testing custom validations against provided json Data.")
+public class AutomationTestCustomValidationsDTO {
 
     @ApiModelProperty(value = "The JSON data", required = true,
                     example = "{\r\n" + "  \"claimId\": \"123e4567-e89b-12d3-a456-556642440000\",\r\n"
@@ -28,21 +28,15 @@ public class AutomationBoundaryValueAnalysisDTO {
                                     + "      }\r\n" + "    }\r\n" + "  ]\r\n" + "}")
     private Object data;
 
-    private List<AutomationBVAMetadataDTO> metaData;
-    @ApiModelProperty(value = "folder name", required = true, example = "folder")
-    private String folderName;
-    @ApiModelProperty(value = "file name", required = true, example = "file.json")
-    private String fileName;
-
-    public AutomationBoundaryValueAnalysisDTO(JSONObject data, List<AutomationBVAMetadataDTO> metaData,
-                    String folderName, String fileName) {
-        this.data = data;
-        this.metaData = metaData;
-        this.folderName = folderName;
-        this.fileName = fileName;
-    }
-
-    public AutomationBoundaryValueAnalysisDTO() {}
+    @ApiModelProperty(
+                    value = "map of custom validations where key is the key path, and value is the validations where validations are need to be applied",
+                    required = true,
+                    example = "{\r\n" + "  \"claimId\": [\r\n" + "    \"isNotNull()\",\r\n"
+                                    + "    \"contains(\\\"-\\\")\"\r\n" + "  ],\r\n"
+                                    + "  \"receiptElements\": [\r\n" + "    \"isArray()\"\r\n" + "  ],\r\n"
+                                    + "  \"receiptElements[0].image.alignment\": [\r\n" + "    \"notNull()\",\r\n"
+                                    + "    \"isEqualTo(\\\"Left\\\")\"\r\n" + "  ]\r\n" + "}")
+    private Map<String, List<String>> customValidations;
 
     public Object getData() {
         return data;
@@ -52,36 +46,17 @@ public class AutomationBoundaryValueAnalysisDTO {
         this.data = data;
     }
 
-    public List<AutomationBVAMetadataDTO> getMetaData() {
-        return metaData;
+    public Map<String, List<String>> getCustomValidations() {
+        return customValidations;
     }
 
-    public void setMetaData(List<AutomationBVAMetadataDTO> metaData) {
-        this.metaData = metaData;
-    }
-
-    public String getFolderName() {
-        return folderName;
-    }
-
-    public void setFolderName(String folderName) {
-        this.folderName = folderName;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setCustomValidations(Map<String, List<String>> customValidations) {
+        this.customValidations = customValidations;
     }
 
     @Override
     public String toString() {
-        return "AutomationBoundaryValueAnalysisDTO [data=" + data + ", metaData=" + metaData + ", folderName="
-                        + folderName + ", fileName=" + fileName + "]";
+        return "AutomationTestCustomValidationsDTO [data=" + data + ", customValidations=" + customValidations + "]";
     }
-
-
 
 }

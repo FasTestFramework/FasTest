@@ -9,11 +9,11 @@ public class AutomationApplicationRestartService {
 
     @Autowired
     private RestartEndpoint restartEndpoint;
-     
+
     public void restartApp() {
         restartEndpoint.restart();
     }
-    
-    }
+
+}
 
 
