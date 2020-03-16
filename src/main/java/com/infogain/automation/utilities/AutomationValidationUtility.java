@@ -203,7 +203,8 @@ public class AutomationValidationUtility {
         logger.traceExit();
     }
 
-    public void performValidations(JSONAware jsonBody, Map<String, List<String>> customValidations) throws CustomValidationFailure {
+    public void performValidations(JSONAware jsonBody, Map<String, List<String>> customValidations)
+                    throws CustomValidationFailure {
         comments = new StringBuilder();
         customKeysValidation = customValidations;
         compareJSONs(jsonBody, jsonBody);
@@ -233,7 +234,7 @@ public class AutomationValidationUtility {
         logger.traceEntry("objectValidate method of AutomationValidationUtility class");
         String keyPath = currentKeyPath.toString();
         List<String> customValidations = getCustomValidationsByKey(keyPath);
-        boolean customValidationsFound = customValidations != null;
+        boolean customValidationsFound = customValidations != null && !customValidations.isEmpty();
         if (customValidationsFound) {
             doCustomValidations(objectExpected, objectActual, keyPath, customValidations);
         }
@@ -414,7 +415,7 @@ public class AutomationValidationUtility {
                 return customKeysValidation.get(keyPath);
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private Set<String> extractArrayGenericKeyPaths(String currentKeyPath) {

@@ -76,5 +76,8 @@ public final class AutomationConstants {
     public static final String ALPHANUMERIC_REGEX = "[a-zA-Z0-9]";
     public static final String ANY_CHAR_REGEX = ".";
     public static final String SPECIAL_CHARACTERS_REGEX = "[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E]";
+    public static final String STRING_REGEX = "\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"";
+    public static final String DIGIT_REGEX = "\\d+(?:\\.[\\d]*)?";
+    public static  String PARAM_REGEX = "(true|false|" + DIGIT_REGEX + "|" + STRING_REGEX + ")";
 
 }
