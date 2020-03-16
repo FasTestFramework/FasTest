@@ -169,12 +169,12 @@ public class AutomationExcelUtility {
     }
 
     private Map<String, List<String>> extractingCustomKeyValidations(String keyValdiationsString) {
-        Map<String, List<String>> keyValidationMap = new HashMap<>();
+        Map<String, List<String>> keyValidationMap = null;
         if (StringUtils.isNotBlank(keyValdiationsString)) {
             keyValidationMap = automationJsonUtility.fetchObject(keyValdiationsString,
                             new TypeReference<LinkedHashMap<String, List<String>>>() {});
         }
-        return keyValidationMap;
+        return keyValidationMap == null ? new HashMap<>() : keyValidationMap;
     }
 
     /**
