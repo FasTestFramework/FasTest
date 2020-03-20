@@ -78,8 +78,10 @@ public class AutomationUiRequestService {
         AutomationInputDTO automationInputDTO = new AutomationInputDTO();
         automationInputDTO.setTestCaseInputJson(bodyJson);
         automationInputDTO.setHeaders(headers);
-        automationClaimsUtility.updateToken(automationInputDTO);
-
+        if (automationProperties.getPropertyAsString(AutomationConstants.FASTEST_GENERATE_TOKEN)
+                        .equalsIgnoreCase("true")) {
+            automationClaimsUtility.updateToken(automationInputDTO);
+        }
         Response resp;
         if (automationInputDTO.getTestCaseInputJson() != null) {
             resp = automationEndpointHitUtility.hitEndpoint(baseClaimUrl, automationUiRequestDTO.getRequestURL(),

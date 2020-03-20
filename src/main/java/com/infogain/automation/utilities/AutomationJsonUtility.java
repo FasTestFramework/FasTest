@@ -56,7 +56,7 @@ public class AutomationJsonUtility {
     public String beautifyJson(Object object) {
         String jsonString;
         try {
-            Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().setPrettyPrinting().create();
             jsonString = gson.toJson(object);
         } catch (Exception e) {
             jsonString = object.toString();
