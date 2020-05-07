@@ -62,704 +62,722 @@ import com.infogain.automation.properties.AutomationProperties;
 @Component
 public class AutomationExcelUtility {
 
-    private static final String FASTEST_TEMPORARY_SHEET_NAME = "FastestemporarySheetName";
+	private static final String FASTEST_TEMPORARY_SHEET_NAME = "FastestemporarySheetName";
 
-    private static final int HEADER_ROW_HEIGHT = 950;
-    private static final Logger logger = LogManager.getLogger(AutomationExcelUtility.class);
-    protected AutomationProperties automationProperties;
-    private final AutomationUtility automationUtility;
-    private final AutomationJsonUtility automationJsonUtility;
-    private final List<FastTestExcelHeaders> headersList = Arrays.asList(FastTestExcelHeaders.values());
+	private static final int HEADER_ROW_HEIGHT = 950;
+	private static final Logger logger = LogManager.getLogger(AutomationExcelUtility.class);
+	protected AutomationProperties automationProperties;
+	private final AutomationUtility automationUtility;
+	private final AutomationJsonUtility automationJsonUtility;
+	private final List<FastTestExcelHeaders> headersList = Arrays.asList(FastTestExcelHeaders.values());
 
-    @Autowired
-    public AutomationExcelUtility(final AutomationProperties automationProperties,
-                    final AutomationUtility automationUtility, final AutomationJsonUtility automationJsonUtility) {
-        this.automationProperties = automationProperties;
-        this.automationUtility = automationUtility;
-        this.automationJsonUtility = automationJsonUtility;
-    }
+	@Autowired
+	public AutomationExcelUtility(final AutomationProperties automationProperties,
+			final AutomationUtility automationUtility, final AutomationJsonUtility automationJsonUtility) {
+		this.automationProperties = automationProperties;
+		this.automationUtility = automationUtility;
+		this.automationJsonUtility = automationJsonUtility;
+	}
 
+	public XSSFWorkbook readExcelFile(String filePath) {
+		XSSFWorkbook workbookInput;
+		ZipSecureFile.setMinInflateRatio(0);
+		try (FileInputStream fis = new FileInputStream(filePath)) {
+			workbookInput = new XSSFWorkbook(fis);
+		} catch (POIXMLException | IOException e) {
+			logger.debug("Exception Occured While Reading Excel {} ", ExceptionUtils.getStackTrace(e));
+			throw new AutomationException("Exception Occured While Reading Excel", e);
+		}
+		return workbookInput;
+	}
 
-    public XSSFWorkbook readExcelFile(String filePath) {
-        XSSFWorkbook workbookInput;
-        ZipSecureFile.setMinInflateRatio(0);
-        try (FileInputStream fis = new FileInputStream(filePath)) {
-            workbookInput = new XSSFWorkbook(fis);
-        } catch (POIXMLException | IOException e) {
-            logger.debug("Exception Occured While Reading Excel {} ", ExceptionUtils.getStackTrace(e));
-            throw new AutomationException("Exception Occured While Reading Excel", e);
-        }
-        return workbookInput;
-    }
+	public XSSFWorkbook createExcelFile() {
+		try {
+			return new XSSFWorkbook();
+		} catch (POIXMLException e) {
+			logger.debug("Exception Occured While creating new existing Excel {} ", ExceptionUtils.getStackTrace(e));
+			throw new AutomationException("Exception Occured While creating Excel File.", e);
+		}
+	}
 
+	/**
+	 * This method read Data from Input Excel File and set it to Automation Input
+	 * DTO List of {@link AutomationInputDTO}
+	 * 
+	 * @param excelSheetName Input Excel File Name
+	 * @param sheetName      Excel Sheet Name
+	 * @throws AutomationException in Writing Data to Excel File
+	 * @return object of list {@link AutomationInputDTO}
+	 */
+	public List<AutomationInputDTO> readInputExcelFile(XSSFWorkbook workbookInput, String fileName, String sheetName) {
+		logger.traceEntry("readInputExcelFile method of AutomationExcelUtility class");
+		String requestUrl;
+		String requestType;
+		ArrayList<AutomationInputDTO> jsonFileList = new ArrayList<>();
+		XSSFSheet sheet = workbookInput.getSheet(sheetName);
+		if (sheet != null) {
+			Iterator<Row> row = sheet.iterator();
+			Row headerRow = row.next();
+			Map<FastTestExcelHeaders, Integer> headerIndexes = getHeaderIndexes(headerRow);
+			while (row.hasNext()) {
+				Row currentRow = row.next();
+				if (!checkIfRowIsEmpty(currentRow)
+						&& !fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.SKIP_TEST).equals("Y")) {
+					String serialNumber = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.SERIAL_NO);
+					String testCaseDescription = fetchCellValue(headerIndexes, currentRow,
+							FastTestExcelHeaders.TEST_CASE_DESCRIPTION);
+					String endpoint = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.URL_PARAMETER);
+					Integer expectedHttpStatus = automationUtility.extractIntegerOfString(
+							fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.EXPECTED_HTTP_STATUS));
+					int currentRowNum = currentRow.getRowNum() + 1;
+					if (StringUtils.isBlank(serialNumber)) {
+						throw new AutomationException(
+								"'" + FastTestExcelHeaders.SERIAL_NO.getName() + "' in Row: " + currentRowNum
+										+ " of Excel Sheet '" + sheetName + "' in file '" + fileName + "' is missing.");
+					}
+					if (StringUtils.isBlank(testCaseDescription)) {
+						throw new AutomationException("'" + FastTestExcelHeaders.TEST_CASE_DESCRIPTION.getName()
+								+ "' in Row: " + currentRowNum + " of Excel Sheet '" + sheetName + "' in file '"
+								+ fileName + "' is missing.");
+					}
+					if (StringUtils.isBlank(endpoint)) {
+						throw new AutomationException(
+								"'" + FastTestExcelHeaders.URL_PARAMETER.getName() + "' in Row: " + currentRowNum
+										+ " of Excel Sheet '" + sheetName + "' in file '" + fileName + "' is missing.");
+					}
+					if (null == expectedHttpStatus) {
+						throw new AutomationException("'" + FastTestExcelHeaders.EXPECTED_HTTP_STATUS.getName()
+								+ "' in Row: " + currentRowNum + " of Excel Sheet '" + sheetName + "' in file '"
+								+ fileName + "' has invalid input.");
+					}
+					Map<String, List<String>> keyValidationMap = extractingCustomKeyValidations(
+							fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.KEYS_VALIDATION));
+					String headerJson = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.HEADERS);
+					String inputJson = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.INPUT_JSON);
+					String expectedOutput = fetchCellValue(headerIndexes, currentRow,
+							FastTestExcelHeaders.EXPECTED_OUTPUT);
+					String inputParam = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.PARAMS);
+					if (!endpoint.contains("|")) {
+						endpoint = automationProperties
+								.getPropertyAsString(AutomationConstants.FASTEST_URL_PREFIX + endpoint);
+					}
+					if (endpoint == null || !endpoint.contains("\\|")) {
+						throw new AutomationException("'" + FastTestExcelHeaders.URL_PARAMETER.getName() + "' in Row: "
+								+ currentRowNum + " of Excel Sheet '" + sheetName + "' in file '" + fileName
+								+ "' has invalid input.");
+					}
+					String[] printJsonReceiptUrlArray = endpoint.split("\\|");
+					// Splitting the Request URl and Request Type which are defined in properties
+					// file
+					requestUrl = printJsonReceiptUrlArray[0];
+					requestType = printJsonReceiptUrlArray[1];
+					AutomationInputDTO automationInput = new AutomationInputDTO(serialNumber, testCaseDescription,
+							headerJson, inputJson, inputParam, expectedOutput, expectedHttpStatus, requestUrl,
+							automationUtility.getRequestMethodType(requestType), keyValidationMap);
+					jsonFileList.add(automationInput);
+				}
+			}
+		}
+		if (jsonFileList.isEmpty()) {
+			throw new AutomationException("Excel Sheet " + sheetName + " in file " + fileName
+					+ " is not found or is not having any valid row data");
+		}
+		return jsonFileList;
+	}
 
-    public XSSFWorkbook createExcelFile() {
-        try {
-            return new XSSFWorkbook();
-        } catch (POIXMLException e) {
-            logger.debug("Exception Occured While creating new existing Excel {} ", ExceptionUtils.getStackTrace(e));
-            throw new AutomationException("Exception Occured While creating Excel File.", e);
-        }
-    }
+	private Map<String, List<String>> extractingCustomKeyValidations(String keyValdiationsString) {
+		Map<String, List<String>> keyValidationMap = null;
+		if (StringUtils.isNotBlank(keyValdiationsString)) {
+			keyValidationMap = automationJsonUtility.fetchObject(keyValdiationsString,
+					new TypeReference<LinkedHashMap<String, List<String>>>() {
+					});
+		}
+		return keyValidationMap == null ? new HashMap<>() : keyValidationMap;
+	}
 
-    /**
-     * This method read Data from Input Excel File and set it to Automation Input DTO List of {@link AutomationInputDTO}
-     * 
-     * @param excelSheetName Input Excel File Name
-     * @param sheetName Excel Sheet Name
-     * @throws AutomationException in Writing Data to Excel File
-     * @return object of list {@link AutomationInputDTO}
-     */
-    public List<AutomationInputDTO> readInputExcelFile(XSSFWorkbook workbookInput, String fileName, String sheetName) {
-        logger.traceEntry("readInputExcelFile method of AutomationExcelUtility class");
-        String requestUrl;
-        String requestType;
-        ArrayList<AutomationInputDTO> jsonFileList = new ArrayList<>();
-        XSSFSheet sheet = workbookInput.getSheet(sheetName);
-        if (sheet != null) {
-            Iterator<Row> row = sheet.iterator();
-            Row headerRow = row.next();
-            Map<FastTestExcelHeaders, Integer> headerIndexes = getHeaderIndexes(headerRow);
-            while (row.hasNext()) {
-                Row currentRow = row.next();
-                if (!checkIfRowIsEmpty(currentRow)
-                                && !fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.SKIP_TEST)
-                                                .equals("Y")) {
-                    String serialNumber = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.SERIAL_NO);
-                    String testCaseDescription = fetchCellValue(headerIndexes, currentRow,
-                                    FastTestExcelHeaders.TEST_CASE_DESCRIPTION);
-                    String endpoint = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.URL_PARAMETER);
-                    Integer expectedHttpStatus = automationUtility.extractIntegerOfString(fetchCellValue(headerIndexes,
-                                    currentRow, FastTestExcelHeaders.EXPECTED_HTTP_STATUS));
-                    if (StringUtils.isNotBlank(serialNumber) && StringUtils.isNotBlank(testCaseDescription)
-                                    && StringUtils.isNotBlank(endpoint) && expectedHttpStatus != null) {
-                        Map<String, List<String>> keyValidationMap =
-                                        extractingCustomKeyValidations(fetchCellValue(headerIndexes, currentRow,
-                                                        FastTestExcelHeaders.KEYS_VALIDATION));
-                        String headerJson = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.HEADERS);
-                        String inputJson = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.INPUT_JSON);
-                        String expectedOutput =
-                                        fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.EXPECTED_OUTPUT);
-                        String inputParam = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.PARAMS);
-                        if (!endpoint.contains("|")) {
-                            endpoint = automationProperties
-                                            .getPropertyAsString(AutomationConstants.FASTEST_URL_PREFIX + endpoint);
-                        }
-                        String[] printJsonReceiptUrlArray = endpoint.split("\\|");
-                        // Splitting the Request URl and Request Type which are defined in properties file
-                        requestUrl = printJsonReceiptUrlArray[0];
-                        requestType = printJsonReceiptUrlArray[1];
-                        AutomationInputDTO automationInput = new AutomationInputDTO(serialNumber, testCaseDescription,
-                                        headerJson, inputJson, inputParam, expectedOutput, expectedHttpStatus,
-                                        requestUrl, automationUtility.getRequestMethodType(requestType),
-                                        keyValidationMap);
-                        jsonFileList.add(automationInput);
-                    } else {
-                        throw new AutomationException("Excel Sheet " + sheetName + " in file " + fileName
-                                        + " has some missing or invalid inputs");
-                    }
-                }
-            }
-        }
-        if (jsonFileList.isEmpty()) {
-            throw new AutomationException("Excel Sheet " + sheetName + " in file " + fileName
-                            + " is not found or is not having any valid row data");
-        }
-        return jsonFileList;
-    }
+	/**
+	 * This method writes Data to Excel Output File
+	 * 
+	 * @param outputExcelSheetName Output Excel Sheet Name
+	 * @since Nov 27, 2019
+	 */
+	public void generateExcel(XSSFWorkbook workbook, String outputExcelSheetName, List<String> excelSheetNames) {
+		logger.traceEntry("saveDataToExcel method of AutomationExcelUtility class");
+		removeOtherSheets(workbook, excelSheetNames);
+		String folderPathOfExcel = StringUtils.substringBeforeLast(outputExcelSheetName, "/");
+		if (!folderPathOfExcel.equals(outputExcelSheetName)) {
+			try {
+				Files.createDirectories(Paths.get(folderPathOfExcel));
+			} catch (IOException e) {
+				throw new AutomationException("Unable to create directory " + folderPathOfExcel, e);
+			}
+		}
+		saveDataToExcel(outputExcelSheetName, workbook);
+		logger.traceExit();
+	}
 
-    private Map<String, List<String>> extractingCustomKeyValidations(String keyValdiationsString) {
-        Map<String, List<String>> keyValidationMap = null;
-        if (StringUtils.isNotBlank(keyValdiationsString)) {
-            keyValidationMap = automationJsonUtility.fetchObject(keyValdiationsString,
-                            new TypeReference<LinkedHashMap<String, List<String>>>() {});
-        }
-        return keyValidationMap == null ? new HashMap<>() : keyValidationMap;
-    }
+	public void saveDataToExcel(String outputExcelFilePath, XSSFWorkbook workbookInput) {
+		logger.traceEntry("saveDataToExcel method of AutomationExcelUtility class");
+		// for (int i = 0; i < workbookInput.getNumberOfSheets(); i++) {
+		// workbookInput.getSheetAt(i).createFreezePane(0, 1);
+		// }
+		try (FileOutputStream fos = new FileOutputStream(outputExcelFilePath)) {
+			workbookInput.write(fos);
+		} catch (POIXMLException | IOException e) {
+			logger.debug("Exception Occured While Writing Excel  as the file is OPEN{} ",
+					ExceptionUtils.getStackTrace(e));
+			throw new AutomationException("Exception Occured While Writing Excel", e);
+		} finally {
+			closeExcel(workbookInput);
+		}
+		logger.traceExit();
+	}
 
-    /**
-     * This method writes Data to Excel Output File
-     * 
-     * @param outputExcelSheetName Output Excel Sheet Name
-     * @since Nov 27, 2019
-     */
-    public void generateExcel(XSSFWorkbook workbook, String outputExcelSheetName, List<String> excelSheetNames) {
-        logger.traceEntry("saveDataToExcel method of AutomationExcelUtility class");
-        removeOtherSheets(workbook, excelSheetNames);
-        String folderPathOfExcel = StringUtils.substringBeforeLast(outputExcelSheetName, "/");
-        if (!folderPathOfExcel.equals(outputExcelSheetName)) {
-            try {
-                Files.createDirectories(Paths.get(folderPathOfExcel));
-            } catch (IOException e) {
-                throw new AutomationException("Unable to create directory " + folderPathOfExcel, e);
-            }
-        }
-        saveDataToExcel(outputExcelSheetName, workbook);
-        logger.traceExit();
-    }
+	public void closeExcel(XSSFWorkbook workbookInput) {
+		if (workbookInput != null) {
+			try {
+				workbookInput.close();
+			} catch (IOException e) {
+				logger.error("Exception Occured While Closing Excel", e);
+			}
+		}
+	}
 
-    public void saveDataToExcel(String outputExcelFilePath, XSSFWorkbook workbookInput) {
-        logger.traceEntry("saveDataToExcel method of AutomationExcelUtility class");
-        // for (int i = 0; i < workbookInput.getNumberOfSheets(); i++) {
-        // workbookInput.getSheetAt(i).createFreezePane(0, 1);
-        // }
-        try (FileOutputStream fos = new FileOutputStream(outputExcelFilePath)) {
-            workbookInput.write(fos);
-        } catch (POIXMLException | IOException e) {
-            logger.debug("Exception Occured While Writing Excel  as the file is OPEN{} ",
-                            ExceptionUtils.getStackTrace(e));
-            throw new AutomationException("Exception Occured While Writing Excel", e);
-        } finally {
-            closeExcel(workbookInput);
-        }
-        logger.traceExit();
-    }
+	public void insertRowData(Row row, Map<FastTestExcelHeaders, Integer> headerIndexes,
+			Map<FastTestExcelHeaders, Object> cellData) {
+		Sheet sheet = row.getSheet();
+		Workbook workbook = sheet.getWorkbook();
+		cellData.forEach((columnName, data) -> {
+			Cell cell = createCell(row, headerIndexes.get(columnName));
+			CellStyle defaultCellStyle = workbook.createCellStyle();
+			switch (columnName) {
+			case TEST_CASE_DESCRIPTION:
+			case SKIP_TEST:
+			case URL_PARAMETER:
+			case PARAMS:
+			case KEYS_VALIDATION:
+			case FAILURES:
+			case COMMENTS:
+				setStyle(cell, defaultCellStyle);
+				if (data != null) {
+					cell.setCellValue((String) data);
+				}
+				break;
+			case HEADERS:
+			case INPUT_JSON:
+			case EXPECTED_OUTPUT:
+			case ACTUAL_OUTPUT:
+				setStyle(cell, defaultCellStyle);
+				if (data != null) {
+					cell.setCellValue(automationJsonUtility.beautifyJson((String) data));
+				}
+				break;
+			case SERIAL_NO:
+			case EXPECTED_HTTP_STATUS:
+			case ACTUAL_HTTP_STATUS:
+				setStyle(cell, defaultCellStyle);
+				if (data != null) {
+					cell.setCellValue((Integer) data);
+				}
+				break;
+			case TEST_CASE_RESULT:
+				String value = (String) data;
+				if (data != null) {
+					IndexedColors bgColor = value.equalsIgnoreCase(AutomationConstants.TEST_CASE_RESULT_PASS)
+							? IndexedColors.BRIGHT_GREEN
+							: IndexedColors.RED;
+					setStyle(cell, getCellStyleForBGColorWithBold(workbook, bgColor));
+					cell.setCellValue(value);
+				} else {
+					setStyle(cell, defaultCellStyle);
+				}
+				break;
+			case EXECUTION_DATE_TIME:
+				LocalDateTime dateTime = (LocalDateTime) data;
+				setStyle(cell, getCellStyleForDate(workbook));
+				if (data != null) {
+					cell.setCellValue(dateTime);
+				}
+				break;
+			case RUNTIME:
+				Double time = (Double) data;
+				setStyle(cell, defaultCellStyle);
+				if (data != null) {
+					cell.setCellValue(time);
+				}
+				break;
+			default:
+			}
+		});
+		setColumnWidthInSheet(sheet, headerIndexes);
+	}
 
+	private void setColumnWidthInSheet(Sheet sheet, Map<FastTestExcelHeaders, Integer> headerIndexes) {
+		for (Entry<FastTestExcelHeaders, Integer> headerEntry : headerIndexes.entrySet()) {
+			sheet.setColumnWidth(headerEntry.getValue(), headerEntry.getKey().getWidth());
+		}
+	}
 
-    public void closeExcel(XSSFWorkbook workbookInput) {
-        if (workbookInput != null) {
-            try {
-                workbookInput.close();
-            } catch (IOException e) {
-                logger.error("Exception Occured While Closing Excel", e);
-            }
-        }
-    }
+	/**
+	 * This method writes Data from {@link AutomationInputDTO} to new Excel File
+	 * 
+	 * @param inputExcelSheetName    Input Excel Sheet Name
+	 * @param sheetName              Excel Sheets Name
+	 * @param automationInputDTOList list of {@link AutomationInputDTO}
+	 * @since Nov 27, 2019
+	 */
+	public void writeOutputExcelFile(XSSFWorkbook workbook, String sheetName,
+			List<AutomationInputDTO> automationInputDTOList) {
+		logger.traceEntry("writeOutputExcelFile method of AutomationExcelUtility class");
+		XSSFSheet sheet = workbook.getSheet(sheetName);
+		if (sheet != null) {
+			ArrayList<Integer> rowToBeRemovedIndex = new ArrayList<>();
+			Iterator<Row> row = sheet.iterator();
+			Row firstRow = row.next();
+			Map<FastTestExcelHeaders, Integer> headerIndexes = reArrangeHeaders(firstRow);
+			int j = 0;
+			Map<FastTestExcelHeaders, Object> cellData = new EnumMap<>(FastTestExcelHeaders.class);
+			List<FastTestExcelHeaders> columnsToDelete = new ArrayList<>();
+			columnsToDelete.add(FastTestExcelHeaders.FAILURES);
+			columnsToDelete.add(FastTestExcelHeaders.KEYS_VALIDATION);
+			columnsToDelete.add(FastTestExcelHeaders.PARAMS);
+			columnsToDelete.add(FastTestExcelHeaders.COMMENTS);
+			columnsToDelete.add(FastTestExcelHeaders.INPUT_JSON);
 
-    public void insertRowData(Row row, Map<FastTestExcelHeaders, Integer> headerIndexes,
-                    Map<FastTestExcelHeaders, Object> cellData) {
-        Sheet sheet = row.getSheet();
-        Workbook workbook = sheet.getWorkbook();
-        cellData.forEach((columnName, data) -> {
-            Cell cell = createCell(row, headerIndexes.get(columnName));
-            CellStyle defaultCellStyle = workbook.createCellStyle();
-            switch (columnName) {
-                case TEST_CASE_DESCRIPTION:
-                case SKIP_TEST:
-                case URL_PARAMETER:
-                case PARAMS:
-                case KEYS_VALIDATION:
-                case FAILURES:
-                case COMMENTS:
-                    setStyle(cell, defaultCellStyle);
-                    if (data != null) {
-                        cell.setCellValue((String) data);
-                    }
-                    break;
-                case HEADERS:
-                case INPUT_JSON:
-                case EXPECTED_OUTPUT:
-                case ACTUAL_OUTPUT:
-                    setStyle(cell, defaultCellStyle);
-                    if (data != null) {
-                        cell.setCellValue(automationJsonUtility.beautifyJson((String) data));
-                    }
-                    break;
-                case SERIAL_NO:
-                case EXPECTED_HTTP_STATUS:
-                case ACTUAL_HTTP_STATUS:
-                    setStyle(cell, defaultCellStyle);
-                    if (data != null) {
-                        cell.setCellValue((Integer) data);
-                    }
-                    break;
-                case TEST_CASE_RESULT:
-                    String value = (String) data;
-                    if (data != null) {
-                        IndexedColors bgColor = value.equalsIgnoreCase(AutomationConstants.TEST_CASE_RESULT_PASS)
-                                        ? IndexedColors.BRIGHT_GREEN
-                                        : IndexedColors.RED;
-                        setStyle(cell, getCellStyleForBGColorWithBold(workbook, bgColor));
-                        cell.setCellValue(value);
-                    } else {
-                        setStyle(cell, defaultCellStyle);
-                    }
-                    break;
-                case EXECUTION_DATE_TIME:
-                    LocalDateTime dateTime = (LocalDateTime) data;
-                    setStyle(cell, getCellStyleForDate(workbook));
-                    if (data != null) {
-                        cell.setCellValue(dateTime);
-                    }
-                    break;
-                case RUNTIME:
-                    Double time = (Double) data;
-                    setStyle(cell, defaultCellStyle);
-                    if (data != null) {
-                        cell.setCellValue(time);
-                    }
-                    break;
-                default:
-            }
-        });
-        setColumnWidthInSheet(sheet, headerIndexes);
-    }
+			while (row.hasNext()) {
+				if (automationInputDTOList.size() > j) {
+					AutomationInputDTO automationInputDTO = automationInputDTOList.get(j);
+					// Iterating Row
+					Row currentRow = row.next();
+					String serialNumber = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.SERIAL_NO);
+					if (serialNumber.equals(automationInputDTO.getSerialNo())) {
+						cellData.clear();
+						cellData.put(FastTestExcelHeaders.ACTUAL_OUTPUT, automationInputDTO.getActualOutput());
+						cellData.put(FastTestExcelHeaders.ACTUAL_HTTP_STATUS, automationInputDTO.getActualHttpStatus());
+						cellData.put(FastTestExcelHeaders.TEST_CASE_RESULT, automationInputDTO.getTestCaseResult());
+						cellData.put(FastTestExcelHeaders.EXECUTION_DATE_TIME, LocalDateTime.now());
+						cellData.put(FastTestExcelHeaders.RUNTIME, automationInputDTO.getRuntime());
+						cellData.put(FastTestExcelHeaders.FAILURES, automationInputDTO.getFailureComments());
+						cellData.put(FastTestExcelHeaders.URL_PARAMETER,
+								automationInputDTO.getRequestURL() + "|" + automationInputDTO.getRequestType());
 
+						insertRowData(currentRow, headerIndexes, cellData);
+						columnsToDelete.removeIf(
+								header -> !StringUtils.isEmpty(fetchCellValue(headerIndexes, currentRow, header)));
+						j++;
+					} else {
+						rowToBeRemovedIndex.add(currentRow.getRowNum());
+					}
+				} else {
+					Row currentRow = row.next();
+					rowToBeRemovedIndex.add(currentRow.getRowNum());
+				}
+			}
+			columnsToDelete.add(FastTestExcelHeaders.SKIP_TEST);
 
-    private void setColumnWidthInSheet(Sheet sheet, Map<FastTestExcelHeaders, Integer> headerIndexes) {
-        for (Entry<FastTestExcelHeaders, Integer> headerEntry : headerIndexes.entrySet()) {
-            sheet.setColumnWidth(headerEntry.getValue(), headerEntry.getKey().getWidth());
-        }
-    }
+			removeRowsInSheet(sheet, rowToBeRemovedIndex);
+			deleteColumnsInSheet(firstRow, columnsToDelete);
+		}
+		logger.traceExit();
+	}
 
-    /**
-     * This method writes Data from {@link AutomationInputDTO} to new Excel File
-     * 
-     * @param inputExcelSheetName Input Excel Sheet Name
-     * @param sheetName Excel Sheets Name
-     * @param automationInputDTOList list of {@link AutomationInputDTO}
-     * @since Nov 27, 2019
-     */
-    public void writeOutputExcelFile(XSSFWorkbook workbook, String sheetName,
-                    List<AutomationInputDTO> automationInputDTOList) {
-        logger.traceEntry("writeOutputExcelFile method of AutomationExcelUtility class");
-        XSSFSheet sheet = workbook.getSheet(sheetName);
-        if (sheet != null) {
-            ArrayList<Integer> rowToBeRemovedIndex = new ArrayList<>();
-            Iterator<Row> row = sheet.iterator();
-            Row firstRow = row.next();
-            Map<FastTestExcelHeaders, Integer> headerIndexes = reArrangeHeaders(firstRow);
-            int j = 0;
-            Map<FastTestExcelHeaders, Object> cellData = new EnumMap<>(FastTestExcelHeaders.class);
-            List<FastTestExcelHeaders> columnsToDelete = new ArrayList<>();
-            columnsToDelete.add(FastTestExcelHeaders.FAILURES);
-            columnsToDelete.add(FastTestExcelHeaders.KEYS_VALIDATION);
-            columnsToDelete.add(FastTestExcelHeaders.PARAMS);
-            columnsToDelete.add(FastTestExcelHeaders.COMMENTS);
-            columnsToDelete.add(FastTestExcelHeaders.INPUT_JSON);
+	private void removeRowsInSheet(XSSFSheet sheet, ArrayList<Integer> rowToBeRemovedIndex) {
+		for (ListIterator<Integer> iterator = rowToBeRemovedIndex.listIterator(rowToBeRemovedIndex.size()); iterator
+				.hasPrevious();) {
+			removeRow(sheet, iterator.previous());
+		}
+	}
 
-            while (row.hasNext() && automationInputDTOList.size() > j) {
-                AutomationInputDTO automationInputDTO = automationInputDTOList.get(j);
-                // Iterating Row
-                Row currentRow = row.next();
-                String serialNumber = fetchCellValue(headerIndexes, currentRow, FastTestExcelHeaders.SERIAL_NO);
-                if (serialNumber.equals(automationInputDTO.getSerialNo())) {
-                    cellData.clear();
-                    cellData.put(FastTestExcelHeaders.ACTUAL_OUTPUT, automationInputDTO.getActualOutput());
-                    cellData.put(FastTestExcelHeaders.ACTUAL_HTTP_STATUS, automationInputDTO.getActualHttpStatus());
-                    cellData.put(FastTestExcelHeaders.TEST_CASE_RESULT, automationInputDTO.getTestCaseResult());
-                    cellData.put(FastTestExcelHeaders.EXECUTION_DATE_TIME, LocalDateTime.now());
-                    cellData.put(FastTestExcelHeaders.RUNTIME, automationInputDTO.getRuntime());
-                    cellData.put(FastTestExcelHeaders.FAILURES, automationInputDTO.getFailureComments());
-                    cellData.put(FastTestExcelHeaders.URL_PARAMETER,
-                                    automationInputDTO.getRequestURL() + "|" + automationInputDTO.getRequestType());
+	public void deleteColumnsInSheet(Row firstRow, List<FastTestExcelHeaders> columnsToDelete) {
+		Sheet sheet = firstRow.getSheet();
+		List<FastTestExcelHeaders> columnsList = Arrays.asList(FastTestExcelHeaders.values());
+		for (ListIterator<FastTestExcelHeaders> iterator = columnsList.listIterator(columnsList.size()); iterator
+				.hasPrevious();) {
+			FastTestExcelHeaders header = iterator.previous();
+			if (columnsToDelete.contains(header)) {
+				removeAndShiftColumn(sheet, getHeaderIndex(firstRow, header));
+			}
+		}
+		setColumnWidthInSheet(sheet, getHeaderIndexes(firstRow));
+	}
 
-                    insertRowData(currentRow, headerIndexes, cellData);
-                    columnsToDelete.removeIf(
-                                    header -> !StringUtils.isEmpty(fetchCellValue(headerIndexes, currentRow, header)));
-                    j++;
-                } else {
-                    rowToBeRemovedIndex.add(currentRow.getRowNum());
-                }
-            }
-            columnsToDelete.add(FastTestExcelHeaders.SKIP_TEST);
+	public void removeCell(Row currentRow, Map<FastTestExcelHeaders, Integer> headerIndexes,
+			FastTestExcelHeaders headerName) {
+		currentRow.removeCell(getCell(currentRow, headerIndexes.get(headerName)));
+	}
 
-            removeRowsInSheet(sheet, rowToBeRemovedIndex);
-            deleteColumnsInSheet(firstRow, columnsToDelete);
-        }
-        logger.traceExit();
-    }
+	public CellStyle getCellStyleForBold(CellStyle cellStyleForHeaderRow, Workbook workbook) {
+		Font boldFont = workbook.createFont();
+		boldFont.setBold(true);
+		cellStyleForHeaderRow.setFont(boldFont);
+		return cellStyleForHeaderRow;
+	}
 
+	public Map<FastTestExcelHeaders, Integer> getHeaderIndexes(Row headerRow) {
+		EnumMap<FastTestExcelHeaders, Integer> headerIndexes = new EnumMap<>(FastTestExcelHeaders.class);
+		Iterator<Cell> cell = headerRow.iterator();
+		int i = 0;
+		while (cell.hasNext()) {
+			FastTestExcelHeaders header = FastTestExcelHeaders.getEnumValueByText(extractValueFromCell(cell.next()));
+			if (header != null) {
+				headerIndexes.put(header, i);
+			}
+			i++;
+		}
+		return headerIndexes;
+	}
 
-    private void removeRowsInSheet(XSSFSheet sheet, ArrayList<Integer> rowToBeRemovedIndex) {
-        for (ListIterator<Integer> iterator = rowToBeRemovedIndex.listIterator(rowToBeRemovedIndex.size()); iterator
-                        .hasPrevious();) {
-            removeRow(sheet, iterator.previous());
-        }
-    }
+	public Integer getHeaderIndex(Row headerRow, FastTestExcelHeaders header) {
+		Integer i = 0;
+		for (Iterator<Cell> cellIterator = headerRow.iterator(); cellIterator.hasNext();) {
+			FastTestExcelHeaders headerFetched = FastTestExcelHeaders
+					.getEnumValueByText(extractValueFromCell(cellIterator.next()));
+			if (headerFetched == header) {
+				return i;
+			}
+			i++;
+		}
+		return null;
+	}
 
+	private String fetchCellValue(Map<FastTestExcelHeaders, Integer> headerIndexes, Row currentRow,
+			FastTestExcelHeaders headers) {
+		String cellValue = "";
+		Integer cellIndex = headerIndexes.get(headers);
+		if (cellIndex != null) {
+			cellValue = extractValueFromCell(currentRow.getCell(cellIndex));
+		}
+		return cellValue;
+	}
 
-    public void deleteColumnsInSheet(Row firstRow, List<FastTestExcelHeaders> columnsToDelete) {
-        Sheet sheet = firstRow.getSheet();
-        List<FastTestExcelHeaders> columnsList = Arrays.asList(FastTestExcelHeaders.values());
-        for (ListIterator<FastTestExcelHeaders> iterator = columnsList.listIterator(columnsList.size()); iterator
-                        .hasPrevious();) {
-            FastTestExcelHeaders header = iterator.previous();
-            if (columnsToDelete.contains(header)) {
-                removeAndShiftColumn(sheet, getHeaderIndex(firstRow, header));
-            }
-        }
-        setColumnWidthInSheet(sheet, getHeaderIndexes(firstRow));
-    }
+	private String extractValueFromCell(Cell cell) {
+		String serialNumber;
+		if (cell == null) {
+			serialNumber = "";
+		} else if (cell.getCellType().equals(CellType.NUMERIC)) {
+			double numericCellValue = cell.getNumericCellValue();
+			serialNumber = String.valueOf(numericCellValue % 1 == 0 ? (int) numericCellValue : numericCellValue);
+		} else {
+			serialNumber = cell.toString();
+		}
+		return serialNumber;
+	}
 
-    public void removeCell(Row currentRow, Map<FastTestExcelHeaders, Integer> headerIndexes,
-                    FastTestExcelHeaders headerName) {
-        currentRow.removeCell(getCell(currentRow, headerIndexes.get(headerName)));
-    }
+	/**
+	 * This method removes extra testInputFiles from Input Excel File which are not
+	 * present in Automation Properties
+	 * 
+	 * @since Nov 27, 2019
+	 */
+	private void removeOtherSheets(XSSFWorkbook workbook, List<String> excelSheetNames) {
+		logger.traceEntry("removeOtherSheets method of AutomationExcelUtility class");
+		int sheetCount = workbook.getNumberOfSheets();
+		for (int i = sheetCount - 1; i >= 0; i--) {
+			boolean isPresent = excelSheetNames.stream().anyMatch(workbook.getSheetName(i)::equals);
+			if (!isPresent) {
+				workbook.removeSheetAt(i);
+			}
+		}
+		logger.traceExit();
+	}
 
-    public CellStyle getCellStyleForBold(CellStyle cellStyleForHeaderRow, Workbook workbook) {
-        Font boldFont = workbook.createFont();
-        boldFont.setBold(true);
-        cellStyleForHeaderRow.setFont(boldFont);
-        return cellStyleForHeaderRow;
-    }
+	private CellStyle getCellStyleForDate(Workbook workbook) {
+		CellStyle cellStyleForDate = workbook.createCellStyle();
+		CreationHelper createHelper = workbook.getCreationHelper();
+		cellStyleForDate.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yyyy h:mm:ss.0"));
+		return cellStyleForDate;
+	}
 
-    public Map<FastTestExcelHeaders, Integer> getHeaderIndexes(Row headerRow) {
-        EnumMap<FastTestExcelHeaders, Integer> headerIndexes = new EnumMap<>(FastTestExcelHeaders.class);
-        Iterator<Cell> cell = headerRow.iterator();
-        int i = 0;
-        while (cell.hasNext()) {
-            FastTestExcelHeaders header = FastTestExcelHeaders.getEnumValueByText(extractValueFromCell(cell.next()));
-            if (header != null) {
-                headerIndexes.put(header, i);
-            }
-            i++;
-        }
-        return headerIndexes;
-    }
+	private CellStyle getCellStyleForBGColorWithBold(Workbook workbook, IndexedColors bgColor) {
+		CellStyle boldWithBgColor = workbook.createCellStyle();
+		boldWithBgColor.setFillForegroundColor(bgColor.getIndex());
+		boldWithBgColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		return getCellStyleForBold(boldWithBgColor, workbook);
+	}
 
-    public Integer getHeaderIndex(Row headerRow, FastTestExcelHeaders header) {
-        Integer i = 0;
-        for (Iterator<Cell> cellIterator = headerRow.iterator(); cellIterator.hasNext();) {
-            FastTestExcelHeaders headerFetched =
-                            FastTestExcelHeaders.getEnumValueByText(extractValueFromCell(cellIterator.next()));
-            if (headerFetched == header) {
-                return i;
-            }
-            i++;
-        }
-        return null;
-    }
+	/**
+	 * This method is to set Border Style in Output Excel File
+	 * 
+	 * @param styleBorder - Style which needs to be apply on Border in Excel File
+	 * @since Nov 27, 2019
+	 */
+	private void setBorders(CellStyle styleBorder, BorderStyle borderStyle) {
+		logger.traceEntry("setBorders method of AutomationExcelUtility class");
+		styleBorder.setBorderBottom(borderStyle);
+		styleBorder.setBorderLeft(borderStyle);
+		styleBorder.setBorderRight(borderStyle);
+		styleBorder.setBorderTop(borderStyle);
+		logger.traceExit();
+	}
 
-    private String fetchCellValue(Map<FastTestExcelHeaders, Integer> headerIndexes, Row currentRow,
-                    FastTestExcelHeaders headers) {
-        String cellValue = "";
-        Integer cellIndex = headerIndexes.get(headers);
-        if (cellIndex != null) {
-            cellValue = extractValueFromCell(currentRow.getCell(cellIndex));
-        }
-        return cellValue;
-    }
+	private Cell setStyle(Cell cell) {
+		return setStyle(cell, cell.getRow().getSheet().getWorkbook().createCellStyle(), BorderStyle.THIN);
+	}
 
+	private Cell setStyle(Cell cell, CellStyle style) {
+		return setStyle(cell, style, BorderStyle.THIN);
+	}
 
+	private Cell setStyle(Cell cell, CellStyle style, BorderStyle borderStyle) {
+		logger.traceEntry("createCell method of AutomationExcelUtility class");
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
+		setBorders(style, borderStyle);
+		style.setWrapText(true);
+		cell.setCellStyle(style);
+		return logger.traceExit(cell);
+	}
 
-    private String extractValueFromCell(Cell cell) {
-        String serialNumber;
-        if (cell == null) {
-            serialNumber = "";
-        } else if (cell.getCellType().equals(CellType.NUMERIC)) {
-            double numericCellValue = cell.getNumericCellValue();
-            serialNumber = String.valueOf(numericCellValue % 1 == 0 ? (int) numericCellValue : numericCellValue);
-        } else {
-            serialNumber = cell.toString();
-        }
-        return serialNumber;
-    }
+	private Cell createCell(Row row, int columnIndex) {
+		Cell cell = getCell(row, columnIndex);
+		if (cell == null) {
+			cell = row.createCell(columnIndex);
+		}
+		return cell;
+	}
 
-    /**
-     * This method removes extra testInputFiles from Input Excel File which are not present in Automation Properties
-     * 
-     * @since Nov 27, 2019
-     */
-    private void removeOtherSheets(XSSFWorkbook workbook, List<String> excelSheetNames) {
-        logger.traceEntry("removeOtherSheets method of AutomationExcelUtility class");
-        int sheetCount = workbook.getNumberOfSheets();
-        for (int i = sheetCount - 1; i >= 0; i--) {
-            boolean isPresent = excelSheetNames.stream().anyMatch(workbook.getSheetName(i)::equals);
-            if (!isPresent) {
-                workbook.removeSheetAt(i);
-            }
-        }
-        logger.traceExit();
-    }
+	private Cell getCell(Row row, int columnIndex) {
+		return row.getCell(columnIndex);
+	}
 
-    private CellStyle getCellStyleForDate(Workbook workbook) {
-        CellStyle cellStyleForDate = workbook.createCellStyle();
-        CreationHelper createHelper = workbook.getCreationHelper();
-        cellStyleForDate.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yyyy h:mm:ss.0"));
-        return cellStyleForDate;
-    }
+	private boolean checkIfRowIsEmpty(Row row) {
+		if (row == null) {
+			return true;
+		}
+		if (row.getLastCellNum() <= 0) {
+			return true;
+		}
+		for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+			Cell cell = row.getCell(cellNum);
+			if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-    private CellStyle getCellStyleForBGColorWithBold(Workbook workbook, IndexedColors bgColor) {
-        CellStyle boldWithBgColor = workbook.createCellStyle();
-        boldWithBgColor.setFillForegroundColor(bgColor.getIndex());
-        boldWithBgColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        return getCellStyleForBold(boldWithBgColor, workbook);
-    }
+	public boolean removeRowIfEmpty(XSSFSheet sheet, int rowIndex) {
+		if (checkIfRowIsEmpty(sheet.getRow(rowIndex))) {
+			removeRow(sheet, rowIndex);
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-    /**
-     * This method is to set Border Style in Output Excel File
-     * 
-     * @param styleBorder - Style which needs to be apply on Border in Excel File
-     * @since Nov 27, 2019
-     */
-    private void setBorders(CellStyle styleBorder, BorderStyle borderStyle) {
-        logger.traceEntry("setBorders method of AutomationExcelUtility class");
-        styleBorder.setBorderBottom(borderStyle);
-        styleBorder.setBorderLeft(borderStyle);
-        styleBorder.setBorderRight(borderStyle);
-        styleBorder.setBorderTop(borderStyle);
-        logger.traceExit();
-    }
+	private void removeRow(XSSFSheet sheet, int rowIndex) {
+		int lastRowNum = sheet.getLastRowNum();
+		if (rowIndex >= 0 && rowIndex < lastRowNum) {
+			sheet.shiftRows(rowIndex + 1, lastRowNum, -1);
+		}
+		if (rowIndex == lastRowNum) {
+			Row removingRow = sheet.getRow(rowIndex);
+			if (removingRow != null) {
+				sheet.removeRow(removingRow);
+			}
+		}
+	}
 
-    private Cell setStyle(Cell cell) {
-        return setStyle(cell, cell.getRow().getSheet().getWorkbook().createCellStyle(), BorderStyle.THIN);
-    }
+	public void removeAndShiftColumn(Sheet sheet, int columnToDelete) {
+		int maxColumn = 0;
+		for (Iterator<Row> rowIterator = sheet.iterator(); rowIterator.hasNext();) {
+			Row row = rowIterator.next();
 
-    private Cell setStyle(Cell cell, CellStyle style) {
-        return setStyle(cell, style, BorderStyle.THIN);
-    }
+			// if no row exists here; then nothing to do; next!
+			if (row == null) {
+				continue;
+			}
 
-    private Cell setStyle(Cell cell, CellStyle style, BorderStyle borderStyle) {
-        logger.traceEntry("createCell method of AutomationExcelUtility class");
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setVerticalAlignment(VerticalAlignment.CENTER);
-        setBorders(style, borderStyle);
-        style.setWrapText(true);
-        cell.setCellStyle(style);
-        return logger.traceExit(cell);
-    }
+			// if the row doesn't have this many columns then we are good; next!
+			int lastColumn = row.getLastCellNum();
+			if (lastColumn > maxColumn) {
+				maxColumn = lastColumn;
+			}
 
-    private Cell createCell(Row row, int columnIndex) {
-        Cell cell = getCell(row, columnIndex);
-        if (cell == null) {
-            cell = row.createCell(columnIndex);
-        }
-        return cell;
-    }
+			if (lastColumn < columnToDelete) {
+				continue;
+			}
 
-    private Cell getCell(Row row, int columnIndex) {
-        return row.getCell(columnIndex);
-    }
+			for (int x = columnToDelete + 1; x < lastColumn + 1; x++) {
+				Cell oldCell = row.getCell(x - 1);
+				if (oldCell != null) {
+					row.removeCell(oldCell);
+				}
+				Cell nextCell = row.getCell(x);
+				if (nextCell != null) {
+					Cell newCell = row.createCell(x - 1, nextCell.getCellType());
+					cloneCell(newCell, nextCell);
+				}
+			}
+		}
+	}
 
-    private boolean checkIfRowIsEmpty(Row row) {
-        if (row == null) {
-            return true;
-        }
-        if (row.getLastCellNum() <= 0) {
-            return true;
-        }
-        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-            Cell cell = row.getCell(cellNum);
-            if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                return false;
-            }
-        }
-        return true;
-    }
+	private void cloneCell(Cell cNew, Cell cOld) {
+		cNew.setCellComment(cOld.getCellComment());
+		cNew.setCellStyle(cOld.getCellStyle());
+		switch (cNew.getCellType()) {
+		case BOOLEAN:
+			cNew.setCellValue(cOld.getBooleanCellValue());
+			break;
 
-    public boolean removeRowIfEmpty(XSSFSheet sheet, int rowIndex) {
-        if (checkIfRowIsEmpty(sheet.getRow(rowIndex))) {
-            removeRow(sheet, rowIndex);
-            return true;
-        } else {
-            return false;
-        }
-    }
+		case NUMERIC:
+			cNew.setCellValue(cOld.getNumericCellValue());
+			break;
 
-    private void removeRow(XSSFSheet sheet, int rowIndex) {
-        int lastRowNum = sheet.getLastRowNum();
-        if (rowIndex >= 0 && rowIndex < lastRowNum) {
-            sheet.shiftRows(rowIndex + 1, lastRowNum, -1);
-        }
-        if (rowIndex == lastRowNum) {
-            Row removingRow = sheet.getRow(rowIndex);
-            if (removingRow != null) {
-                sheet.removeRow(removingRow);
-            }
-        }
-    }
+		case STRING:
+			cNew.setCellValue(cOld.getStringCellValue());
+			break;
 
-    public void removeAndShiftColumn(Sheet sheet, int columnToDelete) {
-        int maxColumn = 0;
-        for (Iterator<Row> rowIterator = sheet.iterator(); rowIterator.hasNext();) {
-            Row row = rowIterator.next();
+		case ERROR:
+			cNew.setCellValue(cOld.getErrorCellValue());
+			break;
 
-            // if no row exists here; then nothing to do; next!
-            if (row == null) {
-                continue;
-            }
+		case FORMULA:
+			cNew.setCellFormula(cOld.getCellFormula());
+			break;
+		default:
+			cNew.setCellValue(cOld.toString());
+			break;
+		}
+	}
 
-            // if the row doesn't have this many columns then we are good; next!
-            int lastColumn = row.getLastCellNum();
-            if (lastColumn > maxColumn) {
-                maxColumn = lastColumn;
-            }
+	public Map<FastTestExcelHeaders, Integer> reArrangeHeaders(Row headerRow) {
+		Map<FastTestExcelHeaders, Integer> headerIndexes = getHeaderIndexes(headerRow);
+		if (!headerIndexes.isEmpty() && headerIndexes.size() != headersList.size()) {
+			reArrange(headerRow.getSheet(), headerIndexes);
+		}
+		generateHeaders(headerRow);
+		return headerIndexes;
+	}
 
-            if (lastColumn < columnToDelete) {
-                continue;
-            }
+	private void reArrange(Sheet mainSheet, Map<FastTestExcelHeaders, Integer> headerIndexes) {
+		// Create New Workbook instance
+		Workbook workbook = mainSheet.getWorkbook();
+		// create temp sheet
+		Sheet tempSheet = workbook.createSheet(FASTEST_TEMPORARY_SHEET_NAME);
+		Row firstRowTempSheet = tempSheet.createRow(0);
+		Row firstRow = mainSheet.getRow(0);
+		int headersSize = headersList.size();
+		int insertionColumnIndex = firstRow.getLastCellNum() >= headersSize ? firstRow.getLastCellNum() : headersSize;
+		int initialMaxColumnIndex = insertionColumnIndex;
+		for (int i = 0; i < headersSize; i++) {
+			FastTestExcelHeaders header = headersList.get(i);
+			String headerValue = extractValueFromCell(firstRow.getCell(i));
+			FastTestExcelHeaders mainHeader = FastTestExcelHeaders.getEnumValueByText(headerValue);
+			if (mainHeader == null) {
+				copyColumnAndDelete(mainSheet, i, tempSheet, insertionColumnIndex);
+				insertionColumnIndex = firstRowTempSheet.getLastCellNum() >= initialMaxColumnIndex
+						? firstRowTempSheet.getLastCellNum()
+						: initialMaxColumnIndex;
+				insertColumn(headerIndexes, tempSheet, header, mainSheet, i);
+			} else if (!header.getName().equals(headerValue)) {
+				int correctIndexOfHeader = headersList.indexOf(mainHeader);
+				copyColumnAndDelete(mainSheet, i, tempSheet, correctIndexOfHeader);
+				insertColumn(headerIndexes, tempSheet, header, mainSheet, i);
+				if (correctIndexOfHeader != headerIndexes.get(mainHeader)) {
+					headerIndexes.remove(mainHeader);
+				}
+			}
+		}
+		for (int j = initialMaxColumnIndex; j < insertionColumnIndex; j++) {
+			copyColumnAndDelete(tempSheet, j, mainSheet, j);
+		}
+		removeSheet(workbook, tempSheet);
+	}
 
-            for (int x = columnToDelete + 1; x < lastColumn + 1; x++) {
-                Cell oldCell = row.getCell(x - 1);
-                if (oldCell != null) {
-                    row.removeCell(oldCell);
-                }
-                Cell nextCell = row.getCell(x);
-                if (nextCell != null) {
-                    Cell newCell = row.createCell(x - 1, nextCell.getCellType());
-                    cloneCell(newCell, nextCell);
-                }
-            }
-        }
-    }
+	public void generateHeaders(Row headerRow) {
+		Sheet sheet = headerRow.getSheet();
+		for (int i = 0; i < headersList.size(); i++) {
+			Cell cell;
+			cell = createCell(headerRow, i);
+			cell.setCellValue(headersList.get(i).getName());
+			setStyle(cell, getCellStyleForBGColorWithBold(sheet.getWorkbook(), IndexedColors.LIGHT_CORNFLOWER_BLUE),
+					BorderStyle.THICK);
+			sheet.setColumnWidth(i, headersList.get(i).getWidth());
+		}
+		headerRow.setHeight((short) HEADER_ROW_HEIGHT);
+	}
 
-    private void cloneCell(Cell cNew, Cell cOld) {
-        cNew.setCellComment(cOld.getCellComment());
-        cNew.setCellStyle(cOld.getCellStyle());
-        switch (cNew.getCellType()) {
-            case BOOLEAN:
-                cNew.setCellValue(cOld.getBooleanCellValue());
-                break;
+	private void insertColumn(Map<FastTestExcelHeaders, Integer> headerIndexes, Sheet tempSheet,
+			FastTestExcelHeaders headerToInsert, Sheet mainSheet, int headerIndexInMainSheet) {
+		Integer headerIndex = headerIndexes.get(headerToInsert);
+		if (headerIndex != null) {
+			copyColumn(mainSheet, headerIndex, mainSheet, headerIndexInMainSheet);
+		} else {
+			Cell cell = tempSheet.getRow(0).getCell(headerIndexInMainSheet);
+			if (cell != null && headerToInsert.getName().equals(cell.toString())) {
+				copyColumnAndDelete(tempSheet, headerIndexInMainSheet, mainSheet, headerIndexInMainSheet);
+			} else {
+				insertEmptyColumnWithHeader(headerToInsert.getName(), mainSheet, headerIndexInMainSheet);
+			}
+		}
+		headerIndexes.put(headerToInsert, headerIndexInMainSheet);
+	}
 
-            case NUMERIC:
-                cNew.setCellValue(cOld.getNumericCellValue());
-                break;
+	private void insertEmptyColumnWithHeader(String headerName, Sheet sheet, int columnIndex) {
+		createCell(sheet.getRow(0), columnIndex).setCellValue(headerName);
+		for (int j = sheet.getFirstRowNum() + 1; j <= sheet.getLastRowNum(); j++) {
+			Row row = sheet.getRow(j);
+			if (row == null) {
+				continue;
+			}
+			setStyle(createCell(row, columnIndex));
+		}
+	}
 
-            case STRING:
-                cNew.setCellValue(cOld.getStringCellValue());
-                break;
+	private void copyColumn(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn, boolean delete) {
+		boolean rowCreated = false;
+		boolean isEmptyColumn = true;
+		for (int j = fromSheet.getFirstRowNum(); j <= fromSheet.getLastRowNum(); j++) {
+			Row row = fromSheet.getRow(j);
+			if (row == null) {
+				continue;
+			}
+			Row mrow = toSheet.getRow(j);
+			if (mrow == null) {
+				mrow = toSheet.createRow(j);
+			}
+			Cell cell = row.getCell(fromColumn);
+			// if cell is null then continue with next cell
+			if (cell != null) {
+				if (StringUtils.isNotBlank(cell.toString())) {
+					isEmptyColumn = false;
+				}
+				rowCreated = true;
+				// Create column in main sheet
+				Cell tempCell = mrow.createCell(toColumn);
+				cloneCell(tempCell, cell);
+				if (delete) {
+					cell.setBlank();
+					setStyle(cell);
+				}
+			}
+		}
+		if (rowCreated && isEmptyColumn) {
+			removeColumn(toSheet, toColumn);
+		}
+	}
 
-            case ERROR:
-                cNew.setCellValue(cOld.getErrorCellValue());
-                break;
+	private void removeColumn(Sheet sheet, int column) {
+		for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
+			Row row = sheet.getRow(i);
+			Cell cell = getCell(row, column);
+			if (cell != null) {
+				row.removeCell(cell);
+			}
+		}
+	}
 
-            case FORMULA:
-                cNew.setCellFormula(cOld.getCellFormula());
-                break;
-            default:
-                cNew.setCellValue(cOld.toString());
-                break;
-        }
-    }
+	private void copyColumnAndDelete(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn) {
+		copyColumn(fromSheet, fromColumn, toSheet, toColumn, true);
+	}
 
-    public Map<FastTestExcelHeaders, Integer> reArrangeHeaders(Row headerRow) {
-        Map<FastTestExcelHeaders, Integer> headerIndexes = getHeaderIndexes(headerRow);
-        if (!headerIndexes.isEmpty() && headerIndexes.size() != headersList.size()) {
-            reArrange(headerRow.getSheet(), headerIndexes);
-        }
-        generateHeaders(headerRow);
-        return headerIndexes;
-    }
+	private void copyColumn(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn) {
+		copyColumn(fromSheet, fromColumn, toSheet, toColumn, false);
+	}
 
-    private void reArrange(Sheet mainSheet, Map<FastTestExcelHeaders, Integer> headerIndexes) {
-        // Create New Workbook instance
-        Workbook workbook = mainSheet.getWorkbook();
-        // create temp sheet
-        Sheet tempSheet = workbook.createSheet(FASTEST_TEMPORARY_SHEET_NAME);
-        Row firstRowTempSheet = tempSheet.createRow(0);
-        Row firstRow = mainSheet.getRow(0);
-        int headersSize = headersList.size();
-        int insertionColumnIndex = firstRow.getLastCellNum() >= headersSize ? firstRow.getLastCellNum() : headersSize;
-        int initialMaxColumnIndex = insertionColumnIndex;
-        for (int i = 0; i < headersSize; i++) {
-            FastTestExcelHeaders header = headersList.get(i);
-            String headerValue = extractValueFromCell(firstRow.getCell(i));
-            FastTestExcelHeaders mainHeader = FastTestExcelHeaders.getEnumValueByText(headerValue);
-            if (mainHeader == null) {
-                copyColumnAndDelete(mainSheet, i, tempSheet, insertionColumnIndex);
-                insertionColumnIndex = firstRowTempSheet.getLastCellNum() >= initialMaxColumnIndex
-                                ? firstRowTempSheet.getLastCellNum()
-                                : initialMaxColumnIndex;
-                insertColumn(headerIndexes, tempSheet, header, mainSheet, i);
-            } else if (!header.getName().equals(headerValue)) {
-                int correctIndexOfHeader = headersList.indexOf(mainHeader);
-                copyColumnAndDelete(mainSheet, i, tempSheet, correctIndexOfHeader);
-                insertColumn(headerIndexes, tempSheet, header, mainSheet, i);
-                if (correctIndexOfHeader != headerIndexes.get(mainHeader)) {
-                    headerIndexes.remove(mainHeader);
-                }
-            }
-        }
-        for (int j = initialMaxColumnIndex; j < insertionColumnIndex; j++) {
-            copyColumnAndDelete(tempSheet, j, mainSheet, j);
-        }
-        removeSheet(workbook, tempSheet);
-    }
-
-    public void generateHeaders(Row headerRow) {
-        Sheet sheet = headerRow.getSheet();
-        for (int i = 0; i < headersList.size(); i++) {
-            Cell cell;
-            cell = createCell(headerRow, i);
-            cell.setCellValue(headersList.get(i).getName());
-            setStyle(cell, getCellStyleForBGColorWithBold(sheet.getWorkbook(), IndexedColors.LIGHT_CORNFLOWER_BLUE),
-                            BorderStyle.THICK);
-            sheet.setColumnWidth(i, headersList.get(i).getWidth());
-        }
-        headerRow.setHeight((short) HEADER_ROW_HEIGHT);
-    }
-
-    private void insertColumn(Map<FastTestExcelHeaders, Integer> headerIndexes, Sheet tempSheet,
-                    FastTestExcelHeaders headerToInsert, Sheet mainSheet, int headerIndexInMainSheet) {
-        Integer headerIndex = headerIndexes.get(headerToInsert);
-        if (headerIndex != null) {
-            copyColumn(mainSheet, headerIndex, mainSheet, headerIndexInMainSheet);
-        } else {
-            Cell cell = tempSheet.getRow(0).getCell(headerIndexInMainSheet);
-            if (cell != null && headerToInsert.getName().equals(cell.toString())) {
-                copyColumnAndDelete(tempSheet, headerIndexInMainSheet, mainSheet, headerIndexInMainSheet);
-            } else {
-                insertEmptyColumnWithHeader(headerToInsert.getName(), mainSheet, headerIndexInMainSheet);
-            }
-        }
-        headerIndexes.put(headerToInsert, headerIndexInMainSheet);
-    }
-
-    private void insertEmptyColumnWithHeader(String headerName, Sheet sheet, int columnIndex) {
-        createCell(sheet.getRow(0), columnIndex).setCellValue(headerName);
-        for (int j = sheet.getFirstRowNum() + 1; j <= sheet.getLastRowNum(); j++) {
-            Row row = sheet.getRow(j);
-            if (row == null) {
-                continue;
-            }
-            setStyle(createCell(row, columnIndex));
-        }
-    }
-
-    private void copyColumn(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn, boolean delete) {
-        boolean rowCreated = false;
-        boolean isEmptyColumn = true;
-        for (int j = fromSheet.getFirstRowNum(); j <= fromSheet.getLastRowNum(); j++) {
-            Row row = fromSheet.getRow(j);
-            if (row == null) {
-                continue;
-            }
-            Row mrow = toSheet.getRow(j);
-            if (mrow == null) {
-                mrow = toSheet.createRow(j);
-            }
-            Cell cell = row.getCell(fromColumn);
-            // if cell is null then continue with next cell
-            if (cell != null) {
-                if (StringUtils.isNotBlank(cell.toString())) {
-                    isEmptyColumn = false;
-                }
-                rowCreated = true;
-                // Create column in main sheet
-                Cell tempCell = mrow.createCell(toColumn);
-                cloneCell(tempCell, cell);
-                if (delete) {
-                    cell.setBlank();
-                    setStyle(cell);
-                }
-            }
-        }
-        if (rowCreated && isEmptyColumn) {
-            removeColumn(toSheet, toColumn);
-        }
-    }
-
-    private void removeColumn(Sheet sheet, int column) {
-        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
-            Row row = sheet.getRow(i);
-            Cell cell = getCell(row, column);
-            if (cell != null) {
-                row.removeCell(cell);
-            }
-        }
-    }
-
-    private void copyColumnAndDelete(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn) {
-        copyColumn(fromSheet, fromColumn, toSheet, toColumn, true);
-    }
-
-    private void copyColumn(Sheet fromSheet, int fromColumn, Sheet toSheet, int toColumn) {
-        copyColumn(fromSheet, fromColumn, toSheet, toColumn, false);
-    }
-
-    public void removeSheet(Workbook workbook, Sheet outSheet) {
-        workbook.removeSheetAt(workbook.getSheetIndex(outSheet));
-    }
+	public void removeSheet(Workbook workbook, Sheet outSheet) {
+		workbook.removeSheetAt(workbook.getSheetIndex(outSheet));
+	}
 
 }

@@ -59,6 +59,8 @@ public final class AutomationConstants {
     public static final String FASTEST_CONNECTED_DEVICE_URL = "fastest.serverConnectedDeviceUrl";
     public static final String FASTEST_PRINT_BIN_LABEL_URL = "fastest.printDymoLabelUrl";
     public static final String FASTEST_SCAN_BARCODE_URL = "fastest.scanBarcodeUrl";
+    public static final String FASTEST_SCALE_CONFIG_URL = "fastest.scaleConfigUrl";
+    public static final String FASTEST_CASHDRAWER_STATUS_URL = "fastest.cashDrawerStatusUrl";
     public static final String FASTEST_OPEN_CASHDRAWER_URL = "fastest.openCashDrawerUrl";
     public static final String FASTEST_PRINT_SHIPPING_LABEL_URL = "fastest.printZebraLabelUrl";
     public static final String FASTEST_SUBSCRIPTIONS = "fastest.subscribeToautomationServer";
