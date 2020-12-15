@@ -153,7 +153,7 @@
 		<poi-ooxml-version>4.1.1</poi-ooxml-version>
 		<json-simple-version>1.1.1</json-simple-version>
 		<commons-lang3-version>3.9</commons-lang3-version>
-		<log4j-version>2.12.1</log4j-version>
+		<log4j-version>2.13.3</log4j-version>
 		<mssql-jdbc-version>6.1.0.jre8</mssql-jdbc-version>
 		<maven-jar-plugin-version>3.1.0</maven-jar-plugin-version>
 		<reflow-velocity-tools-version>1.3.3</reflow-velocity-tools-version>
