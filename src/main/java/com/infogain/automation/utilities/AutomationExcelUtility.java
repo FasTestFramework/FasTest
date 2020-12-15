@@ -161,7 +161,7 @@ public class AutomationExcelUtility {
 						endpoint = automationProperties
 								.getPropertyAsString(AutomationConstants.FASTEST_URL_PREFIX + endpoint);
 					}
-					if (endpoint == null || !endpoint.contains("\\|")) {
+					if (endpoint == null || !endpoint.contains("|")) {
 						throw new AutomationException("'" + FastTestExcelHeaders.URL_PARAMETER.getName() + "' in Row: "
 								+ currentRowNum + " of Excel Sheet '" + sheetName + "' in file '" + fileName
 								+ "' has invalid input.");
